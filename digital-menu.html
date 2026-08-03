@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="night">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Menu Board</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Cinzel:wght@400;600;700;900&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ══════════════════════════════════════════════════════════════
+   THEME TOKENS — two skins: "night" (mandir gold) & "day" (sandal)
+   ══════════════════════════════════════════════════════════════ */
+:root[data-theme="night"] {
+  --bg0:#12060f; --bg1:#2a0b1c; --bg2:#3d1024;
+  --glow: rgba(255,153,51,.22);
+  --glow2: rgba(120,20,70,.30);
+  --gold:#f0c46a; --gold2:#d9a03f; --gold-dim: rgba(240,196,106,.34);
+  --ink:#fbf3e4; --ink2:#f2dcb6; --ink3: rgba(251,243,228,.55);
+  --card: linear-gradient(180deg, rgba(255,255,255,.085), rgba(255,255,255,.028));
+  --card-brd: rgba(240,196,106,.30);
+  --row-alt: rgba(255,255,255,.038);
+  --row-line: rgba(240,196,106,.13);
+  --shadow: 0 12px 34px rgba(0,0,0,.48);
+  --orn: rgba(240,196,106,.22);
+  --chip-bg: rgba(255,255,255,.06);
+}
+:root[data-theme="day"] {
+  --bg0:#fbf3df; --bg1:#f1e2c0; --bg2:#e5d0a4;
+  --glow: rgba(255,153,51,.30);
+  --glow2: rgba(180,90,40,.16);
+  --gold:#8a5c0e; --gold2:#b8862a; --gold-dim: rgba(138,92,14,.34);
+  --ink:#2b1607; --ink2:#5d3812; --ink3: rgba(43,22,7,.55);
+  --card: linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,252,244,.80));
+  --card-brd: rgba(138,92,14,.30);
+  --row-alt: rgba(93,56,18,.055);
+  --row-line: rgba(93,56,18,.13);
+  --shadow: 0 8px 24px rgba(93,56,18,.20);
+  --orn: rgba(138,92,14,.20);
+  --chip-bg: rgba(255,255,255,.75);
+}
+
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg1);
+  color: var(--ink);
+}
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(1200px 620px at 50% -12%, var(--glow), transparent 62%),
+    radial-gradient(900px 520px at 8% 112%, var(--glow2), transparent 60%),
+    radial-gradient(900px 520px at 92% 112%, var(--glow2), transparent 60%),
+    linear-gradient(158deg, var(--bg0), var(--bg1) 48%, var(--bg2));
+}
+
+/* ── LOADING ───────────────────────────────────────────────── */
+#loading {
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+  background: linear-gradient(158deg, var(--bg0), var(--bg1) 48%, var(--bg2));
+  color: var(--ink);
+}
+.lotus { width: 54px; height: 54px; animation: spin 3.4s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.load-title { font-family: 'Cinzel', serif; font-size: 1.15rem; font-weight: 700; letter-spacing: .22em; color: var(--gold); }
+.load-sub { font-size: .68rem; letter-spacing: .16em; color: var(--ink3); text-transform: uppercase; }
+#load-err {
+  display: none; margin-top: 10px; max-width: 440px; text-align: center;
+  background: rgba(160,40,40,.14); border: 1px solid rgba(220,90,90,.35);
+  border-radius: 10px; padding: 15px 24px; color: #ffb3b3; font-size: .76rem; line-height: 1.85;
+}
+#load-err strong { display: block; margin-bottom: 5px; color: #ff9a9a; }
+
+/* ── BOARD SHELL ───────────────────────────────────────────── */
+#board {
+  display: none; flex-direction: column;
+  height: 100vh; width: 100vw; overflow: hidden;
+  position: relative; z-index: 1;
+}
+
+/* Corner mandalas + peacock ornaments */
+.orn { position: absolute; pointer-events: none; z-index: 0; color: var(--orn); }
+.orn-tl { top: -46px; left: -46px; width: 230px; height: 230px; }
+.orn-tr { top: -46px; right: -46px; width: 230px; height: 230px; transform: scaleX(-1); }
+.orn-bl { bottom: -60px; left: -56px; width: 210px; height: 210px; transform: scaleY(-1); opacity: .7; }
+.orn-br { bottom: -60px; right: -56px; width: 210px; height: 210px; transform: scale(-1,-1); opacity: .7; }
+.mandala-spin { animation: spin 120s linear infinite; transform-origin: 100px 100px; }
+
+/* Drifting golden motes */
+.motes { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.mote {
+  position: absolute; bottom: -20px; width: 5px; height: 5px; border-radius: 50%;
+  background: radial-gradient(circle, var(--gold), transparent 70%);
+  opacity: 0; animation: float-up linear infinite;
+}
+@keyframes float-up {
+  0%   { transform: translateY(0) translateX(0) scale(.6); opacity: 0; }
+  12%  { opacity: .75; }
+  85%  { opacity: .35; }
+  100% { transform: translateY(-104vh) translateX(38px) scale(1.15); opacity: 0; }
+}
+
+/* ── HEADER ────────────────────────────────────────────────── */
+.hdr {
+  position: relative; z-index: 2; flex-shrink: 0;
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+  padding: 8px 20px 6px; gap: 10px;
+}
+.hdr::after {
+  content: ''; position: absolute; left: 6%; right: 6%; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim) 18%, var(--gold) 50%, var(--gold-dim) 82%, transparent);
+}
+.hdr-side { display: flex; align-items: center; gap: 10px; }
+.hdr-left { justify-content: flex-start; }
+.hdr-right { justify-content: flex-end; }
+
+/* Brand block */
+.brand { text-align: center; line-height: 1; }
+.om-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 3px; }
+.om {
+  font-family: 'Noto Sans Devanagari', sans-serif; color: var(--gold);
+  font-size: 1.05rem; text-shadow: 0 0 16px var(--glow);
+  animation: om-pulse 4.5s ease-in-out infinite;
+}
+@keyframes om-pulse { 0%,100% { opacity: .75; } 50% { opacity: 1; text-shadow: 0 0 24px var(--glow); } }
+.feather { width: 22px; height: 56px; }
+.feather.right { transform: scaleX(-1); }
+.brand-en {
+  font-family: 'Cinzel', serif; font-weight: 900; letter-spacing: .14em; text-transform: uppercase;
+  background: linear-gradient(180deg, #fff6df 4%, var(--gold) 46%, var(--gold2) 78%, #fff6df 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.35));
+  white-space: nowrap;
+}
+:root[data-theme="day"] .brand-en { filter: drop-shadow(0 1px 2px rgba(255,255,255,.7)); }
+.brand-hi {
+  font-family: 'Tiro Devanagari Hindi', 'Noto Sans Devanagari', serif;
+  color: var(--ink2); margin-top: 4px; letter-spacing: .04em; white-space: nowrap;
+}
+.brand-rule {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-top: 6px; color: var(--gold-dim);
+}
+.brand-rule::before, .brand-rule::after {
+  content: ''; height: 1px; width: 62px;
+  background: linear-gradient(90deg, transparent, var(--gold));
+}
+.brand-rule::after { background: linear-gradient(270deg, transparent, var(--gold)); }
+.brand-rule i { font-size: .5rem; color: var(--gold); }
+.tagline {
+  margin-top: 5px; font-size: .58rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink3); display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.tagline .hi { font-family: 'Noto Sans Devanagari', sans-serif; text-transform: none; letter-spacing: .04em; font-size: .68rem; color: var(--ink2); }
+.tagline .sep { color: var(--gold); }
+
+/* Clock */
+.clock { line-height: 1.15; }
+.clock-time {
+  font-family: 'Cinzel', serif; font-size: 1.25rem; font-weight: 700; color: var(--gold);
+  letter-spacing: .06em; text-shadow: 0 0 18px var(--glow);
+}
+.clock-time .ampm { font-size: .55em; letter-spacing: .14em; opacity: .75; margin-left: 3px; }
+.clock-date { font-size: .56rem; letter-spacing: .13em; text-transform: uppercase; color: var(--ink3); margin-top: 2px; }
+
+/* Badges */
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 999px; padding: 5px 13px;
+  font-size: .58rem; letter-spacing: .12em; font-weight: 700; text-transform: uppercase;
+  border: 1px solid var(--card-brd); background: var(--chip-bg); color: var(--ink2);
+  white-space: nowrap;
+}
+.pill.morning { border-color: rgba(255,170,60,.55); color: #ffca7a; background: rgba(255,153,51,.14); }
+:root[data-theme="day"] .pill.morning { color: #8a4b00; background: rgba(255,153,51,.22); }
+.pill.allday  { border-color: rgba(120,200,140,.45); color: #a8e6bb; background: rgba(60,160,90,.14); }
+:root[data-theme="day"] .pill.allday { color: #1f5f33; background: rgba(60,160,90,.18); }
+.pill .hi { font-family: 'Noto Sans Devanagari', sans-serif; text-transform: none; letter-spacing: 0; opacity: .85; }
+
+.icon-btn {
+  border: 1px solid var(--card-brd); background: var(--chip-bg); color: var(--gold);
+  width: 30px; height: 30px; border-radius: 50%; font-size: .8rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: transform .18s, background .18s;
+}
+.icon-btn:hover { transform: rotate(-18deg) scale(1.08); background: var(--gold-dim); }
+#fsBtn:hover { transform: scale(1.12); }
+
+/* Kiosk polish: the pointer fades away once the board is left alone. */
+body.idle, body.idle * { cursor: none !important; }
+
+/* ── CONTENT COLUMNS ───────────────────────────────────────── */
+.content {
+  position: relative; z-index: 2;
+  flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px; padding: 10px 16px 6px;
+  overflow: hidden; min-height: 0;
+}
+.col { display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+.col:empty {
+  min-height: 80px; border: 2px dashed var(--gold-dim); border-radius: 12px;
+  align-items: center; justify-content: center;
+}
+.col:empty::before {
+  content: '✦  Drop a category here  ✦';
+  font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink3);
+}
+
+/* ── CATEGORY CARD ─────────────────────────────────────────── */
+.cat-block {
+  display: flex; flex-direction: column; flex-shrink: 0;
+  border-radius: 14px; overflow: hidden; cursor: grab;
+  background: var(--card);
+  border: 1px solid var(--card-brd);
+  box-shadow: var(--shadow);
+  transition: box-shadow .2s, transform .2s;
+}
+.cat-block:active { cursor: grabbing; }
+.cat-block:hover { box-shadow: var(--shadow), 0 0 0 1px var(--gold-dim); }
+.cat-block.dragging { opacity: .35; }
+.cat-block.drag-over-block { box-shadow: inset 0 3px 0 var(--gold), var(--shadow); }
+.col.drag-over-col { outline: 2px dashed var(--gold-dim); outline-offset: -4px; border-radius: 12px; }
+
+/* Category header bar */
+.cat-hdr {
+  position: relative; overflow: hidden; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.cat-hdr::before {
+  content: ''; position: absolute; inset: 0 0 auto 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.65), transparent);
+}
+.cat-hdr::after {
+  content: ''; position: absolute; top: 0; bottom: 0; width: 42%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.16), transparent);
+  animation: sheen 7s ease-in-out infinite; pointer-events: none;
+}
+@keyframes sheen { 0% { left: -50%; } 55%, 100% { left: 115%; } }
+.cat-hdr-left { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.cat-icon {
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  border-radius: 50%; color: #fff;
+  background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.34);
+  box-shadow: inset 0 1px 2px rgba(255,255,255,.25);
+}
+.cat-name-en {
+  font-weight: 800; color: #fff; letter-spacing: .1em; text-transform: uppercase; line-height: 1;
+  text-shadow: 0 1px 3px rgba(0,0,0,.4);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cat-name-hi {
+  font-family: 'Noto Sans Devanagari', sans-serif; color: rgba(255,255,255,.82);
+  line-height: 1; text-shadow: 0 1px 3px rgba(0,0,0,.35); white-space: nowrap;
+}
+.cat-meta { position: relative; display: flex; align-items: center; flex-shrink: 0; }
+.cat-count {
+  color: rgba(255,255,255,.9); letter-spacing: .06em;
+  background: rgba(0,0,0,.20); border: 1px solid rgba(255,255,255,.22);
+  border-radius: 999px; padding: 2px 8px; white-space: nowrap;
+  transition: opacity .15s;
+}
+
+/* Category colour themes — jewel gradients */
+.cat-color-0 .cat-hdr { background: linear-gradient(115deg,#8e1b3a,#c02a52); }
+.cat-color-1 .cat-hdr { background: linear-gradient(115deg,#0f5132,#1f8a55); }
+.cat-color-2 .cat-hdr { background: linear-gradient(115deg,#46270f,#8a5220); }
+.cat-color-3 .cat-hdr { background: linear-gradient(115deg,#12305e,#2160ad); }
+.cat-color-4 .cat-hdr { background: linear-gradient(115deg,#3d1a5c,#71329f); }
+.cat-color-5 .cat-hdr { background: linear-gradient(115deg,#7a3d00,#c87400); }
+.cat-color-6 .cat-hdr { background: linear-gradient(115deg,#0b4a44,#158a7c); }
+.cat-color-7 .cat-hdr { background: linear-gradient(115deg,#6d1039,#ab2160); }
+
+/* Drag grip + per-category A−/A+ font controls.
+   These are hover-only, so they are taken out of flow and overlaid on the count
+   chip — in-flow they would steal width from the category name and clip it
+   ("COUNTER" → "COUNT…") even though they are invisible on a hands-off board. */
+.hover-tools {
+  position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+  display: flex; align-items: center; gap: 5px;
+  opacity: 0; pointer-events: none; transition: opacity .15s;
+}
+.cat-block:hover .hover-tools { opacity: 1; pointer-events: auto; }
+.cat-block:hover .cat-count { opacity: 0; }
+.drag-grip { font-size: .72rem; letter-spacing: .05em; color: rgba(255,255,255,.85); cursor: grab; }
+.font-btn {
+  border: 1px solid rgba(255,255,255,.35); border-radius: 5px;
+  background: rgba(255,255,255,.20); color: #fff;
+  width: 24px; height: 24px; font-size: .72rem; font-weight: 800; line-height: 1;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;
+  transition: background .15s, transform .15s;
+}
+.font-btn:hover { background: rgba(255,255,255,.5); transform: scale(1.12); cursor: pointer; }
+.font-btn:active { transform: scale(.94); }
+
+/* ── ITEM ROWS ─────────────────────────────────────────────── */
+.item {
+  display: grid;
+  grid-template-columns: auto minmax(0,1.35fr) minmax(0,1.15fr) auto;
+  align-items: center; gap: 10px; flex-shrink: 0;
+  border-bottom: 1px solid var(--row-line);
+  position: relative;
+}
+.item:last-child { border-bottom: none; }
+.item:nth-child(even) { background: var(--row-alt); }
+.item.has-img::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, transparent, var(--gold), transparent);
+}
+
+.lead { display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
+.thumb {
+  border-radius: 50%; object-fit: cover; display: block;
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 0 2px rgba(0,0,0,.18), 0 4px 12px rgba(0,0,0,.35);
+}
+:root[data-theme="day"] .thumb { box-shadow: 0 0 0 2px rgba(255,255,255,.7), 0 4px 10px rgba(93,56,18,.25); }
+
+.name-en {
+  font-weight: 600; color: var(--ink); line-height: 1.28;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  display: flex; align-items: center; gap: 6px;
+}
+.name-hi {
+  font-family: 'Noto Sans Devanagari', sans-serif; font-weight: 500; color: var(--ink2); line-height: 1.32;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.morning-chip { color: #ffb648; flex-shrink: 0; }
+.price {
+  font-weight: 800; color: var(--gold); white-space: nowrap; text-align: right; line-height: 1.2;
+  border: 1px solid var(--gold-dim); border-radius: 999px;
+  background: linear-gradient(180deg, rgba(240,196,106,.16), rgba(240,196,106,.05));
+  padding: 2px 11px; justify-self: end;
+}
+:root[data-theme="day"] .price { background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(240,196,106,.20)); }
+.price .cur { font-size: .78em; opacity: .8; margin-right: 1px; }
+
+/* Entrance animation — only on fresh data, never on the idle re-render */
+.content.animate-in .cat-block { animation: rise .55s cubic-bezier(.2,.8,.25,1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+.content.animate-in .item     { animation: fade .45s ease both;                    animation-delay: calc(var(--d, 0) * 26ms + 180ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(22px) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+
+/* ── SPECIALS STRIP + STATUS ───────────────────────────────── */
+.strip {
+  position: relative; z-index: 2; flex-shrink: 0;
+  display: flex; align-items: center; gap: 12px;
+  padding: 6px 16px 7px; min-height: 0;
+  border-top: 1px solid var(--gold-dim);
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,.16));
+}
+:root[data-theme="day"] .strip { background: linear-gradient(180deg, transparent, rgba(93,56,18,.07)); }
+.strip-label { flex-shrink: 0; line-height: 1.1; text-align: right; }
+.strip-label .hi { font-family: 'Noto Sans Devanagari', sans-serif; font-size: .82rem; font-weight: 700; color: var(--gold); display: block; }
+.strip-label .en { font-size: .5rem; letter-spacing: .18em; text-transform: uppercase; color: var(--ink3); }
+.marquee { flex: 1; overflow: hidden; min-width: 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); }
+.mq-track { display: flex; gap: 10px; width: max-content; animation: mq linear infinite; }
+.marquee:hover .mq-track { animation-play-state: paused; }
+@keyframes mq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.chip {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+  padding: 4px 13px 4px 4px; border-radius: 999px;
+  background: var(--card); border: 1px solid var(--card-brd);
+}
+.chip.no-img { padding-left: 13px; }
+.chip img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--gold); }
+.chip .cn { font-size: .72rem; font-weight: 700; color: var(--ink); white-space: nowrap; }
+.chip .ch { font-family: 'Noto Sans Devanagari', sans-serif; font-size: .68rem; color: var(--ink2); white-space: nowrap; }
+.chip .cp { font-size: .72rem; font-weight: 800; color: var(--gold); white-space: nowrap; }
+.chip .sepd { color: var(--gold-dim); font-size: .6rem; }
+.strip-status {
+  flex-shrink: 0; font-size: .52rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ink3); text-align: right; line-height: 1.5;
+}
+.live-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #4caf50; margin-right: 4px; animation: blink 2.2s ease-in-out infinite; }
+.live-dot.off { background: #e05252; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+
+#resetLayoutBtn {
+  position: fixed; right: 5px; bottom: 3px; z-index: 20;
+  border: none; background: transparent; color: var(--ink3); opacity: .35;
+  font-size: .85rem; padding: 3px 6px; cursor: pointer; line-height: 1;
+}
+#resetLayoutBtn:hover { opacity: 1; color: var(--gold); }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <svg class="lotus" viewBox="0 0 100 100" fill="none">
+    <g stroke="#f0c46a" stroke-width="1.6" stroke-linejoin="round">
+      <path d="M50 12 C58 30 58 44 50 56 C42 44 42 30 50 12Z" fill="rgba(240,196,106,.14)"/>
+      <path d="M50 12 C58 30 58 44 50 56 C42 44 42 30 50 12Z" transform="rotate(60 50 50)" fill="rgba(240,196,106,.14)"/>
+      <path d="M50 12 C58 30 58 44 50 56 C42 44 42 30 50 12Z" transform="rotate(120 50 50)" fill="rgba(240,196,106,.14)"/>
+      <path d="M50 12 C58 30 58 44 50 56 C42 44 42 30 50 12Z" transform="rotate(180 50 50)" fill="rgba(240,196,106,.14)"/>
+      <path d="M50 12 C58 30 58 44 50 56 C42 44 42 30 50 12Z" transform="rotate(240 50 50)" fill="rgba(240,196,106,.14)"/>
+      <path d="M50 12 C58 30 58 44 50 56 C42 44 42 30 50 12Z" transform="rotate(300 50 50)" fill="rgba(240,196,106,.14)"/>
+      <circle cx="50" cy="50" r="6" fill="#f0c46a"/>
+    </g>
+  </svg>
+  <div class="load-title">RADHA GOVINDA</div>
+  <div class="load-sub">Preparing today's menu…</div>
+  <div id="load-err"></div>
+</div>
+
+<div id="board">
+
+  <!-- Corner mandala ornaments -->
+  <svg class="orn orn-tl" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+    <g class="mandala-spin" stroke="currentColor" stroke-width="1.1">
+      <circle cx="100" cy="100" r="86"/><circle cx="100" cy="100" r="70"/><circle cx="100" cy="100" r="34"/><circle cx="100" cy="100" r="12"/>
+      <g fill="currentColor" fill-opacity=".22">
+        <ellipse cx="100" cy="52" rx="9" ry="26"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(30 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(60 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(90 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(120 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(150 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(180 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(210 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(240 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(270 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(300 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(330 100 100)"/>
+      </g>
+      <g fill="currentColor" fill-opacity=".3">
+        <circle cx="100" cy="24" r="3"/><circle cx="100" cy="24" r="3" transform="rotate(45 100 100)"/>
+        <circle cx="100" cy="24" r="3" transform="rotate(90 100 100)"/><circle cx="100" cy="24" r="3" transform="rotate(135 100 100)"/>
+        <circle cx="100" cy="24" r="3" transform="rotate(180 100 100)"/><circle cx="100" cy="24" r="3" transform="rotate(225 100 100)"/>
+        <circle cx="100" cy="24" r="3" transform="rotate(270 100 100)"/><circle cx="100" cy="24" r="3" transform="rotate(315 100 100)"/>
+      </g>
+    </g>
+  </svg>
+  <svg class="orn orn-tr" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+    <g class="mandala-spin" stroke="currentColor" stroke-width="1.1">
+      <circle cx="100" cy="100" r="86"/><circle cx="100" cy="100" r="70"/><circle cx="100" cy="100" r="34"/><circle cx="100" cy="100" r="12"/>
+      <g fill="currentColor" fill-opacity=".22">
+        <ellipse cx="100" cy="52" rx="9" ry="26"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(30 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(60 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(90 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(120 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(150 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(180 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(210 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(240 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(270 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(300 100 100)"/>
+        <ellipse cx="100" cy="52" rx="9" ry="26" transform="rotate(330 100 100)"/>
+      </g>
+    </g>
+  </svg>
+  <svg class="orn orn-bl" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+    <g stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none">
+      <path d="M20,190 Q52,140 86,86 Q118,32 172,6"/>
+      <path d="M86,86 Q60,66 40,78 Q20,90 14,116"/>
+      <path d="M86,86 Q112,60 134,72 Q156,84 156,110"/>
+      <path d="M112,48 Q90,34 74,46 Q58,58 58,76"/>
+      <path d="M112,48 Q136,32 156,40 Q176,48 174,68"/>
+      <g fill="currentColor" fill-opacity=".3" stroke="none">
+        <ellipse cx="34" cy="86" rx="14" ry="7" transform="rotate(-28 34 86)"/>
+        <ellipse cx="146" cy="84" rx="12" ry="6" transform="rotate(22 146 84)"/>
+        <ellipse cx="68" cy="48" rx="10" ry="5" transform="rotate(-18 68 48)"/>
+        <ellipse cx="158" cy="48" rx="10" ry="5" transform="rotate(28 158 48)"/>
+      </g>
+    </g>
+  </svg>
+  <svg class="orn orn-br" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+    <g stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none">
+      <path d="M20,190 Q52,140 86,86 Q118,32 172,6"/>
+      <path d="M86,86 Q60,66 40,78 Q20,90 14,116"/>
+      <path d="M86,86 Q112,60 134,72 Q156,84 156,110"/>
+      <path d="M112,48 Q90,34 74,46 Q58,58 58,76"/>
+      <path d="M112,48 Q136,32 156,40 Q176,48 174,68"/>
+      <g fill="currentColor" fill-opacity=".3" stroke="none">
+        <ellipse cx="34" cy="86" rx="14" ry="7" transform="rotate(-28 34 86)"/>
+        <ellipse cx="146" cy="84" rx="12" ry="6" transform="rotate(22 146 84)"/>
+        <ellipse cx="68" cy="48" rx="10" ry="5" transform="rotate(-18 68 48)"/>
+        <ellipse cx="158" cy="48" rx="10" ry="5" transform="rotate(28 158 48)"/>
+      </g>
+    </g>
+  </svg>
+
+  <div class="motes" id="motes"></div>
+
+  <!-- ── HEADER ── -->
+  <div class="hdr" id="hdr">
+    <div class="hdr-side hdr-left">
+      <div class="clock">
+        <div class="clock-time" id="clockTime">--:--</div>
+        <div class="clock-date" id="clockDate"></div>
+      </div>
+    </div>
+
+    <div class="brand">
+      <div class="om-row">
+        <svg class="feather" viewBox="0 0 40 110" fill="none" aria-hidden="true">
+          <path d="M20 110 L20 46" stroke="#1c6f63" stroke-width="2" stroke-linecap="round"/>
+          <g stroke="#1c6f63" stroke-width="1" stroke-linecap="round" opacity=".75">
+            <path d="M20 60 L6 74"/><path d="M20 66 L8 82"/><path d="M20 72 L10 88"/>
+            <path d="M20 60 L34 74"/><path d="M20 66 L32 82"/><path d="M20 72 L30 88"/>
+          </g>
+          <ellipse cx="20" cy="30" rx="17" ry="26" fill="#127a6c"/>
+          <ellipse cx="20" cy="30" rx="12" ry="19" fill="#e0a63c"/>
+          <ellipse cx="20" cy="32" rx="7.5" ry="11" fill="#1b3f8f"/>
+          <ellipse cx="20" cy="31" rx="3.6" ry="5.5" fill="#0d1f4d"/>
+          <ellipse cx="18.4" cy="28" rx="1.2" ry="1.9" fill="#fff" opacity=".65"/>
+        </svg>
+        <span class="om">ॐ</span>
+        <svg class="feather right" viewBox="0 0 40 110" fill="none" aria-hidden="true">
+          <path d="M20 110 L20 46" stroke="#1c6f63" stroke-width="2" stroke-linecap="round"/>
+          <g stroke="#1c6f63" stroke-width="1" stroke-linecap="round" opacity=".75">
+            <path d="M20 60 L6 74"/><path d="M20 66 L8 82"/><path d="M20 72 L10 88"/>
+            <path d="M20 60 L34 74"/><path d="M20 66 L32 82"/><path d="M20 72 L30 88"/>
+          </g>
+          <ellipse cx="20" cy="30" rx="17" ry="26" fill="#127a6c"/>
+          <ellipse cx="20" cy="30" rx="12" ry="19" fill="#e0a63c"/>
+          <ellipse cx="20" cy="32" rx="7.5" ry="11" fill="#1b3f8f"/>
+          <ellipse cx="20" cy="31" rx="3.6" ry="5.5" fill="#0d1f4d"/>
+          <ellipse cx="18.4" cy="28" rx="1.2" ry="1.9" fill="#fff" opacity=".65"/>
+        </svg>
+      </div>
+      <h1 class="brand-en" id="brandEn">Radha Govinda Upahar</h1>
+      <div class="brand-hi" id="brandHi">राधा गोविंदा उपहार</div>
+      <div class="brand-rule"><i class="fa-solid fa-leaf"></i></div>
+      <div class="tagline">
+        <span class="hi" id="taglineHi"></span>
+        <span class="sep">✦</span>
+        <span id="taglineEn"></span>
+      </div>
+    </div>
+
+    <div class="hdr-side hdr-right">
+      <span class="pill allday" id="mode-badge">
+        <i class="fa-solid fa-utensils"></i><span id="mode-label">All Day</span>
+      </span>
+      <button class="icon-btn" id="fsBtn" title="Full screen (F11)">⛶</button>
+      <button class="icon-btn" id="themeBtn" title="Switch board theme">☾</button>
+    </div>
+  </div>
+
+  <!-- ── MENU COLUMNS ── -->
+  <div class="content" id="columns"></div>
+
+  <!-- ── SPECIALS STRIP ── -->
+  <div class="strip" id="strip">
+    <div class="strip-label">
+      <span class="hi">आज का विशेष</span>
+      <span class="en">Today's Specials</span>
+    </div>
+    <div class="marquee"><div class="mq-track" id="mqTrack"></div></div>
+    <div class="strip-status" id="ftr"></div>
+  </div>
+
+  <button id="resetLayoutBtn" title="Reset manually-arranged layout">↺</button>
+</div>
+
+<script>
+const EXCEL_FILE='Menu.xlsx';
+const CAT_COLORS=['cat-color-0','cat-color-1','cat-color-2','cat-color-3','cat-color-4','cat-color-5','cat-color-6','cat-color-7'];
+
+const ICONS=[
+  {k:['breakfast','morning','nashta','नाश्ता'],i:'fa-solid fa-egg'},
+  {k:['burger'],i:'fa-solid fa-burger'},
+  {k:['pizza'],i:'fa-solid fa-pizza-slice'},
+  {k:['pasta','noodle','spaghetti'],i:'fa-solid fa-bowl-food'},
+  {k:['salad','sabzi','sabji'],i:'fa-solid fa-leaf'},
+  {k:['soup','shorba','dal','lentil'],i:'fa-solid fa-bowl-rice'},
+  {k:['grill','bbq','kebab','tikka','tandoor'],i:'fa-solid fa-fire-flame-curved'},
+  {k:['chicken','murgh'],i:'fa-solid fa-drumstick-bite'},
+  {k:['fish','seafood','prawn','jhinga'],i:'fa-solid fa-fish'},
+  {k:['mutton','lamb','beef','gosht','meat'],i:'fa-solid fa-cow'},
+  {k:['paneer','veg','vegetarian'],i:'fa-solid fa-seedling'},
+  {k:['rice','biryani','pulao','khichdi'],i:'fa-solid fa-bowl-rice'},
+  {k:['bread','roti','naan','paratha','puri'],i:'fa-solid fa-bread-slice'},
+  {k:['dessert','sweet','mithai','halwa','मीठा'],i:'fa-solid fa-ice-cream'},
+  {k:['cake','pastry','bakery'],i:'fa-solid fa-cake-candles'},
+  {k:['coffee','espresso','latte','cappuccino'],i:'fa-solid fa-mug-hot'},
+  {k:['tea','chai','chay'],i:'fa-solid fa-mug-saucer'},
+  {k:['juice','nimbu','lemonade'],i:'fa-solid fa-lemon'},
+  {k:['drink','beverage','soda','cold','soft','पेय'],i:'fa-solid fa-glass-water'},
+  {k:['shake','milkshake','smoothie','lassi'],i:'fa-solid fa-blender'},
+  {k:['snack','starter','appetizer','chaat','चाट'],i:'fa-solid fa-plate-wheat'},
+  {k:['sandwich','wrap','roll'],i:'fa-solid fa-bread-slice'},
+  {k:['thali','combo','special','set','meal'],i:'fa-solid fa-star'},
+  {k:['counter','काउन्टर'],i:'fa-solid fa-store'},
+  {k:['main','mains','main course','मुख्य'],i:'fa-solid fa-utensils'},
+  {k:['prasad','prashad','प्रसाद'],i:'fa-solid fa-hands-praying'},
+  {k:['side','sides','extras'],i:'fa-solid fa-plus'},
+  {k:['kids','child','junior'],i:'fa-solid fa-child'},
+];
+function gi(cat){const l=(cat||'').toLowerCase();for(const e of ICONS)if(e.k.some(k=>l.includes(k)))return e.i;return 'fa-solid fa-utensils';}
+
+let settings={},menuItems=[];
+function S(k,d=''){return k in settings?settings[k]:d;}
+function Sn(k,d=0){const v=parseFloat(S(k,d));return isNaN(v)?d:v;}
+
+/* ═══ THEME (night / day), remembered per screen ═══ */
+const themeBtn=document.getElementById('themeBtn');
+function applyTheme(t){
+  document.documentElement.dataset.theme=t;
+  themeBtn.textContent = t==='night' ? '☾' : '☀';
+  themeBtn.title = t==='night' ? 'Switch to daylight board' : 'Switch to mandir-night board';
+  try{ localStorage.setItem('menuBoardTheme',t); }catch{}
+}
+applyTheme((()=>{ try{ return localStorage.getItem('menuBoardTheme')||'night'; }catch{ return 'night'; } })());
+themeBtn.addEventListener('click',()=>applyTheme(document.documentElement.dataset.theme==='night'?'day':'night'));
+
+/* ═══ FULL SCREEN ═══
+   A browser will only grant full screen from a user gesture, so the board asks
+   on the first interaction and offers the ⛶ button (F11 keeps working too).
+   Once someone leaves full screen deliberately, we stop asking again. */
+const fsBtn=document.getElementById('fsBtn');
+let fsDeclined=false;
+function isFs(){ return !!(document.fullscreenElement||document.webkitFullscreenElement); }
+function updateFsBtn(){
+  fsBtn.textContent=isFs()?'⤡':'⛶';
+  fsBtn.title=isFs()?'Exit full screen (F11)':'Full screen (F11)';
+}
+function toggleFullscreen(){
+  try{
+    if(isFs()){
+      fsDeclined=true;
+      (document.exitFullscreen||document.webkitExitFullscreen||function(){}).call(document);
+    }else{
+      const el=document.documentElement;
+      const req=el.requestFullscreen||el.webkitRequestFullscreen;
+      req&&Promise.resolve(req.call(el)).catch(()=>{});
+    }
+  }catch{}
+}
+fsBtn.addEventListener('click',(e)=>{ e.stopPropagation(); toggleFullscreen(); });
+document.addEventListener('fullscreenchange',()=>{ updateFsBtn(); renderBoard(); });
+updateFsBtn();
+
+// First click anywhere on the board (except the controls) goes full screen.
+function autoFullscreen(e){
+  if(e.target.closest&&e.target.closest('button')) return;
+  if(!isFs()&&!fsDeclined) toggleFullscreen();
+  window.removeEventListener('pointerdown',autoFullscreen);
+}
+window.addEventListener('pointerdown',autoFullscreen);
+
+// Hide the mouse pointer while the board is left alone.
+let idleTimer;
+function pointerActive(){
+  document.body.classList.remove('idle');
+  clearTimeout(idleTimer);
+  idleTimer=setTimeout(()=>document.body.classList.add('idle'),5000);
+}
+window.addEventListener('mousemove',pointerActive);
+pointerActive();
+
+/* ═══ Ambient golden motes ═══ */
+(function motes(){
+  const box=document.getElementById('motes');
+  for(let i=0;i<14;i++){
+    const m=document.createElement('div');
+    m.className='mote';
+    m.style.left=(Math.random()*100)+'%';
+    m.style.animationDuration=(16+Math.random()*20)+'s';
+    m.style.animationDelay=(-Math.random()*30)+'s';
+    const s=(3+Math.random()*4);
+    m.style.width=s+'px'; m.style.height=s+'px';
+    box.appendChild(m);
+  }
+})();
+
+/* ═══ Live clock ═══ */
+function updateClock(){
+  const now=new Date();
+  let h=now.getHours(); const ampm=h<12?'AM':'PM';
+  h=h%12||12;
+  const m=String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('clockTime').innerHTML=`${h}:${m}<span class="ampm">${ampm}</span>`;
+  document.getElementById('clockDate').textContent=
+    now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+}
+updateClock(); setInterval(updateClock,15000);
+
+/* ═══ Manually-arranged layout (drag & drop) — persisted server-side, localStorage fallback ═══ */
+let layoutOverride=null;
+const columnsEl=document.getElementById('columns');
+
+async function loadLayout(){
+  try{
+    const res=await fetch('/api/layout');
+    if(res.ok){
+      const data=await res.json();
+      if(data&&typeof data==='object'&&(Array.isArray(data.columns)||data.fonts)){ layoutOverride=data; return; }
+    }
+  }catch{}
+  try{
+    const raw=localStorage.getItem('menuBoardLayout');
+    if(raw){ const data=JSON.parse(raw); if(data&&typeof data==='object'&&(Array.isArray(data.columns)||data.fonts)) layoutOverride=data; }
+  }catch{}
+}
+function getCatFontScale(cat){
+  const v=layoutOverride&&layoutOverride.fonts&&layoutOverride.fonts[cat];
+  return (typeof v==='number'&&v>0)?v:1;
+}
+function adjustCatFont(cat,delta){
+  if(!layoutOverride) layoutOverride={};
+  if(!layoutOverride.fonts) layoutOverride.fonts={};
+  const next=Math.max(0.7,Math.min(1.8,Math.round((getCatFontScale(cat)+delta)*10)/10));
+  layoutOverride.fonts[cat]=next;
+  saveLayout();
+  renderBoard();
+}
+async function saveLayout(){
+  try{ localStorage.setItem('menuBoardLayout', JSON.stringify(layoutOverride)); }catch{}
+  try{
+    await fetch('/api/layout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(layoutOverride)});
+  }catch{}
+}
+function computeColumns(cats,bycat){
+  const catSet=new Set(cats);
+  if(layoutOverride&&Array.isArray(layoutOverride.columns)){
+    const used=new Set();
+    const cols=layoutOverride.columns.map(colCats=>{
+      const filtered=colCats.filter(c=>catSet.has(c)&&(bycat[c]||[]).length);
+      filtered.forEach(c=>used.add(c));
+      return filtered;
+    });
+    while(cols.length<3) cols.push([]);
+    const leftover=cats.filter(c=>!used.has(c)&&(bycat[c]||[]).length);
+    leftover.sort((a,b)=>(bycat[b]||[]).length-(bycat[a]||[]).length);
+    leftover.forEach(c=>{
+      const totals=cols.map(col=>col.reduce((s,cc)=>s+(bycat[cc]||[]).length,0));
+      const mi=totals.indexOf(Math.min(...totals));
+      cols[mi].push(c);
+    });
+    return cols;
+  }
+  return balance(cats,bycat);
+}
+function applyManualMove(cat,colEl,targetBlock){
+  if(!layoutOverride||!Array.isArray(layoutOverride.columns)){
+    const currentCats=[...new Set(menuItems.map(i=>i.category))].filter(Boolean);
+    const bycatNow={}; currentCats.forEach(c=>bycatNow[c]=menuItems.filter(i=>i.category===c));
+    layoutOverride={...(layoutOverride||{}),columns:balance(currentCats,bycatNow)};
+  }
+  const cols=layoutOverride.columns;
+  cols.forEach(col=>{ const i=col.indexOf(cat); if(i>-1) col.splice(i,1); });
+  const colIndex=+colEl.dataset.colIndex;
+  while(cols.length<=colIndex) cols.push([]);
+  const destCol=cols[colIndex];
+  if(targetBlock&&targetBlock.dataset.cat&&targetBlock.dataset.cat!==cat){
+    const insertAt=destCol.indexOf(targetBlock.dataset.cat);
+    destCol.splice(insertAt>-1?insertAt:destCol.length,0,cat);
+  }else{
+    destCol.push(cat);
+  }
+  saveLayout();
+  renderBoard();
+}
+
+let dragCat=null;
+columnsEl.addEventListener('dragstart',(e)=>{
+  const block=e.target.closest('.cat-block');
+  if(!block) return;
+  dragCat=block.dataset.cat;
+  block.classList.add('dragging');
+  e.dataTransfer.effectAllowed='move';
+});
+columnsEl.addEventListener('dragend',(e)=>{
+  const block=e.target.closest('.cat-block');
+  block&&block.classList.remove('dragging');
+  columnsEl.querySelectorAll('.drag-over-block,.drag-over-col').forEach(el=>el.classList.remove('drag-over-block','drag-over-col'));
+  dragCat=null;
+});
+columnsEl.addEventListener('dragover',(e)=>{
+  if(!dragCat) return;
+  const col=e.target.closest('.col');
+  if(!col) return;
+  e.preventDefault();
+  const block=e.target.closest('.cat-block');
+  columnsEl.querySelectorAll('.drag-over-block,.drag-over-col').forEach(el=>el.classList.remove('drag-over-block','drag-over-col'));
+  if(block&&block.dataset.cat!==dragCat) block.classList.add('drag-over-block'); else col.classList.add('drag-over-col');
+});
+columnsEl.addEventListener('drop',(e)=>{
+  if(!dragCat) return;
+  const col=e.target.closest('.col');
+  if(!col) return;
+  e.preventDefault();
+  const targetBlock=e.target.closest('.cat-block');
+  applyManualMove(dragCat,col,targetBlock);
+  columnsEl.querySelectorAll('.drag-over-block,.drag-over-col').forEach(el=>el.classList.remove('drag-over-block','drag-over-col'));
+  dragCat=null;
+});
+document.getElementById('resetLayoutBtn').addEventListener('click',()=>{
+  layoutOverride=null;
+  saveLayout();
+  renderBoard(true);
+});
+columnsEl.addEventListener('click',(e)=>{
+  const btn=e.target.closest('.font-btn');
+  if(!btn) return;
+  e.stopPropagation();
+  const cat=btn.closest('.cat-block').dataset.cat;
+  adjustCatFont(cat, btn.dataset.delta==='+'?0.1:-0.1);
+});
+
+/* ═══ Data ═══ */
+async function loadExcel(){
+  try{
+    const res=await fetch(EXCEL_FILE+'?t='+Date.now());
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const wb=XLSX.read(await res.arrayBuffer(),{type:'array'});
+    const sn=wb.SheetNames.find(n=>/setting|config/i.test(n));
+    settings={};
+    if(sn){
+      XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1}).forEach(r=>{
+        const k=String(r[0]||'').trim();
+        if(k&&!/^[⚙🌅🔤📐]/.test(k)) settings[k]=String(r[1]??'').trim();
+      });
+    }
+    const mn=wb.SheetNames.find(n=>/menu|item/i.test(n))||wb.SheetNames[0];
+    const raw=XLSX.utils.sheet_to_json(wb.Sheets[mn],{defval:''});
+    function col(row,...aa){
+      const keys=Object.keys(row);
+      for(const a of aa){
+        const f=keys.find(k=>k.trim().toLowerCase().replace(/[\s_]/g,'')=== a.toLowerCase().replace(/[\s_]/g,''));
+        if(f!==undefined) return String(row[f]).trim();
+      }
+      return '';
+    }
+    menuItems=raw.map((r,i)=>({
+      id:i,
+      category: col(r,'Category','cat','section','type'),
+      cat_hi:   col(r,'Category_Hindi','CategoryHindi','cat_hi'),
+      name:     col(r,'Name','item','dish','product'),
+      name_hi:  col(r,'Name_Hindi','NameHindi','name_hi'),
+      price:    col(r,'Price','cost','rate','amount'),
+      image:    col(r,'Image','img','photo','picture'),
+      isMorning:/^(true|yes|1)$/i.test(col(r,'IsMorning','ismorning','morning')),
+      available:!/^(false|no|0)$/i.test(col(r,'Available','available')||'true'),
+    })).filter(i=>i.name&&i.available);
+    return true;
+  }catch(e){
+    document.getElementById('load-err').innerHTML=
+      `<strong>Could not load Menu.xlsx</strong>
+       1. Launch via <b>START-MENU.bat</b><br>
+       2. Menu.xlsx must be in the same folder<br>
+       <small style="opacity:.5">${e.message}</small>`;
+    document.getElementById('load-err').style.display='block';
+    document.querySelector('.load-title').textContent='Failed to load';
+    document.querySelector('.lotus').style.animationPlayState='paused';
+    return false;
+  }
+}
+
+function parseTime(v){
+  const n=parseFloat(v);
+  if(!isNaN(n)&&n>0&&n<1) return Math.round(n*1440);
+  const p=String(v).trim().split(':').map(Number);
+  return(p.length>=2&&!isNaN(p[0])&&!isNaN(p[1]))?p[0]*60+p[1]:null;
+}
+/* Excel stores "07:00:00" as the fraction 0.2916…, so always print minutes-since-
+   midnight back as HH:MM rather than echoing the raw cell value. */
+function fmtTime(v){
+  const m=parseTime(v);
+  if(m===null) return String(v);
+  return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+}
+function isMorning(){
+  const f=parseTime(S('MorningHours_From','06:00'));
+  const t=parseTime(S('MorningHours_To','11:00'));
+  if(f===null||t===null) return false;
+  const c=new Date().getHours()*60+new Date().getMinutes();
+  return c>=f&&c<t;
+}
+function visibleItems(){
+  const m=isMorning();
+  return m?menuItems.filter(i=>i.isMorning&&i.available):menuItems.filter(i=>i.available);
+}
+function balance(cats,bycat){
+  const sorted=[...cats].sort((a,b)=>(bycat[b]||[]).length-(bycat[a]||[]).length);
+  const cols=[[],[],[]],tots=[0,0,0];
+  for(const c of sorted){const mi=tots.indexOf(Math.min(...tots));cols[mi].push(c);tots[mi]+=(bycat[c]||[]).length;}
+  return cols;
+}
+
+/* SmartFit — binary-searches the largest font scale whose estimated column
+   height still fits. It now also accounts for each category's own font
+   multiplier (the A−/A+ buttons) and for the taller rows that carry a photo,
+   so a column with images no longer silently overflows and gets clipped. */
+function smartFit(colCats,bycat,availH){
+  const prefEN  = Sn('FontSize_ItemName_EN',13);
+  const prefCat = Sn('FontSize_CategoryName',12);
+  const prefPI  = Sn('Padding_Item',3);
+  const prefPC  = Sn('Padding_CategoryHeader',5);
+  const prefGap = Sn('Gap_Categories',6);
+  const minFont = Sn('FontSize_Min',7);
+  const prefMax = Math.max(prefEN,prefCat);
+
+  function estH(sc){
+    let tot=0;
+    for(const cat of colCats){
+      const its=bycat[cat]||[];
+      if(!its.length) continue;
+      const cs   = getCatFontScale(cat);
+      const enPx = prefEN*sc*cs;
+      const pad  = Math.max(2,Math.round(prefPI*sc))*2;
+      const textH= Math.ceil(enPx*1.4)+pad+1;
+      const imgH = Math.round(enPx*1.75)+pad+1;
+      const cH   = Math.ceil(prefCat*sc*cs*1.35)+Math.max(3,Math.round(prefPC*sc))*2+4;
+      let t=cH;
+      its.forEach(it=>{ t += it.image ? Math.max(textH,imgH) : textH; });
+      tot += t + Math.max(8,Math.round(prefGap*sc));
+    }
+    return tot;
+  }
+  function search(loBound){
+    let lo=loBound,hi=1.0,best=loBound;
+    for(let i=0;i<26;i++){const mid=(lo+hi)/2;if(estH(mid)<=availH){best=mid;lo=mid;}else hi=mid;}
+    return best;
+  }
+  let best=search(Math.min(1,minFont/prefMax));
+  // Respect FontSize_Min normally, but rather than clip content off the screen,
+  // fall back to a smaller scale when even the minimum cannot fit.
+  if(estH(best)>availH) best=search(0.45);
+  return {scale:best,fits:estH(best)<=availH};
+}
+
+const catColorMap={};let catColorIdx=0;
+function getCatColor(cat){
+  if(!(cat in catColorMap)) catColorMap[cat]=catColorIdx++%CAT_COLORS.length;
+  return CAT_COLORS[catColorMap[cat]];
+}
+
+/* SmartFit only solves for height. A category pushed to a large A+ scale can still
+   be too WIDE for its column, which used to silently clip names to "Chole Kul…".
+   These helpers measure the real text width off-screen so the renderer can step a
+   category back down until its longest name actually fits. */
+const _measCtx=document.createElement('canvas').getContext('2d');
+function textW(text,px,family,weight=400,tracking=0){
+  _measCtx.font=`${weight} ${px}px "${family}", sans-serif`;
+  return _measCtx.measureText(text).width + tracking*px*String(text).length;
+}
+function fitWidth(px,longest,avail,floor=9){
+  return longest>avail&&longest>0 ? Math.max(floor,Math.floor(px*avail/longest)) : px;
+}
+
+/* Every render rebuilds the DOM, which throws away the <img> elements and cancels
+   any download still in flight — on a slow first paint that leaves empty photo
+   rings on the board. Holding a decoded Image per URL keeps them in the browser's
+   memory cache so the recreated tags paint instantly. */
+const imgCache={};
+function preloadImages(items){
+  items.forEach(i=>{
+    if(i.image&&!imgCache[i.image]){
+      const im=new Image();
+      im.src=i.image;
+      imgCache[i.image]=im;
+    }
+  });
+}
+
+function priceHTML(p){
+  const s=String(p||'').trim();
+  if(!s) return '–';
+  return /^[0-9]/.test(s) ? `<span class="cur">₹</span>${esc(s)}` : esc(s);
+}
+
+/* ═══ Specials ribbon ═══ */
+function renderStrip(items){
+  const track=document.getElementById('mqTrack');
+  const withImg=items.filter(i=>i.image);
+  let source;
+  if(withImg.length){
+    source=withImg;
+  }else{
+    // No photos uploaded yet — highlight one item per category instead.
+    const seen=new Set();
+    source=items.filter(i=>{ if(seen.has(i.category)) return false; seen.add(i.category); return true; });
+  }
+  if(!source.length){ track.innerHTML=''; return; }
+
+  const chip=i=>`
+    <div class="chip${i.image?'':' no-img'}">
+      ${i.image?`<img src="${esc(i.image)}" alt="" onerror="this.remove()">`:''}
+      <span class="cn">${esc(i.name)}</span>
+      ${i.name_hi?`<span class="ch">${esc(i.name_hi)}</span>`:''}
+      <span class="sepd">✦</span>
+      <span class="cp">${priceHTML(i.price)}</span>
+    </div>`;
+
+  // Repeat until the run is long enough to look continuous, then double it
+  // so the -50% translate loops seamlessly.
+  let run=[...source];
+  while(run.length<8) run=run.concat(source);
+  track.innerHTML=run.map(chip).join('')+run.map(chip).join('');
+  track.style.animationDuration=Math.max(26,run.length*3.6)+'s';
+}
+
+/* ═══ Main render ═══ */
+function renderBoard(animate=false){
+  const morning=isMorning();
+  const items=visibleItems();
+  preloadImages(items);
+
+  document.getElementById('brandEn').textContent=S('RestaurantName','Radha Govinda Upahar');
+  document.getElementById('brandHi').textContent=S('RestaurantName_Hindi','राधा गोविंदा उपहार');
+  document.getElementById('taglineHi').textContent=S('Tagline_Hindi','');
+  document.getElementById('taglineEn').textContent=S('Tagline','·');
+
+  const fBrand=Sn('FontSize_RestaurantName',26);
+  document.getElementById('brandEn').style.fontSize=fBrand+'px';
+  document.getElementById('brandEn').style.fontFamily=`'${S('Font_RestaurantName','Cinzel')}', 'Cinzel', serif`;
+  document.getElementById('brandHi').style.fontSize=Math.round(fBrand*0.72)+'px';
+
+  const badge=document.getElementById('mode-badge');
+  badge.className='pill '+(morning?'morning':'allday');
+  badge.querySelector('i').className=morning?'fa-solid fa-sun':'fa-solid fa-utensils';
+  document.getElementById('mode-label').textContent=morning?'Morning Menu':'All Day';
+
+  const cats=[...new Set(items.map(i=>i.category))].filter(Boolean);
+  const bycat={};
+  cats.forEach(c=>{bycat[c]=items.filter(i=>i.category===c);});
+  const cols=computeColumns(cats,bycat);
+
+  renderStrip(items);
+
+  const hdrH  = document.getElementById('hdr').offsetHeight||90;
+  const stripH= document.getElementById('strip').offsetHeight||60;
+  const availH= window.innerHeight-hdrH-stripH-20;
+
+  columnsEl.innerHTML='';
+  columnsEl.classList.remove('animate-in');
+
+  // Create the three columns empty first: their real pixel width is needed before
+  // any text is sized, so the width fitter below has something to measure against.
+  const colEls=cols.map((_,colIdx)=>{
+    const el=document.createElement('div');
+    el.className='col';
+    el.dataset.colIndex=colIdx;
+    columnsEl.appendChild(el);
+    return el;
+  });
+
+  cols.forEach((colCats,colIdx)=>{
+    const fit=smartFit(colCats,bycat,availH);
+    const sc=fit.scale;
+
+    const fEN  = Math.max(8, Math.round(Sn('FontSize_ItemName_EN',13)*sc));
+    const fHI  = Math.max(8, Math.round(Sn('FontSize_ItemName_HI',13)*sc));
+    const fPr  = Math.max(8, Math.round(Sn('FontSize_Price',13)*sc));
+    const fCat = Math.max(8, Math.round(Sn('FontSize_CategoryName',12)*sc));
+    const pI   = Math.max(2, Math.round(Sn('Padding_Item',3)*sc));
+    const pIH  = Math.max(8, Math.round(Sn('Padding_Item_Horizontal',14)*sc));
+    const pC   = Math.max(4, Math.round(Sn('Padding_CategoryHeader',5)*sc));
+    const gC   = Math.max(8, Math.round(Sn('Gap_Categories',6)*sc));
+    const fFHI = S('Font_ItemName_HI','Noto Sans Devanagari');
+    const fFEN = S('Font_ItemName_EN','Poppins');
+    const fFCat= S('Font_CategoryName','Poppins');
+    const fFPr = S('Font_Price','Poppins');
+
+    const colEl=colEls[colIdx];
+    const colInner=(colEl.clientWidth||Math.floor(columnsEl.clientWidth/3))-2; // minus card border
+
+    let rowSeq=0;
+    colCats.forEach((cat,catIdx)=>{
+      const citems=bycat[cat]||[];
+      if(!citems.length) return;
+      const colorClass=getCatColor(cat);
+      const catScale=getCatFontScale(cat);
+      let cEN=Math.round(fEN*catScale), cHI=Math.round(fHI*catScale),
+          cPr=Math.round(fPr*catScale), cCat=Math.round(fCat*catScale);
+      const catHi=citems[0].cat_hi||'';
+
+      /* ---- width fit: shrink until the longest name really fits its grid cell ---- */
+      // The photo column only exists when at least one item in the category has an
+      // image; items without one get an empty spacer so every name still lines up.
+      const hasImg=citems.some(i=>i.image);
+      const leadW=hasImg?Math.round(cEN*1.65)+10:0;
+      let maxPr=0,maxEN=0,maxHI=0;
+      citems.forEach(i=>{
+        maxPr=Math.max(maxPr,textW(i.price?'₹'+i.price:'–',cPr,fFPr,800));
+        maxEN=Math.max(maxEN,textW(i.name,cEN,fFEN,600)+(i.isMorning?cEN*0.9:0));
+        maxHI=Math.max(maxHI,textW(i.name_hi||'—',cHI,fFHI,500));
+      });
+      const flex=Math.max(60,colInner-2*pIH-leadW-20-(maxPr+26)); // 2 grid gaps + price pill chrome
+      cEN=fitWidth(cEN,maxEN,flex*1.35/2.5);
+      cHI=fitWidth(cHI,maxHI,flex*1.15/2.5);
+
+      // Category bar: uppercase + .1em tracking, plus the Hindi name. Only the icon,
+      // the two 9px gaps and the count chip share the row (the A−/A+ tools are
+      // absolutely positioned, so they cost no width).
+      const countPx=Math.max(8,Math.round(cCat*0.6));
+      const countW=textW(String(citems.length),countPx,'Poppins',700)+20;
+      const catW=textW(cat.toUpperCase(),cCat,fFCat,800,.1)+(catHi?textW(catHi,cCat*0.82,'Noto Sans Devanagari',500)+9:0);
+      cCat=fitWidth(cCat,catW,Math.max(50,colInner-2*pIH-Math.round(cCat*1.55)-countW-27));
+
+      const thumbPx=Math.round(cEN*1.65);
+      const itemCols=hasImg
+        ? `${thumbPx}px minmax(0,1.35fr) minmax(0,1.15fr) auto`
+        : `minmax(0,1.35fr) minmax(0,1.15fr) auto`;
+
+      const block=document.createElement('div');
+      block.className=`cat-block ${colorClass}`;
+      block.style.marginBottom=gC+'px';
+      block.style.setProperty('--i',catIdx+colIdx*2);
+      block.draggable=true;
+      block.dataset.cat=cat;
+
+      const iconPx=Math.round(cCat*1.55);
+      const ch=document.createElement('div');
+      ch.className='cat-hdr';
+      ch.style.padding=`${pC}px ${pIH}px`;
+      ch.innerHTML=`
+        <div class="cat-hdr-left">
+          <span class="cat-icon" style="width:${iconPx}px;height:${iconPx}px;font-size:${Math.round(cCat*0.8)}px">
+            <i class="${gi(cat)}"></i>
+          </span>
+          <span class="cat-name-en" style="font-size:${cCat}px;font-family:'${fFCat}',sans-serif">${esc(cat)}</span>
+          ${catHi?`<span class="cat-name-hi" style="font-size:${Math.round(cCat*0.82)}px">${esc(catHi)}</span>`:''}
+        </div>
+        <span class="cat-meta">
+          <span class="cat-count" style="font-size:${countPx}px">${citems.length}</span>
+          <span class="hover-tools">
+            <span class="drag-grip" title="Drag this category to another column">⠿</span>
+            <button class="font-btn" draggable="false" data-delta="-" title="Smaller font for this category">A−</button>
+            <button class="font-btn" draggable="false" data-delta="+" title="Bigger font for this category">A+</button>
+          </span>
+        </span>`;
+      block.appendChild(ch);
+
+      citems.forEach(item=>{
+        const d=document.createElement('div');
+        d.className='item'+(item.image?' has-img':'');
+        d.style.padding=`${pI}px ${pIH}px`;
+        d.style.gridTemplateColumns=itemCols;
+        d.style.setProperty('--d',rowSeq++);
+        // A missing/renamed photo leaves an empty gold ring, so hide the <img>
+        // and keep the spacer — the other names in the category stay aligned.
+        const lead=hasImg
+          ? `<div class="lead" style="width:${thumbPx}px">${item.image
+              ? `<img class="thumb" src="${esc(item.image)}" alt="" style="width:${thumbPx}px;height:${thumbPx}px" onerror="this.style.display='none'">`
+              : ''}</div>`
+          : '';
+        d.innerHTML=`
+          ${lead}
+          <div class="name-en" style="font-size:${cEN}px;font-family:'${fFEN}',sans-serif">
+            <span style="overflow:hidden;text-overflow:ellipsis">${esc(item.name)}</span>
+            ${item.isMorning?`<i class="fa-solid fa-sun morning-chip" style="font-size:${Math.round(cEN*0.6)}px" title="Morning special"></i>`:''}
+          </div>
+          <div class="name-hi" style="font-size:${cHI}px;font-family:'${fFHI}',sans-serif">${esc(item.name_hi||'—')}</div>
+          <div class="price"   style="font-size:${cPr}px;font-family:'${fFPr}',sans-serif">${priceHTML(item.price)}</div>`;
+        block.appendChild(d);
+      });
+
+      colEl.appendChild(block);
+    });
+  });
+
+  if(animate){
+    void columnsEl.offsetWidth;               // restart the CSS animations
+    columnsEl.classList.add('animate-in');
+    clearTimeout(renderBoard._t);
+    renderBoard._t=setTimeout(()=>columnsEl.classList.remove('animate-in'),3000);
+  }
+
+  loadFonts();
+  const from=fmtTime(S('MorningHours_From','06:00')),to=fmtTime(S('MorningHours_To','11:00'));
+  document.getElementById('ftr').innerHTML=
+    `<span class="live-dot${wsConnected?'':' off'}"></span>${wsConnected?'Live':'Reconnecting…'}<br>
+     ${items.length} items · Morning ${from}–${to}`;
+}
+
+const LFONTS=new Set();
+function loadFonts(){
+  const sys=['arial','georgia','verdana','times new roman','courier new','tahoma'];
+  ['Font_RestaurantName','Font_CategoryName','Font_ItemName_EN','Font_ItemName_HI','Font_Price'].forEach(k=>{
+    const f=S(k,'');
+    if(f&&!LFONTS.has(f)&&!sys.includes(f.toLowerCase())){
+      const l=document.createElement('link');l.rel='stylesheet';
+      l.href='https://fonts.googleapis.com/css2?family='+encodeURIComponent(f)+':wght@300;400;500;600;700;800;900&display=swap';
+      document.head.appendChild(l);LFONTS.add(f);
+    }
+  });
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+let wsConnected=false;
+function connectLiveUpdates(){
+  const proto=location.protocol==='https:'?'wss:':'ws:';
+  let ws;
+  try{ ws=new WebSocket(proto+'//'+location.host+'/ws'); }
+  catch{ setTimeout(connectLiveUpdates,3000); return; }
+  ws.onopen=()=>{ wsConnected=true; renderBoard(); };
+  ws.onmessage=async(evt)=>{
+    try{
+      const msg=JSON.parse(evt.data);
+      if(msg.type==='menu-updated'){ await loadExcel(); await loadLayout(); renderBoard(true); }
+    }catch{}
+  };
+  ws.onclose=()=>{ wsConnected=false; renderBoard(); setTimeout(connectLiveUpdates,3000); };
+  ws.onerror=()=>{ ws.close(); };
+}
+
+async function init(){
+  const ok=await loadExcel();
+  if(!ok) return;
+  await loadLayout();
+  document.getElementById('loading').style.display='none';
+  document.getElementById('board').style.display='flex';
+  renderBoard(true);
+  // The width fitter measures text on a canvas, so its first pass runs against
+  // fallback metrics. Re-fit once the real web fonts have arrived.
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>renderBoard());
+  setInterval(()=>renderBoard(),60000); // local re-render only (morning/day boundary) — no network fetch
+  window.addEventListener('resize',()=>renderBoard());
+  connectLiveUpdates();
+}
+init();
+</script>
+</body>
+</html>

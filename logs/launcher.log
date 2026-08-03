@@ -1,0 +1,275 @@
+2026-07-28 13:54:15 [INFO] launcher: ============================================================
+2026-07-28 13:54:15 [INFO] launcher: Digital Menu launcher starting (root=E:\MENU)
+2026-07-28 13:54:15 [INFO] launcher: LAN IP detected: 10.3.16.204
+2026-07-28 13:54:15 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-07-28 13:54:16 [INFO] launcher: spawned menu_server.py (pid=2968) on 0.0.0.0:8080
+2026-07-28 13:54:18 [INFO] launcher: server is ready
+2026-07-28 13:54:18 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://10.3.16.204:8080/digital-menu.html
+2026-07-28 13:56:23 [INFO] launcher: ============================================================
+2026-07-28 13:56:23 [INFO] launcher: Digital Menu launcher starting (root=E:\MENU)
+2026-07-28 13:56:23 [INFO] launcher: LAN IP detected: 10.3.16.204
+2026-07-28 13:56:23 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-07-28 13:56:24 [INFO] launcher: spawned menu_server.py (pid=6924) on 0.0.0.0:8080
+2026-07-28 13:56:26 [INFO] launcher: server is ready
+2026-07-28 13:56:26 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://10.3.16.204:8080/digital-menu.html
+2026-07-28 13:57:06 [INFO] launcher: ============================================================
+2026-07-28 13:57:06 [INFO] launcher: Digital Menu launcher starting (root=E:\MENU)
+2026-07-28 13:57:06 [INFO] launcher: LAN IP detected: 10.3.16.204
+2026-07-28 13:57:07 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-07-28 13:57:07 [INFO] launcher: spawned menu_server.py (pid=6480) on 0.0.0.0:8080
+2026-07-28 13:57:09 [INFO] launcher: server is ready
+2026-07-28 13:57:09 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://10.3.16.204:8080/digital-menu.html
+2026-07-28 13:57:37 [INFO] launcher: spawned menu_server.py (pid=17796) on 0.0.0.0:8080
+2026-07-28 13:57:40 [INFO] launcher: stopping menu_server.py (pid=17796)
+2026-07-28 13:57:45 [WARNING] launcher: graceful stop timed out after 5.0s — force killing
+2026-07-28 13:57:45 [INFO] launcher: server process exited (code=1)
+2026-07-28 14:01:59 [INFO] launcher: spawned menu_server.py (pid=21372) on 0.0.0.0:8080
+2026-07-28 14:02:02 [INFO] launcher: stopping menu_server.py (pid=21372)
+2026-07-28 14:02:02 [INFO] launcher: server exited gracefully
+2026-07-28 14:02:02 [INFO] launcher: server process exited (code=0)
+2026-07-28 14:02:27 [INFO] launcher: spawned menu_server.py (pid=16412) on 0.0.0.0:8080
+2026-07-28 14:02:29 [WARNING] launcher: server process exited unexpectedly (code=1)
+2026-07-28 14:02:31 [INFO] launcher: spawned menu_server.py (pid=9952) on 0.0.0.0:8080
+2026-07-28 14:02:32 [WARNING] launcher: server process exited unexpectedly (code=1)
+2026-07-28 14:02:34 [INFO] launcher: spawned menu_server.py (pid=6168) on 0.0.0.0:8080
+2026-07-28 14:02:35 [WARNING] launcher: server process exited unexpectedly (code=1)
+2026-07-28 14:02:35 [ERROR] launcher: max restart attempts (2) reached — giving up
+2026-07-28 14:03:09 [INFO] launcher: ============================================================
+2026-07-28 14:03:09 [INFO] launcher: Digital Menu launcher starting (root=E:\MENU)
+2026-07-28 14:03:10 [INFO] launcher: LAN IP detected: 10.3.16.204
+2026-07-28 14:03:10 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-07-28 14:03:11 [INFO] launcher: spawned menu_server.py (pid=3440) on 0.0.0.0:8080
+2026-07-28 14:03:13 [INFO] launcher: server is ready
+2026-07-28 14:03:13 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://10.3.16.204:8080/digital-menu.html
+2026-07-28 14:07:18 [INFO] launcher: ============================================================
+2026-07-28 14:07:18 [INFO] launcher: Digital Menu launcher starting (root=E:\MENU)
+2026-07-28 14:07:19 [INFO] launcher: LAN IP detected: 10.3.16.204
+2026-07-28 14:07:19 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-07-28 14:07:19 [INFO] launcher: spawned menu_server.py (pid=21184) on 0.0.0.0:8080
+2026-07-28 14:07:21 [INFO] launcher: server is ready
+2026-07-28 14:07:21 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://10.3.16.204:8080/digital-menu.html
+2026-07-28 14:20:03 [INFO] launcher: notify: Restarting Server — Restarting the Digital Menu server...
+2026-07-28 14:20:03 [INFO] launcher: manual restart requested
+2026-07-28 14:20:03 [INFO] launcher: stopping menu_server.py (pid=21184)
+2026-07-28 14:20:03 [INFO] launcher: server exited gracefully
+2026-07-28 14:20:03 [INFO] launcher: server process exited (code=0)
+2026-07-28 14:20:03 [ERROR] launcher: failed to update tray icon for state=stopped
+Traceback (most recent call last):
+  File "E:\MENU\launcher\app.py", line 67, in handle_state_change
+    icon.icon = tray_manager.build_icon_image(state)
+    ^^^^^^^^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_base.py", line 134, in icon
+    self._update_icon()
+    ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_win32.py", line 72, in _update_icon
+    self._release_icon()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_win32.py", line 350, in _release_icon
+    win32.DestroyIcon(self._icon_handle)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_util\win32.py", line 204, in _err
+    raise ctypes.WinError()
+OSError: [WinError 1402] Invalid cursor handle.
+2026-07-28 14:20:03 [INFO] launcher: notify: Server Stopped — The Digital Menu server has stopped.
+2026-07-28 14:20:04 [INFO] launcher: spawned menu_server.py (pid=17144) on 0.0.0.0:8080
+2026-07-28 14:20:06 [INFO] launcher: notify: Server Restarted — The Digital Menu server is back up.
+2026-07-28 14:29:49 [INFO] launcher: ============================================================
+2026-07-28 14:29:49 [INFO] launcher: Digital Menu launcher starting (root=E:\MENU)
+2026-07-28 14:29:50 [INFO] launcher: LAN IP detected: 10.3.16.204
+2026-07-28 14:29:50 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-07-28 14:29:50 [WARNING] launcher: port 8080 already occupied before start — assuming an existing server instance
+2026-07-28 14:29:50 [INFO] launcher: notify: Port Already In Use — Port 8080 is already serving something — reusing the existing server.
+2026-07-28 14:29:52 [INFO] launcher: server is ready
+2026-07-28 14:29:52 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://10.3.16.204:8080/digital-menu.html
+2026-07-28 14:30:04 [INFO] launcher: Exit requested from tray menu
+2026-07-28 14:30:04 [INFO] launcher: Digital Menu launcher exited
+2026-07-29 13:50:50 [INFO] launcher: ============================================================
+2026-07-29 13:50:50 [INFO] launcher: Digital Menu launcher starting (root=E:\MENU)
+2026-07-29 13:50:53 [INFO] launcher: LAN IP detected: 10.3.16.204
+2026-07-29 13:50:54 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-07-29 13:50:54 [INFO] launcher: spawned menu_server.py (pid=1920) on 0.0.0.0:8080
+2026-07-29 13:50:56 [INFO] launcher: server is ready
+2026-07-29 13:50:56 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://10.3.16.204:8080/digital-menu.html
+2026-07-29 21:27:56 [WARNING] launcher: server process exited unexpectedly (code=1073807364)
+2026-07-29 21:34:09 [INFO] launcher: ============================================================
+2026-07-29 21:34:09 [INFO] launcher: Digital Menu launcher starting (root=E:\MENU)
+2026-07-29 21:34:11 [INFO] launcher: LAN IP detected: 10.3.16.204
+2026-07-29 21:34:12 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-07-29 21:34:12 [INFO] launcher: spawned menu_server.py (pid=18756) on 0.0.0.0:8080
+2026-07-29 21:34:14 [INFO] launcher: server is ready
+2026-07-29 21:34:14 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://10.3.16.204:8080/digital-menu.html
+2026-07-29 21:35:55 [INFO] launcher: ============================================================
+2026-07-29 21:35:55 [INFO] launcher: Digital Menu launcher starting (root=E:\MENU)
+2026-07-29 21:35:55 [INFO] launcher: LAN IP detected: 10.3.16.204
+2026-07-29 21:35:55 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-07-29 21:35:55 [WARNING] launcher: port 8080 already occupied before start — assuming an existing server instance
+2026-07-29 21:35:55 [INFO] launcher: notify: Port Already In Use — Port 8080 is already serving something — reusing the existing server.
+2026-07-29 21:35:58 [INFO] launcher: server is ready
+2026-07-29 21:35:58 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://10.3.16.204:8080/digital-menu.html
+2026-07-29 21:36:18 [INFO] launcher: Exit requested from tray menu
+2026-07-29 21:36:18 [INFO] launcher: Digital Menu launcher exited
+2026-07-29 21:45:21 [INFO] launcher: ============================================================
+2026-07-29 21:45:21 [INFO] launcher: Digital Menu launcher starting (root=E:\MENU)
+2026-07-29 21:45:21 [INFO] launcher: LAN IP detected: 10.3.16.204
+2026-07-29 21:45:21 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-07-29 21:45:21 [WARNING] launcher: port 8080 already occupied before start — assuming an existing server instance
+2026-07-29 21:45:21 [INFO] launcher: notify: Port Already In Use — Port 8080 is already serving something — reusing the existing server.
+2026-07-29 21:45:23 [INFO] launcher: server is ready
+2026-07-29 21:45:23 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://10.3.16.204:8080/digital-menu.html
+2026-07-29 21:45:29 [INFO] launcher: Exit requested from tray menu
+2026-07-29 21:45:29 [INFO] launcher: Digital Menu launcher exited
+2026-07-30 14:40:56 [INFO] launcher: ============================================================
+2026-07-30 14:40:56 [INFO] launcher: Digital Menu launcher starting (root=E:\MENU)
+2026-07-30 14:40:59 [INFO] launcher: LAN IP detected: 10.3.16.204
+2026-07-30 14:41:00 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-07-30 14:41:00 [INFO] launcher: spawned menu_server.py (pid=9228) on 0.0.0.0:8080
+2026-07-30 14:41:03 [INFO] launcher: server is ready
+2026-07-30 14:41:03 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://10.3.16.204:8080/digital-menu.html
+2026-07-31 14:17:03 [INFO] launcher: ============================================================
+2026-07-31 14:17:03 [INFO] launcher: Digital Menu launcher starting (root=E:\MENU)
+2026-07-31 14:17:06 [INFO] launcher: LAN IP detected: 10.3.16.204
+2026-07-31 14:17:06 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-07-31 14:17:07 [INFO] launcher: spawned menu_server.py (pid=11120) on 0.0.0.0:8080
+2026-07-31 14:17:09 [INFO] launcher: server is ready
+2026-07-31 14:17:09 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://10.3.16.204:8080/digital-menu.html
+2026-07-31 14:32:32 [INFO] launcher: Exit requested from tray menu
+2026-07-31 14:32:32 [INFO] launcher: stopping menu_server.py (pid=11120)
+2026-07-31 14:32:33 [INFO] launcher: server exited gracefully
+2026-07-31 14:32:33 [INFO] launcher: server process exited (code=0)
+2026-07-31 14:32:33 [ERROR] launcher: failed to update tray icon for state=stopped
+Traceback (most recent call last):
+  File "E:\MENU\launcher\app.py", line 67, in handle_state_change
+    icon.icon = tray_manager.build_icon_image(state)
+    ^^^^^^^^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_base.py", line 134, in icon
+    self._update_icon()
+    ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_win32.py", line 72, in _update_icon
+    self._release_icon()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_win32.py", line 350, in _release_icon
+    win32.DestroyIcon(self._icon_handle)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_util\win32.py", line 204, in _err
+    raise ctypes.WinError()
+OSError: [WinError 1402] Invalid cursor handle.
+2026-07-31 14:32:33 [INFO] launcher: Digital Menu launcher exited
+2026-07-31 14:32:33 [INFO] launcher: notify: Server Stopped — The Digital Menu server has stopped.
+2026-07-31 14:32:41 [INFO] launcher: ============================================================
+2026-07-31 14:32:41 [INFO] launcher: Digital Menu launcher starting (root=E:\MENU)
+2026-07-31 14:32:42 [INFO] launcher: LAN IP detected: 10.3.16.204
+2026-07-31 14:32:42 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-07-31 14:32:42 [INFO] launcher: spawned menu_server.py (pid=10332) on 0.0.0.0:8080
+2026-07-31 14:32:44 [INFO] launcher: server is ready
+2026-07-31 14:32:44 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://10.3.16.204:8080/digital-menu.html
+2026-08-01 11:44:12 [INFO] launcher: ============================================================
+2026-08-01 11:44:12 [INFO] launcher: Digital Menu launcher starting (root=E:\MENU)
+2026-08-01 11:44:13 [INFO] launcher: LAN IP detected: 10.3.16.204
+2026-08-01 11:44:14 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-08-01 11:44:15 [INFO] launcher: spawned menu_server.py (pid=16760) on 0.0.0.0:8080
+2026-08-01 11:44:17 [INFO] launcher: server is ready
+2026-08-01 11:44:17 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://10.3.16.204:8080/digital-menu.html
+2026-08-01 12:25:31 [INFO] launcher: notify: Restarting Server — Restarting the Digital Menu server...
+2026-08-01 12:25:31 [INFO] launcher: manual restart requested
+2026-08-01 12:25:31 [INFO] launcher: stopping menu_server.py (pid=16760)
+2026-08-01 12:25:32 [INFO] launcher: server exited gracefully
+2026-08-01 12:25:32 [INFO] launcher: server process exited (code=0)
+2026-08-01 12:25:32 [ERROR] launcher: failed to update tray icon for state=stopped
+Traceback (most recent call last):
+  File "E:\MENU\launcher\app.py", line 67, in handle_state_change
+    icon.icon = tray_manager.build_icon_image(state)
+    ^^^^^^^^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_base.py", line 134, in icon
+    self._update_icon()
+    ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_win32.py", line 72, in _update_icon
+    self._release_icon()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_win32.py", line 350, in _release_icon
+    win32.DestroyIcon(self._icon_handle)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_util\win32.py", line 204, in _err
+    raise ctypes.WinError()
+OSError: [WinError 1402] Invalid cursor handle.
+2026-08-01 12:25:32 [INFO] launcher: notify: Server Stopped — The Digital Menu server has stopped.
+2026-08-01 12:25:33 [INFO] launcher: spawned menu_server.py (pid=17928) on 0.0.0.0:8080
+2026-08-01 12:25:39 [INFO] launcher: notify: Server Restarted — The Digital Menu server is back up.
+2026-08-01 14:25:22 [INFO] launcher: Exit requested from tray menu
+2026-08-01 14:25:22 [INFO] launcher: stopping menu_server.py (pid=17928)
+2026-08-01 14:25:22 [INFO] launcher: server exited gracefully
+2026-08-01 14:25:22 [INFO] launcher: server process exited (code=0)
+2026-08-01 14:25:22 [ERROR] launcher: failed to update tray icon for state=stopped
+Traceback (most recent call last):
+  File "E:\MENU\launcher\app.py", line 67, in handle_state_change
+    icon.icon = tray_manager.build_icon_image(state)
+    ^^^^^^^^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_base.py", line 134, in icon
+    self._update_icon()
+    ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_win32.py", line 72, in _update_icon
+    self._release_icon()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_win32.py", line 350, in _release_icon
+    win32.DestroyIcon(self._icon_handle)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_util\win32.py", line 204, in _err
+    raise ctypes.WinError()
+OSError: [WinError 1402] Invalid cursor handle.
+2026-08-01 14:25:22 [INFO] launcher: notify: Server Stopped — The Digital Menu server has stopped.
+2026-08-01 14:25:22 [INFO] launcher: Digital Menu launcher exited
+2026-08-01 14:25:27 [INFO] launcher: ============================================================
+2026-08-01 14:25:27 [INFO] launcher: Digital Menu launcher starting (root=E:\MENU)
+2026-08-01 14:25:28 [INFO] launcher: LAN IP detected: 10.3.16.204
+2026-08-01 14:25:29 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-08-01 14:25:29 [INFO] launcher: spawned menu_server.py (pid=8128) on 0.0.0.0:8080
+2026-08-01 14:25:30 [INFO] launcher: server is ready
+2026-08-01 14:25:30 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://10.3.16.204:8080/digital-menu.html
+2026-08-01 14:27:21 [INFO] launcher: notify: Restarting Server — Restarting the Digital Menu server...
+2026-08-01 14:27:21 [INFO] launcher: manual restart requested
+2026-08-01 14:27:21 [INFO] launcher: stopping menu_server.py (pid=8128)
+2026-08-01 14:27:22 [INFO] launcher: server process exited (code=0)
+2026-08-01 14:27:22 [INFO] launcher: server exited gracefully
+2026-08-01 14:27:22 [ERROR] launcher: failed to update tray icon for state=stopped
+Traceback (most recent call last):
+  File "E:\MENU\launcher\app.py", line 67, in handle_state_change
+    icon.icon = tray_manager.build_icon_image(state)
+    ^^^^^^^^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_base.py", line 134, in icon
+    self._update_icon()
+    ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_win32.py", line 72, in _update_icon
+    self._release_icon()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_win32.py", line 350, in _release_icon
+    win32.DestroyIcon(self._icon_handle)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Manas\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pystray\_util\win32.py", line 204, in _err
+    raise ctypes.WinError()
+OSError: [WinError 1402] Invalid cursor handle.
+2026-08-01 14:27:22 [INFO] launcher: notify: Server Stopped — The Digital Menu server has stopped.
+2026-08-01 14:27:23 [INFO] launcher: spawned menu_server.py (pid=19168) on 0.0.0.0:8080
+2026-08-01 14:27:24 [INFO] launcher: notify: Server Restarted — The Digital Menu server is back up.
+2026-08-02 14:10:03 [INFO] launcher: ============================================================
+2026-08-02 14:10:03 [INFO] launcher: Digital Menu launcher starting (root=E:\MENU)
+2026-08-02 14:10:06 [INFO] launcher: LAN IP detected: 10.3.16.204
+2026-08-02 14:10:07 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-08-02 14:10:07 [INFO] launcher: spawned menu_server.py (pid=19008) on 0.0.0.0:8080
+2026-08-02 14:10:08 [INFO] launcher: server is ready
+2026-08-02 14:10:08 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://10.3.16.204:8080/digital-menu.html
+2026-08-02 22:10:04 [WARNING] launcher: server process exited unexpectedly (code=1073807364)
