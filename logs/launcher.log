@@ -522,3 +522,11 @@ Traceback (most recent call last):
 OSError: [WinError 1402] Invalid cursor handle.
 2026-08-15 07:13:32 [INFO] launcher: Digital Menu launcher exited
 2026-08-15 07:13:32 [INFO] launcher: notify: Server Stopped — The Digital Menu server has stopped.
+2026-08-15 07:13:37 [INFO] launcher: ============================================================
+2026-08-15 07:13:37 [INFO] launcher: Digital Menu launcher starting (root=E:\digitalmenu)
+2026-08-15 07:13:37 [INFO] launcher: LAN IP detected: 192.168.1.37
+2026-08-15 07:13:37 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-08-15 07:13:37 [INFO] launcher: spawned menu_server.py (pid=29412) on 0.0.0.0:8080
+2026-08-15 07:13:38 [INFO] launcher: server is ready
+2026-08-15 07:13:38 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://192.168.1.37:8080/digital-menu.html
