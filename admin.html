@@ -1,463 +1,1060 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Menu Admin — Menu.xlsx</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { min-height: 100%; }
-body {
-  font-family: 'Poppins', sans-serif;
-  background: #c9c99b;
-  color: #2a2015;
-  padding: 18px;
-}
-.wrap { max-width: 1400px; margin: 0 auto; }
-
-/* ---- Top bar ---- */
-.topbar {
-  display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
-  background: #3a2a1a; color: #f3e9d2;
-  border-radius: 10px; padding: 12px 16px; margin-bottom: 14px;
-}
-.topbar h1 { font-size: 1.05rem; font-weight: 800; letter-spacing: .03em; margin-right: auto; }
-.topbar h1 span { display:block; font-size:.65rem; font-weight:500; opacity:.65; letter-spacing:.05em; }
-.topbar a.link { color:#e8d8a0; font-size:.75rem; text-decoration:none; border:1px solid rgba(232,216,160,.4); padding:6px 10px; border-radius:6px; white-space:nowrap; }
-.topbar a.link:hover { background: rgba(232,216,160,.12); }
-
-button { font-family: inherit; cursor: pointer; }
-.btn {
-  border: none; border-radius: 7px; padding: 8px 14px; font-size: .8rem; font-weight: 600;
-  display: inline-flex; align-items: center; gap: 6px; transition: filter .15s, opacity .15s;
-  white-space: nowrap;
-}
-.btn:hover { filter: brightness(1.08); }
-.btn:active { filter: brightness(.95); }
-.btn:disabled { opacity: .45; cursor: not-allowed; }
-.btn-primary { background: #1a5c1a; color: #fff; }
-.btn-secondary { background: #6b3a2a; color: #fff; }
-.btn-ghost { background: rgba(255,255,255,.12); color: #f3e9d2; }
-.btn-sm { padding: 4px 8px; font-size: .68rem; border-radius: 5px; font-weight:600; }
-.btn-ghost-dark { background: rgba(58,42,26,.1); color: #3a2a1a; }
-.btn-ghost-dark:hover { background: rgba(58,42,26,.18); }
-
-.toggle-wrap { display:flex; align-items:center; gap:8px; background: rgba(255,255,255,.1); padding:6px 10px; border-radius: 7px; }
-.toggle-wrap label { font-size: .78rem; font-weight:600; user-select:none; }
-.switch { position: relative; width: 40px; height: 22px; flex-shrink:0; }
-.switch input { opacity:0; width:0; height:0; }
-.slider { position:absolute; inset:0; background:#8a7a5a; border-radius:22px; transition:.2s; }
-.slider::before { content:""; position:absolute; width:16px; height:16px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; }
-.switch input:checked + .slider { background:#1a5c1a; }
-.switch input:checked + .slider::before { transform: translateX(18px); }
-
-/* ---- Status line ---- */
-.status-line { display:flex; align-items:center; gap:12px; font-size:.75rem; padding: 2px 4px 12px; color:#3a2a1a; flex-wrap:wrap; }
-.dot { width:8px; height:8px; border-radius:50%; background:#999; display:inline-block; }
-.dot.dirty { background:#c98a00; }
-.dot.saved { background:#1a5c1a; }
-.dot.error { background:#8b2020; }
-#searchBox { padding:6px 10px; border-radius:6px; border:1px solid rgba(58,42,26,.3); font-size:.78rem; width:220px; background:#fff; }
-#filterSelect { padding:6px 10px; border-radius:6px; border:1px solid rgba(58,42,26,.3); font-size:.78rem; background:#fff; font-family:inherit; }
-.hint { opacity:.6; }
-
-/* ---- Table card ---- */
-.card { background: #fdf9ee; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.12); }
-table { border-collapse: collapse; table-layout: fixed; }
-thead th {
-  position: sticky; top: 0; z-index: 3;
-  background: #2e7d32; color: #fff; text-align: left;
-  font-size: .72rem; letter-spacing: .05em; text-transform: uppercase;
-  padding: 10px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  font-weight: 700; border-right: 1px solid rgba(255,255,255,.15);
-  user-select: none;
-}
-thead th[data-key] { cursor: pointer; position: relative; }
-thead th[data-key].drag-over { background: #1b5e20; box-shadow: inset 0 0 0 2px #e8d8a0; }
-thead th.num { text-align:center; left: 0; z-index: 6; }
-thead th.act { text-align:center; right: 0; z-index: 6; }
-.resize-handle {
-  position: absolute; right: 0; top: 0; bottom: 0; width: 8px; cursor: col-resize;
-  z-index: 4;
-}
-.resize-handle:hover, .resize-handle.active { background: rgba(255,255,255,.35); }
-.sort-arrow { opacity: .85; margin-left: 3px; }
-
-tbody tr { border-bottom: 1px solid rgba(58,42,26,.1); }
-tbody tr:nth-child(even) { background: rgba(46,125,50,.04); }
-tbody tr.unavailable { background: repeating-linear-gradient(45deg, rgba(0,0,0,.035), rgba(0,0,0,.035) 6px, rgba(0,0,0,.06) 6px, rgba(0,0,0,.06) 12px); }
-tbody tr.drag-over-row { box-shadow: inset 0 2px 0 #1a5c1a; }
-tbody td { padding: 5px 6px; vertical-align: middle; overflow: hidden; }
-
-tbody td.num, thead th.num, tbody td.act, thead th.act { position: sticky; }
-tbody td.num {
-  left: 0; z-index: 2; text-align:center; color:#8a7a5a; font-size:.72rem;
-  background: #fdf9ee; border-right: 1px solid rgba(58,42,26,.12);
-  display: flex; align-items: center; justify-content: center; gap: 4px;
-}
-tbody tr:nth-child(even) td.num { background: #f5f2e3; }
-tbody tr.unavailable td.num { background: #ece7d5; }
-tbody td.act {
-  right: 0; z-index: 2; text-align:center; background: #fdf9ee; border-left: 1px solid rgba(58,42,26,.12);
-}
-tbody tr:nth-child(even) td.act { background: #f5f2e3; }
-tbody tr.unavailable td.act { background: #ece7d5; }
-
-.drag-handle { cursor: grab; font-size: .85rem; color: #8a7a5a; line-height:1; }
-.drag-handle:active { cursor: grabbing; }
-.row-num { min-width: 14px; }
-.row-edit-toggle {
-  border: none; background: transparent; font-size: .78rem; padding: 1px 2px; border-radius: 4px; line-height:1;
-}
-.row-edit-toggle:hover:not(:disabled) { background: rgba(58,42,26,.1); }
-.row-edit-toggle:disabled { opacity: .35; cursor: not-allowed; }
-
-.cell-input {
-  width: 100%; border: 1px solid transparent; background: transparent;
-  padding: 6px 7px; border-radius: 5px; font-family: inherit; font-size: .84rem; color: #2a2015;
-}
-.cell-input:focus { outline:none; border-color:#2e7d32; background:#fff; }
-.cell-input.hindi { font-family: 'Noto Sans Devanagari', sans-serif; }
-.cell-input[readonly] { background: transparent; color: #4a3a25; cursor: default; }
-.cell-input:disabled { opacity:.5; cursor:not-allowed; background:transparent; }
-.price-input { text-align:right; }
-
-.hindi-cell-wrap { display:flex; align-items:center; gap:4px; width: 100%; }
-.hindi-cell-wrap .cell-input { flex:1; min-width: 0; }
-.xlate-btn {
-  flex-shrink:0; border:none; background:#e8d8a0; color:#5a3d10; width:26px; height:26px;
-  border-radius:6px; font-size:.85rem; display:flex; align-items:center; justify-content:center;
-}
-.xlate-btn:hover { background:#dcc57c; }
-.xlate-btn:disabled { opacity:.35; cursor:not-allowed; }
-.xlate-btn.spin { animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.chk-cell { text-align:center; }
-.chk-cell input[type=checkbox] { width:18px; height:18px; cursor:pointer; accent-color:#1a5c1a; }
-.chk-cell input[type=checkbox]:disabled { cursor:not-allowed; }
-
-.strike { text-decoration: line-through; }
-.grayed { color: #9a8a70 !important; }
-
-.row-del {
-  border:none; background:transparent; color:#8b2020; font-size:1rem; width:28px; height:28px;
-  border-radius:6px;
-}
-.row-del:hover:not(:disabled) { background: rgba(139,32,32,.12); }
-.row-del:disabled { opacity:.3; cursor:not-allowed; }
-
-/* ---- Image cell ---- */
-.img-cell { display:flex; align-items:center; gap:6px; }
-.img-thumb { width:34px; height:34px; object-fit:cover; border-radius:6px; border:1px solid rgba(58,42,26,.2); flex-shrink:0; }
-.img-placeholder { width:34px; height:34px; border-radius:6px; background:rgba(58,42,26,.08); display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; color:#8a7a5a; }
-.img-actions { display:flex; flex-direction:column; gap:2px; }
-.file-hidden { display:none; }
-.img-cell.uploading .img-actions { opacity:.5; pointer-events:none; }
-
-.empty-state { padding: 40px; text-align:center; color:#8a7a5a; font-size:.85rem; }
-
-.footerbar { display:flex; align-items:center; justify-content:space-between; padding:10px 4px 20px; font-size:.7rem; color:#3a2a1a; opacity:.65; flex-wrap:wrap; gap:6px;}
-</style>
-</head>
-<body>
-<div class="wrap">
-
-  <div class="topbar">
-    <h1>Menu Admin<span>CRUD editor for Menu.xlsx</span></h1>
-    <div class="toggle-wrap">
-      <label for="editModeToggle">🔓 Edit Mode</label>
-      <div class="switch"><input type="checkbox" id="editModeToggle"><span class="slider"></span></div>
-    </div>
-    <button class="btn btn-ghost" id="btnAddRow">➕ Add Row</button>
-    <button class="btn btn-ghost" id="btnTranslateAll">🌐 Translate Missing Hindi</button>
-    <button class="btn btn-secondary" id="btnReload">↻ Reload</button>
-    <button class="btn btn-primary" id="btnSaveAll">💾 Save All</button>
-    <a class="link" href="digital-menu.html" target="_blank">View Menu Board ↗</a>
-    <a class="link" href="Menu.xlsx" download title="Download/open the raw Excel sheet">📄 Menu.xlsx ↗</a>
-  </div>
-
-  <div class="status-line">
-    <span><span class="dot" id="statusDot"></span> <span id="statusText">Loading…</span></span>
-    <input id="searchBox" type="text" placeholder="Filter by name or category…">
-    <select id="filterSelect">
-      <option value="all">All items</option>
-      <option value="available">Available only</option>
-      <option value="unavailable">Unavailable only</option>
-      <option value="morning">Morning only</option>
-    </select>
-    <span id="rowCount"></span>
-  </div>
-
-  <div class="card">
-    <div class="table-scroll">
-      <table id="menuTable">
-        <colgroup id="colgroup"></colgroup>
-        <thead><tr id="headRow"></tr></thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
-  </div>
-  <div class="footerbar">
-    <span>Not available items show grayed &amp; struck-through, and lock editing until re-enabled. Images are saved as square WEBP files under <code>images/</code>. Row order is saved to Menu.xlsx and the board displays items in that same order.</span>
-    <span id="lastSaved"></span>
-  </div>
-</div>
-
-<datalist id="categoryList"></datalist>
-
-<script>
-const API = '/api/menu';
-const UPLOAD_API = '/api/upload-image';
-let rows = [];               // in-memory working set
-let dirty = false;
-let editMode = false;        // global edit toggle
-let editingRows = new Set(); // rows individually unlocked regardless of global editMode
-let sortState = { key: null, dir: 'asc' };
-
-const NUM_COL_WIDTH = 78;
-const ACT_COL_WIDTH = 56;
-const MIN_COL_WIDTH = 60;
-const DEFAULT_COLUMNS = [
-  { key: 'category_hindi', label: 'Only Hindi',        width: 160 },
-  { key: 'category',       label: 'Category',          width: 130 },
-  { key: 'name',            label: 'Name',              width: 190 },
-  { key: 'name_hindi',      label: 'Name (Hindi)',      width: 190 },
-  { key: 'image',           label: 'Image',             width: 130 },
-  { key: 'price',           label: 'Price',             width: 90 },
-  { key: 'is_morning',      label: 'Morning',           width: 84 },
-  { key: 'available',       label: 'Available',         width: 94 },
-];
-let colState = loadColState();
-
-function loadColState() {
-  try {
-    const saved = JSON.parse(localStorage.getItem('menuAdminColumns') || 'null');
-    if (Array.isArray(saved) && saved.length) {
-      const merged = [];
-      saved.forEach(c => {
-        const d = DEFAULT_COLUMNS.find(x => x.key === c.key);
-        if (d) merged.push({ key: d.key, label: d.label, width: Math.max(MIN_COL_WIDTH, c.width || d.width) });
-      });
-      DEFAULT_COLUMNS.forEach(d => { if (!merged.find(c => c.key === d.key)) merged.push({ ...d }); });
-      return merged;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Admin — Menu.xlsx</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-  } catch {}
-  return DEFAULT_COLUMNS.map(c => ({ ...c }));
-}
-function saveColState() { localStorage.setItem('menuAdminColumns', JSON.stringify(colState)); }
 
-const tbody = document.getElementById('tbody');
-const headRow = document.getElementById('headRow');
-const colgroup = document.getElementById('colgroup');
-const statusDot = document.getElementById('statusDot');
-const statusText = document.getElementById('statusText');
-const rowCountEl = document.getElementById('rowCount');
-const lastSavedEl = document.getElementById('lastSaved');
-const editModeToggle = document.getElementById('editModeToggle');
-const searchBox = document.getElementById('searchBox');
-const filterSelect = document.getElementById('filterSelect');
-const categoryList = document.getElementById('categoryList');
+    html,
+    body {
+      min-height: 100%;
+    }
 
-function setStatus(kind, text) {
-  statusDot.className = 'dot ' + kind;
-  statusText.textContent = text;
-}
-function markDirty() {
-  dirty = true;
-  setStatus('dirty', 'Unsaved changes');
-}
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #c9c99b;
+      color: #2a2015;
+      padding: 18px;
+    }
 
-async function loadData() {
-  setStatus('', 'Loading…');
-  try {
-    const res = await fetch(API + '?t=' + Date.now());
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    rows = data.map(normalizeRow);
-    dirty = false;
-    editingRows.clear();
-    renderHead();
-    renderTable();
-    setStatus('saved', 'Loaded ' + rows.length + ' items from Menu.xlsx');
-  } catch (e) {
-    setStatus('error', 'Could not load Menu.xlsx — is menu_server.py running? (' + e.message + ')');
-  }
-}
+    .wrap {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
 
-function normalizeRow(r) {
-  return {
-    category: r.category || '',
-    category_hindi: r.category_hindi || '',
-    name: r.name || '',
-    name_hindi: r.name_hindi || '',
-    price: r.price ?? '',
-    is_morning: !!r.is_morning,
-    available: r.available !== false,
-    image: r.image || '',
-  };
-}
-function blankRow() {
-  return { category:'', category_hindi:'', name:'', name_hindi:'', price:'', is_morning:false, available:true, image:'' };
-}
+    /* ---- Top bar ---- */
+    .topbar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: #3a2a1a;
+      color: #f3e9d2;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+    }
 
-function updateCategoryList() {
-  const cats = [...new Set(rows.map(r => r.category).filter(Boolean))];
-  categoryList.innerHTML = cats.map(c => `<option value="${escAttr(c)}">`).join('');
-}
-function escAttr(s) { return String(s).replace(/"/g, '&quot;'); }
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    .topbar h1 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: .03em;
+      margin-right: auto;
+    }
 
-/* ---------------- Header: render, resize, reorder, sort ---------------- */
+    .topbar h1 span {
+      display: block;
+      font-size: .65rem;
+      font-weight: 500;
+      opacity: .65;
+      letter-spacing: .05em;
+    }
 
-function renderHead() {
-  headRow.innerHTML = '<th class="num" style="width:' + NUM_COL_WIDTH + 'px">#</th>' +
-    colState.map(c => `
+    .topbar a.link {
+      color: #e8d8a0;
+      font-size: .75rem;
+      text-decoration: none;
+      border: 1px solid rgba(232, 216, 160, .4);
+      padding: 6px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .topbar a.link:hover {
+      background: rgba(232, 216, 160, .12);
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 7px;
+      padding: 8px 14px;
+      font-size: .8rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: filter .15s, opacity .15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      filter: brightness(1.08);
+    }
+
+    .btn:active {
+      filter: brightness(.95);
+    }
+
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: #1a5c1a;
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #6b3a2a;
+      color: #fff;
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, .12);
+      color: #f3e9d2;
+    }
+
+    .btn-sm {
+      padding: 4px 8px;
+      font-size: .68rem;
+      border-radius: 5px;
+      font-weight: 600;
+    }
+
+    .btn-ghost-dark {
+      background: rgba(58, 42, 26, .1);
+      color: #3a2a1a;
+    }
+
+    .btn-ghost-dark:hover {
+      background: rgba(58, 42, 26, .18);
+    }
+
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, .1);
+      padding: 6px 10px;
+      border-radius: 7px;
+    }
+
+    .toggle-wrap label {
+      font-size: .78rem;
+      font-weight: 600;
+      user-select: none;
+    }
+
+    .switch {
+      position: relative;
+      width: 40px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #8a7a5a;
+      border-radius: 22px;
+      transition: .2s;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: .2s;
+    }
+
+    .switch input:checked+.slider {
+      background: #1a5c1a;
+    }
+
+    .switch input:checked+.slider::before {
+      transform: translateX(18px);
+    }
+
+    /* ---- Status line ---- */
+    .status-line {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: .75rem;
+      padding: 2px 4px 12px;
+      color: #3a2a1a;
+      flex-wrap: wrap;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #999;
+      display: inline-block;
+    }
+
+    .dot.dirty {
+      background: #c98a00;
+    }
+
+    .dot.saved {
+      background: #1a5c1a;
+    }
+
+    .dot.error {
+      background: #8b2020;
+    }
+
+    #searchBox {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(58, 42, 26, .3);
+      font-size: .78rem;
+      width: 220px;
+      background: #fff;
+    }
+
+    #filterSelect {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(58, 42, 26, .3);
+      font-size: .78rem;
+      background: #fff;
+      font-family: inherit;
+    }
+
+    .hint {
+      opacity: .6;
+    }
+
+    /* ---- Table card ---- */
+    .card {
+      background: #fdf9ee;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .12);
+    }
+
+    table {
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      background: #2e7d32;
+      color: #fff;
+      text-align: left;
+      font-size: .72rem;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      padding: 10px 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 700;
+      border-right: 1px solid rgba(255, 255, 255, .15);
+      user-select: none;
+    }
+
+    thead th[data-key] {
+      cursor: pointer;
+      position: relative;
+    }
+
+    thead th[data-key].drag-over {
+      background: #1b5e20;
+      box-shadow: inset 0 0 0 2px #e8d8a0;
+    }
+
+    thead th.num {
+      text-align: center;
+      left: 0;
+      z-index: 6;
+    }
+
+    thead th.act {
+      text-align: center;
+      right: 0;
+      z-index: 6;
+    }
+
+    .resize-handle {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 8px;
+      cursor: col-resize;
+      z-index: 4;
+    }
+
+    .resize-handle:hover,
+    .resize-handle.active {
+      background: rgba(255, 255, 255, .35);
+    }
+
+    .sort-arrow {
+      opacity: .85;
+      margin-left: 3px;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(58, 42, 26, .1);
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(46, 125, 50, .04);
+    }
+
+    tbody tr.unavailable {
+      background: repeating-linear-gradient(45deg, rgba(0, 0, 0, .035), rgba(0, 0, 0, .035) 6px, rgba(0, 0, 0, .06) 6px, rgba(0, 0, 0, .06) 12px);
+    }
+
+    tbody tr.drag-over-row {
+      box-shadow: inset 0 2px 0 #1a5c1a;
+    }
+
+    tbody td {
+      padding: 5px 6px;
+      vertical-align: middle;
+      overflow: hidden;
+    }
+
+    tbody td.num,
+    thead th.num,
+    tbody td.act,
+    thead th.act {
+      position: sticky;
+    }
+
+    tbody td.num {
+      left: 0;
+      z-index: 2;
+      text-align: center;
+      color: #8a7a5a;
+      font-size: .72rem;
+      background: #fdf9ee;
+      border-right: 1px solid rgba(58, 42, 26, .12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    tbody tr:nth-child(even) td.num {
+      background: #f5f2e3;
+    }
+
+    tbody tr.unavailable td.num {
+      background: #ece7d5;
+    }
+
+    tbody td.act {
+      right: 0;
+      z-index: 2;
+      text-align: center;
+      background: #fdf9ee;
+      border-left: 1px solid rgba(58, 42, 26, .12);
+    }
+
+    tbody tr:nth-child(even) td.act {
+      background: #f5f2e3;
+    }
+
+    tbody tr.unavailable td.act {
+      background: #ece7d5;
+    }
+
+    .drag-handle {
+      cursor: grab;
+      font-size: .85rem;
+      color: #8a7a5a;
+      line-height: 1;
+    }
+
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+
+    .row-num {
+      min-width: 14px;
+    }
+
+    .row-edit-toggle {
+      border: none;
+      background: transparent;
+      font-size: .78rem;
+      padding: 1px 2px;
+      border-radius: 4px;
+      line-height: 1;
+    }
+
+    .row-edit-toggle:hover:not(:disabled) {
+      background: rgba(58, 42, 26, .1);
+    }
+
+    .row-edit-toggle:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+    }
+
+    .cell-input {
+      width: 100%;
+      border: 1px solid transparent;
+      background: transparent;
+      padding: 6px 7px;
+      border-radius: 5px;
+      font-family: inherit;
+      font-size: .84rem;
+      color: #2a2015;
+    }
+
+    .cell-input:focus {
+      outline: none;
+      border-color: #2e7d32;
+      background: #fff;
+    }
+
+    .cell-input.hindi {
+      font-family: 'Noto Sans Devanagari', sans-serif;
+    }
+
+    .cell-input[readonly] {
+      background: transparent;
+      color: #4a3a25;
+      cursor: default;
+    }
+
+    .cell-input:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      background: transparent;
+    }
+
+    .price-input {
+      text-align: right;
+    }
+
+    .hindi-cell-wrap {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .hindi-cell-wrap .cell-input {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .xlate-btn {
+      flex-shrink: 0;
+      border: none;
+      background: #e8d8a0;
+      color: #5a3d10;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      font-size: .85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .xlate-btn:hover {
+      background: #dcc57c;
+    }
+
+    .xlate-btn:disabled {
+      opacity: .35;
+      cursor: not-allowed;
+    }
+
+    .xlate-btn.spin {
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .chk-cell {
+      text-align: center;
+    }
+
+    .chk-cell input[type=checkbox] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #1a5c1a;
+    }
+
+    .chk-cell input[type=checkbox]:disabled {
+      cursor: not-allowed;
+    }
+
+    .strike {
+      text-decoration: line-through;
+    }
+
+    .grayed {
+      color: #9a8a70 !important;
+    }
+
+    .row-del {
+      border: none;
+      background: transparent;
+      color: #8b2020;
+      font-size: 1rem;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+    }
+
+    .row-del:hover:not(:disabled) {
+      background: rgba(139, 32, 32, .12);
+    }
+
+    .row-del:disabled {
+      opacity: .3;
+      cursor: not-allowed;
+    }
+
+    /* ---- Image cell ---- */
+    .img-cell {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .img-thumb {
+      width: 34px;
+      height: 34px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid rgba(58, 42, 26, .2);
+      flex-shrink: 0;
+    }
+
+    .img-placeholder {
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      background: rgba(58, 42, 26, .08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+      color: #8a7a5a;
+    }
+
+    .img-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .file-hidden {
+      display: none;
+    }
+
+    .img-cell.uploading .img-actions {
+      opacity: .5;
+      pointer-events: none;
+    }
+
+    .empty-state {
+      padding: 40px;
+      text-align: center;
+      color: #8a7a5a;
+      font-size: .85rem;
+    }
+
+    .footerbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 4px 20px;
+      font-size: .7rem;
+      color: #3a2a1a;
+      opacity: .65;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    /* ---- Danger confirmation modal ---- */
+    .confirm-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      background: rgba(0, 0, 0, .45);
+      backdrop-filter: blur(2px);
+      animation: cfm-fade .15s ease both;
+    }
+
+    .confirm-overlay.is-open {
+      display: block;
+    }
+
+    .confirm-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(420px, 92vw);
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, .25);
+      overflow: hidden;
+      animation: cfm-pop .2s cubic-bezier(.34, 1.56, .64, 1) both;
+    }
+
+    .confirm-modal.is-open {
+      display: block;
+    }
+
+    .confirm-modal__hd {
+      padding: 14px 18px 12px;
+      background: #8b2020;
+      color: #fff;
+      font-weight: 700;
+      font-size: .95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .confirm-modal__hd::before {
+      content: '\26A0';
+      font-size: 1.2rem;
+    }
+
+    .confirm-modal__bd {
+      padding: 18px 20px;
+      font-size: .85rem;
+      line-height: 1.6;
+      color: #2a2015;
+    }
+
+    .confirm-modal__bd strong {
+      color: #8b2020;
+    }
+
+    .confirm-modal__ft {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 0 18px 16px;
+    }
+
+    .confirm-modal__ft button {
+      border: none;
+      border-radius: 7px;
+      padding: 9px 18px;
+      font-size: .8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: filter .15s;
+    }
+
+    .confirm-modal__ft .cfm-cancel {
+      background: #e8e0d0;
+      color: #3a2a1a;
+    }
+
+    .confirm-modal__ft .cfm-cancel:hover {
+      filter: brightness(.95);
+    }
+
+    .confirm-modal__ft .cfm-ok {
+      background: #8b2020;
+      color: #fff;
+    }
+
+    .confirm-modal__ft .cfm-ok:hover {
+      filter: brightness(1.15);
+    }
+
+    @keyframes cfm-fade {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    @keyframes cfm-pop {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(.92)
+      }
+
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1)
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <div class="topbar">
+      <h1>Menu Admin<span>CRUD editor for Menu.xlsx</span></h1>
+      <div class="toggle-wrap">
+        <label for="editModeToggle">🔓 Edit Mode</label>
+        <div class="switch"><input type="checkbox" id="editModeToggle"><span class="slider"></span></div>
+      </div>
+      <button class="btn btn-ghost" id="btnAddRow">➕ Add Row</button>
+      <button class="btn btn-ghost" id="btnTranslateAll">🌐 Translate Missing Hindi</button>
+      <button class="btn btn-secondary" id="btnReload">↻ Reload</button>
+      <button class="btn btn-primary" id="btnSaveAll">💾 Save All</button>
+      <a class="link" href="digital-menu.html" target="_blank">View Menu Board ↗</a>
+      <a class="link" href="Menu.xlsx" download title="Download/open the raw Excel sheet">📄 Menu.xlsx ↗</a>
+    </div>
+
+    <div class="status-line">
+      <span><span class="dot" id="statusDot"></span> <span id="statusText">Loading…</span></span>
+      <input id="searchBox" type="text" placeholder="Filter by name or category…">
+      <select id="filterSelect">
+        <option value="all">All items</option>
+        <option value="available">Available only</option>
+        <option value="unavailable">Unavailable only</option>
+        <option value="morning">Morning only</option>
+      </select>
+      <span id="rowCount"></span>
+    </div>
+
+    <div class="card">
+      <div class="table-scroll">
+        <table id="menuTable">
+          <colgroup id="colgroup"></colgroup>
+          <thead>
+            <tr id="headRow"></tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="footerbar">
+      <span>Not available items show grayed &amp; struck-through, and lock editing until re-enabled. Images are saved as
+        square WEBP files under <code>images/</code>. Row order is saved to Menu.xlsx and the board displays items in
+        that same order.</span>
+      <span id="lastSaved"></span>
+    </div>
+  </div>
+
+  <datalist id="categoryList"></datalist>
+
+  <div class="confirm-overlay" id="cfmOverlay"></div>
+  <div class="confirm-modal" id="cfmModal" role="alertdialog" aria-modal="true">
+    <div class="confirm-modal__hd" id="cfmTitle">Confirm Deletion</div>
+    <div class="confirm-modal__bd" id="cfmBody"></div>
+    <div class="confirm-modal__ft">
+      <button class="cfm-cancel" id="cfmCancel" type="button">Cancel</button>
+      <button class="cfm-ok" id="cfmOk" type="button">Delete</button>
+    </div>
+  </div>
+
+  <script>
+    const API = '/api/menu';
+    const UPLOAD_API = '/api/upload-image';
+    let rows = [];               // in-memory working set
+    let dirty = false;
+    let editMode = false;        // global edit toggle
+    let editingRows = new Set(); // rows individually unlocked regardless of global editMode
+    let sortState = { key: null, dir: 'asc' };
+
+    let _cfmResolve = null;
+    function dangerConfirm(title, body, okLabel) {
+      document.getElementById('cfmTitle').textContent = title;
+      document.getElementById('cfmBody').innerHTML = body;
+      document.getElementById('cfmOk').textContent = okLabel || 'Delete';
+      document.getElementById('cfmOverlay').classList.add('is-open');
+      document.getElementById('cfmModal').classList.add('is-open');
+      return new Promise(resolve => { _cfmResolve = resolve; });
+    }
+    function _cfmEnd(val) {
+      document.getElementById('cfmOverlay').classList.remove('is-open');
+      document.getElementById('cfmModal').classList.remove('is-open');
+      if (_cfmResolve) { _cfmResolve(val); _cfmResolve = null; }
+    }
+    document.getElementById('cfmOk').addEventListener('click', () => _cfmEnd(true));
+    document.getElementById('cfmCancel').addEventListener('click', () => _cfmEnd(false));
+    document.getElementById('cfmOverlay').addEventListener('click', () => _cfmEnd(false));
+    document.getElementById('cfmModal').addEventListener('keydown', e => { if (e.key === 'Escape') _cfmEnd(false); });
+
+    const NUM_COL_WIDTH = 78;
+    const ACT_COL_WIDTH = 56;
+    const MIN_COL_WIDTH = 60;
+    const DEFAULT_COLUMNS = [
+      { key: 'category_hindi', label: 'Only Hindi', width: 160 },
+      { key: 'category', label: 'Category', width: 130 },
+      { key: 'name', label: 'Name', width: 190 },
+      { key: 'name_hindi', label: 'Name (Hindi)', width: 190 },
+      { key: 'image', label: 'Image', width: 130 },
+      { key: 'price', label: 'Price', width: 90 },
+      { key: 'is_morning', label: 'Morning', width: 84 },
+      { key: 'available', label: 'Available', width: 94 },
+    ];
+    let colState = loadColState();
+
+    function loadColState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('menuAdminColumns') || 'null');
+        if (Array.isArray(saved) && saved.length) {
+          const merged = [];
+          saved.forEach(c => {
+            const d = DEFAULT_COLUMNS.find(x => x.key === c.key);
+            if (d) merged.push({ key: d.key, label: d.label, width: Math.max(MIN_COL_WIDTH, c.width || d.width) });
+          });
+          DEFAULT_COLUMNS.forEach(d => { if (!merged.find(c => c.key === d.key)) merged.push({ ...d }); });
+          return merged;
+        }
+      } catch { }
+      return DEFAULT_COLUMNS.map(c => ({ ...c }));
+    }
+    function saveColState() { localStorage.setItem('menuAdminColumns', JSON.stringify(colState)); }
+
+    const tbody = document.getElementById('tbody');
+    const headRow = document.getElementById('headRow');
+    const colgroup = document.getElementById('colgroup');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const rowCountEl = document.getElementById('rowCount');
+    const lastSavedEl = document.getElementById('lastSaved');
+    const editModeToggle = document.getElementById('editModeToggle');
+    const searchBox = document.getElementById('searchBox');
+    const filterSelect = document.getElementById('filterSelect');
+    const categoryList = document.getElementById('categoryList');
+
+    function setStatus(kind, text) {
+      statusDot.className = 'dot ' + kind;
+      statusText.textContent = text;
+    }
+    function markDirty() {
+      dirty = true;
+      setStatus('dirty', 'Unsaved changes');
+    }
+
+    async function loadData() {
+      setStatus('', 'Loading…');
+      try {
+        const res = await fetch(API + '?t=' + Date.now());
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        rows = data.map(normalizeRow);
+        dirty = false;
+        editingRows.clear();
+        renderHead();
+        renderTable();
+        setStatus('saved', 'Loaded ' + rows.length + ' items from Menu.xlsx');
+      } catch (e) {
+        setStatus('error', 'Could not load Menu.xlsx — is menu_server.py running? (' + e.message + ')');
+      }
+    }
+
+    function normalizeRow(r) {
+      return {
+        category: r.category || '',
+        category_hindi: r.category_hindi || '',
+        name: r.name || '',
+        name_hindi: r.name_hindi || '',
+        price: r.price ?? '',
+        is_morning: !!r.is_morning,
+        available: r.available !== false,
+        image: r.image || '',
+      };
+    }
+    function blankRow() {
+      return { category: '', category_hindi: '', name: '', name_hindi: '', price: '', is_morning: false, available: true, image: '' };
+    }
+
+    function updateCategoryList() {
+      const cats = [...new Set(rows.map(r => r.category).filter(Boolean))];
+      categoryList.innerHTML = cats.map(c => `<option value="${escAttr(c)}">`).join('');
+    }
+    function escAttr(s) { return String(s).replace(/"/g, '&quot;'); }
+    function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+    /* ---------------- Header: render, resize, reorder, sort ---------------- */
+
+    function renderHead() {
+      headRow.innerHTML = '<th class="num" style="width:' + NUM_COL_WIDTH + 'px">#</th>' +
+        colState.map(c => `
       <th data-key="${c.key}" style="width:${c.width}px">
         <span draggable="true" class="th-drag">${esc(c.label)}${sortState.key === c.key ? `<span class="sort-arrow">${sortState.dir === 'asc' ? '▲' : '▼'}</span>` : ''}</span>
         <span class="resize-handle" data-key="${c.key}"></span>
       </th>`).join('') +
-    '<th class="act" style="width:' + ACT_COL_WIDTH + 'px">Del</th>';
+        '<th class="act" style="width:' + ACT_COL_WIDTH + 'px">Del</th>';
 
-  colgroup.innerHTML = `<col style="width:${NUM_COL_WIDTH}px">` +
-    colState.map(c => `<col data-key="${c.key}" style="width:${c.width}px">`).join('') +
-    `<col style="width:${ACT_COL_WIDTH}px">`;
-}
+      colgroup.innerHTML = `<col style="width:${NUM_COL_WIDTH}px">` +
+        colState.map(c => `<col data-key="${c.key}" style="width:${c.width}px">`).join('') +
+        `<col style="width:${ACT_COL_WIDTH}px">`;
+    }
 
-function applyColWidths() {
-  colState.forEach(c => {
-    const th = headRow.querySelector(`th[data-key="${c.key}"]`);
-    const col = colgroup.querySelector(`col[data-key="${c.key}"]`);
-    if (th) th.style.width = c.width + 'px';
-    if (col) col.style.width = c.width + 'px';
-  });
-}
+    function applyColWidths() {
+      colState.forEach(c => {
+        const th = headRow.querySelector(`th[data-key="${c.key}"]`);
+        const col = colgroup.querySelector(`col[data-key="${c.key}"]`);
+        if (th) th.style.width = c.width + 'px';
+        if (col) col.style.width = c.width + 'px';
+      });
+    }
 
-let resizing = null;
-headRow.addEventListener('mousedown', (e) => {
-  const handle = e.target.closest('.resize-handle');
-  if (!handle) return;
-  e.preventDefault();
-  e.stopPropagation();
-  const key = handle.dataset.key;
-  const col = colState.find(c => c.key === key);
-  resizing = { key, startX: e.clientX, startWidth: col.width };
-  handle.classList.add('active');
-});
-document.addEventListener('mousemove', (e) => {
-  if (!resizing) return;
-  const col = colState.find(c => c.key === resizing.key);
-  col.width = Math.max(MIN_COL_WIDTH, resizing.startWidth + (e.clientX - resizing.startX));
-  applyColWidths();
-});
-document.addEventListener('mouseup', () => {
-  if (!resizing) return;
-  headRow.querySelectorAll('.resize-handle.active').forEach(h => h.classList.remove('active'));
-  resizing = null;
-  saveColState();
-});
+    let resizing = null;
+    headRow.addEventListener('mousedown', (e) => {
+      const handle = e.target.closest('.resize-handle');
+      if (!handle) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const key = handle.dataset.key;
+      const col = colState.find(c => c.key === key);
+      resizing = { key, startX: e.clientX, startWidth: col.width };
+      handle.classList.add('active');
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (!resizing) return;
+      const col = colState.find(c => c.key === resizing.key);
+      col.width = Math.max(MIN_COL_WIDTH, resizing.startWidth + (e.clientX - resizing.startX));
+      applyColWidths();
+    });
+    document.addEventListener('mouseup', () => {
+      if (!resizing) return;
+      headRow.querySelectorAll('.resize-handle.active').forEach(h => h.classList.remove('active'));
+      resizing = null;
+      saveColState();
+    });
 
-let dragColKey = null;
-headRow.addEventListener('dragstart', (e) => {
-  const th = e.target.closest('th[data-key]');
-  if (!th) return;
-  dragColKey = th.dataset.key;
-  e.dataTransfer.effectAllowed = 'move';
-});
-headRow.addEventListener('dragover', (e) => {
-  const th = e.target.closest('th[data-key]');
-  if (!th || !dragColKey) return;
-  e.preventDefault();
-  headRow.querySelectorAll('th.drag-over').forEach(t => t.classList.remove('drag-over'));
-  th.classList.add('drag-over');
-});
-headRow.addEventListener('dragleave', (e) => {
-  const th = e.target.closest('th[data-key]');
-  th && th.classList.remove('drag-over');
-});
-headRow.addEventListener('drop', (e) => {
-  const th = e.target.closest('th[data-key]');
-  headRow.querySelectorAll('th.drag-over').forEach(t => t.classList.remove('drag-over'));
-  if (!th || !dragColKey) return;
-  e.preventDefault();
-  const targetKey = th.dataset.key;
-  if (targetKey !== dragColKey) {
-    const from = colState.findIndex(c => c.key === dragColKey);
-    const to = colState.findIndex(c => c.key === targetKey);
-    const [moved] = colState.splice(from, 1);
-    colState.splice(to, 0, moved);
-    saveColState();
-    renderHead();
-    renderTable();
-  }
-  dragColKey = null;
-});
-headRow.addEventListener('dragend', () => {
-  headRow.querySelectorAll('th.drag-over').forEach(t => t.classList.remove('drag-over'));
-  dragColKey = null;
-});
+    let dragColKey = null;
+    headRow.addEventListener('dragstart', (e) => {
+      const th = e.target.closest('th[data-key]');
+      if (!th) return;
+      dragColKey = th.dataset.key;
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    headRow.addEventListener('dragover', (e) => {
+      const th = e.target.closest('th[data-key]');
+      if (!th || !dragColKey) return;
+      e.preventDefault();
+      headRow.querySelectorAll('th.drag-over').forEach(t => t.classList.remove('drag-over'));
+      th.classList.add('drag-over');
+    });
+    headRow.addEventListener('dragleave', (e) => {
+      const th = e.target.closest('th[data-key]');
+      th && th.classList.remove('drag-over');
+    });
+    headRow.addEventListener('drop', (e) => {
+      const th = e.target.closest('th[data-key]');
+      headRow.querySelectorAll('th.drag-over').forEach(t => t.classList.remove('drag-over'));
+      if (!th || !dragColKey) return;
+      e.preventDefault();
+      const targetKey = th.dataset.key;
+      if (targetKey !== dragColKey) {
+        const from = colState.findIndex(c => c.key === dragColKey);
+        const to = colState.findIndex(c => c.key === targetKey);
+        const [moved] = colState.splice(from, 1);
+        colState.splice(to, 0, moved);
+        saveColState();
+        renderHead();
+        renderTable();
+      }
+      dragColKey = null;
+    });
+    headRow.addEventListener('dragend', () => {
+      headRow.querySelectorAll('th.drag-over').forEach(t => t.classList.remove('drag-over'));
+      dragColKey = null;
+    });
 
-// Click a column title to sort by it (suppressed automatically if a real drag just happened).
-headRow.addEventListener('click', (e) => {
-  if (e.target.closest('.resize-handle')) return;
-  const th = e.target.closest('th[data-key]');
-  if (!th) return;
-  const key = th.dataset.key;
-  sortState = sortState.key === key ? { key, dir: sortState.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' };
-  sortRows();
-  renderHead();
-  renderTable();
-});
+    // Click a column title to sort by it (suppressed automatically if a real drag just happened).
+    headRow.addEventListener('click', (e) => {
+      if (e.target.closest('.resize-handle')) return;
+      const th = e.target.closest('th[data-key]');
+      if (!th) return;
+      const key = th.dataset.key;
+      sortState = sortState.key === key ? { key, dir: sortState.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' };
+      sortRows();
+      renderHead();
+      renderTable();
+    });
 
-function sortRows() {
-  const { key, dir } = sortState;
-  if (!key) return;
-  const mult = dir === 'asc' ? 1 : -1;
-  rows.sort((a, b) => {
-    if (key === 'price') return ((parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)) * mult;
-    if (key === 'is_morning' || key === 'available') return ((a[key] === b[key]) ? 0 : (a[key] ? 1 : -1)) * mult;
-    return String(a[key] || '').localeCompare(String(b[key] || '')) * mult;
-  });
-  markDirty();
-}
+    function sortRows() {
+      const { key, dir } = sortState;
+      if (!key) return;
+      const mult = dir === 'asc' ? 1 : -1;
+      rows.sort((a, b) => {
+        if (key === 'price') return ((parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)) * mult;
+        if (key === 'is_morning' || key === 'available') return ((a[key] === b[key]) ? 0 : (a[key] ? 1 : -1)) * mult;
+        return String(a[key] || '').localeCompare(String(b[key] || '')) * mult;
+      });
+      markDirty();
+    }
 
-/* ---------------- Body: render ---------------- */
+    /* ---------------- Body: render ---------------- */
 
-function renderTable() {
-  updateCategoryList();
-  const filter = searchBox.value.trim().toLowerCase();
-  tbody.innerHTML = '';
+    function renderTable() {
+      updateCategoryList();
+      const filter = searchBox.value.trim().toLowerCase();
+      tbody.innerHTML = '';
 
-  if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="${colState.length + 2}"><div class="empty-state">No menu items yet. Click "➕ Add Row" to create one.</div></td></tr>`;
-    rowCountEl.textContent = '';
-    return;
-  }
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="${colState.length + 2}"><div class="empty-state">No menu items yet. Click "➕ Add Row" to create one.</div></td></tr>`;
+        rowCountEl.textContent = '';
+        return;
+      }
 
-  const fv = filterSelect.value;
-  let shown = 0;
-  rows.forEach((row, idx) => {
-    if (filter && !(`${row.name} ${row.category} ${row.name_hindi}`.toLowerCase().includes(filter))) return;
-    if (fv === 'available' && !row.available) return;
-    if (fv === 'unavailable' && row.available) return;
-    if (fv === 'morning' && !row.is_morning) return;
-    shown++;
-    tbody.appendChild(buildRowEl(row, idx));
-  });
-  rowCountEl.textContent = `${shown} of ${rows.length} items`;
-}
+      const fv = filterSelect.value;
+      let shown = 0;
+      rows.forEach((row, idx) => {
+        if (filter && !(`${row.name} ${row.category} ${row.name_hindi}`.toLowerCase().includes(filter))) return;
+        if (fv === 'available' && !row.available) return;
+        if (fv === 'unavailable' && row.available) return;
+        if (fv === 'morning' && !row.is_morning) return;
+        shown++;
+        tbody.appendChild(buildRowEl(row, idx));
+      });
+      rowCountEl.textContent = `${shown} of ${rows.length} items`;
+    }
 
-function buildRowEl(row, idx) {
-  const tr = document.createElement('tr');
-  tr.dataset.idx = idx;
-  if (!row.available) tr.classList.add('unavailable');
-  const locked = !row.available;
-  const rowEditable = editMode || editingRows.has(idx);
-  const unlocked = editingRows.has(idx);
+    function buildRowEl(row, idx) {
+      const tr = document.createElement('tr');
+      tr.dataset.idx = idx;
+      if (!row.available) tr.classList.add('unavailable');
+      const locked = !row.available;
+      const rowEditable = editMode || editingRows.has(idx);
+      const unlocked = editingRows.has(idx);
 
-  const numCell = `<td class="num">
+      const numCell = `<td class="num">
       <span class="drag-handle" draggable="true" title="Drag to reorder this row">⠿</span>
       <span class="row-num">${idx + 1}</span>
       <button class="row-edit-toggle" data-action="toggle-row-edit"
@@ -465,34 +1062,34 @@ function buildRowEl(row, idx) {
         ${editMode ? 'disabled' : ''}>${rowEditable ? '🔓' : '🔒'}</button>
     </td>`;
 
-  tr.innerHTML = numCell +
-    colState.map(c => cellFor(c.key, row, rowEditable, locked)).join('') +
-    `<td class="act"><button class="row-del" data-action="delete" title="Delete row" ${!rowEditable ? 'disabled' : ''}>🗑</button></td>`;
-  return tr;
-}
+      tr.innerHTML = numCell +
+        colState.map(c => cellFor(c.key, row, rowEditable, locked)).join('') +
+        `<td class="act"><button class="row-del" data-action="delete" title="Delete row" ${!rowEditable ? 'disabled' : ''}>🗑</button></td>`;
+      return tr;
+    }
 
-function cellFor(key, row, rowEditable, locked) {
-  const disabledAttr = (!rowEditable || locked) ? 'disabled' : '';
-  const readonlyAttr = !rowEditable ? 'readonly' : '';
-  const strikeClass = !row.available ? 'strike grayed' : '';
+    function cellFor(key, row, rowEditable, locked) {
+      const disabledAttr = (!rowEditable || locked) ? 'disabled' : '';
+      const readonlyAttr = !rowEditable ? 'readonly' : '';
+      const strikeClass = !row.available ? 'strike grayed' : '';
 
-  switch (key) {
-    case 'category':
-      return `<td><input class="cell-input ${strikeClass}" list="categoryList" data-field="category" value="${escAttr(row.category)}" placeholder="e.g. Main" ${disabledAttr} ${readonlyAttr}></td>`;
-    case 'category_hindi':
-      return `<td><div class="hindi-cell-wrap">
+      switch (key) {
+        case 'category':
+          return `<td><input class="cell-input ${strikeClass}" list="categoryList" data-field="category" value="${escAttr(row.category)}" placeholder="e.g. Main" ${disabledAttr} ${readonlyAttr}></td>`;
+        case 'category_hindi':
+          return `<td><div class="hindi-cell-wrap">
         <input class="cell-input hindi ${strikeClass}" data-field="category_hindi" value="${escAttr(row.category_hindi)}" placeholder="श्रेणी" ${disabledAttr} ${readonlyAttr}>
         <button class="xlate-btn" data-action="translate-cat" title="Auto-translate from Category" ${!rowEditable || locked ? 'disabled' : ''}>🌐</button>
       </div></td>`;
-    case 'name':
-      return `<td><input class="cell-input ${strikeClass}" data-field="name" value="${escAttr(row.name)}" placeholder="Item name" ${disabledAttr} ${readonlyAttr}></td>`;
-    case 'name_hindi':
-      return `<td><div class="hindi-cell-wrap">
+        case 'name':
+          return `<td><input class="cell-input ${strikeClass}" data-field="name" value="${escAttr(row.name)}" placeholder="Item name" ${disabledAttr} ${readonlyAttr}></td>`;
+        case 'name_hindi':
+          return `<td><div class="hindi-cell-wrap">
         <input class="cell-input hindi ${strikeClass}" data-field="name_hindi" value="${escAttr(row.name_hindi)}" placeholder="नाम" ${disabledAttr} ${readonlyAttr}>
         <button class="xlate-btn" data-action="translate-name" title="Auto-translate from Name" ${!rowEditable || locked ? 'disabled' : ''}>🌐</button>
       </div></td>`;
-    case 'image':
-      return `<td><div class="img-cell">
+        case 'image':
+          return `<td><div class="img-cell">
         ${row.image ? `<img class="img-thumb" src="${escAttr(row.image)}" alt="">` : `<div class="img-placeholder">🖼</div>`}
         <div class="img-actions">
           <button class="btn-sm btn-ghost-dark" data-action="upload-image" ${!rowEditable || locked ? 'disabled' : ''}>Upload</button>
@@ -500,283 +1097,298 @@ function cellFor(key, row, rowEditable, locked) {
         </div>
         <input type="file" accept="image/*" class="file-hidden" data-action="file-input">
       </div></td>`;
-    case 'price':
-      return `<td><input class="cell-input price-input ${strikeClass}" data-field="price" type="number" min="0" step="1" value="${escAttr(row.price)}" placeholder="0" ${disabledAttr} ${readonlyAttr}></td>`;
-    case 'is_morning':
-      return `<td class="chk-cell"><input type="checkbox" data-field="is_morning" ${row.is_morning ? 'checked' : ''} ${!rowEditable || locked ? 'disabled' : ''}></td>`;
-    case 'available':
-      return `<td class="chk-cell"><input type="checkbox" data-field="available" ${row.available ? 'checked' : ''} ${!rowEditable ? 'disabled' : ''}></td>`;
-    default:
-      return '<td></td>';
-  }
-}
-
-/* ---------------- Body: field/checkbox events ---------------- */
-
-tbody.addEventListener('input', (e) => {
-  const field = e.target.dataset.field;
-  if (!field) return;
-  const idx = +e.target.closest('tr').dataset.idx;
-  rows[idx][field] = e.target.value;
-  markDirty();
-  if (field === 'category') updateCategoryList();
-});
-
-tbody.addEventListener('change', async (e) => {
-  if (e.target.matches('input[type=file]')) {
-    const idx = +e.target.closest('tr').dataset.idx;
-    const file = e.target.files[0];
-    if (file) await handleImageUpload(idx, file, e.target);
-    e.target.value = '';
-    return;
-  }
-  const field = e.target.dataset.field;
-  if (field === 'is_morning' || field === 'available') {
-    const idx = +e.target.closest('tr').dataset.idx;
-    rows[idx][field] = e.target.checked;
-    markDirty();
-    renderTable(); // refresh strike/gray/lock state
-  }
-});
-
-// Enter moves focus to the next editable field (one step forward), like Excel/Tab.
-tbody.addEventListener('keydown', (e) => {
-  if (e.key !== 'Enter' || !e.target.matches('input')) return;
-  e.preventDefault();
-  const focusables = Array.from(tbody.querySelectorAll('input:not(:disabled)'));
-  const i = focusables.indexOf(e.target);
-  if (i > -1 && i < focusables.length - 1) {
-    const next = focusables[i + 1];
-    next.focus();
-    if (next.select) next.select();
-  }
-});
-
-tbody.addEventListener('click', async (e) => {
-  const btn = e.target.closest('button');
-  if (!btn) return;
-  const tr = btn.closest('tr');
-  const idx = +tr.dataset.idx;
-  const action = btn.dataset.action;
-
-  if (action === 'toggle-row-edit') {
-    if (editingRows.has(idx)) editingRows.delete(idx); else editingRows.add(idx);
-    renderTable();
-    return;
-  }
-  if (action === 'delete') {
-    if (!confirm(`Delete "${rows[idx].name || 'this row'}"?`)) return;
-    rows.splice(idx, 1);
-    editingRows.delete(idx);
-    markDirty();
-    renderTable();
-    return;
-  }
-  if (action === 'translate-cat') { await translateField(idx, 'category', 'category_hindi', btn); return; }
-  if (action === 'translate-name') { await translateField(idx, 'name', 'name_hindi', btn); return; }
-  if (action === 'upload-image') { btn.closest('.img-cell').querySelector('input[type=file]').click(); return; }
-  if (action === 'remove-image') {
-    rows[idx].image = '';
-    markDirty();
-    renderTable();
-    return;
-  }
-});
-
-/* ---------------- Row drag-and-drop reordering ---------------- */
-
-let dragRowIdx = null;
-tbody.addEventListener('dragstart', (e) => {
-  const handle = e.target.closest('.drag-handle');
-  if (!handle) return;
-  dragRowIdx = +handle.closest('tr').dataset.idx;
-  e.dataTransfer.effectAllowed = 'move';
-});
-tbody.addEventListener('dragover', (e) => {
-  if (dragRowIdx === null) return;
-  const tr = e.target.closest('tr[data-idx]');
-  if (!tr) return;
-  e.preventDefault();
-  tbody.querySelectorAll('tr.drag-over-row').forEach(t => t.classList.remove('drag-over-row'));
-  tr.classList.add('drag-over-row');
-});
-tbody.addEventListener('drop', (e) => {
-  const tr = e.target.closest('tr[data-idx]');
-  tbody.querySelectorAll('tr.drag-over-row').forEach(t => t.classList.remove('drag-over-row'));
-  if (!tr || dragRowIdx === null) return;
-  e.preventDefault();
-  const targetIdx = +tr.dataset.idx;
-  if (targetIdx !== dragRowIdx) {
-    const [moved] = rows.splice(dragRowIdx, 1);
-    rows.splice(targetIdx, 0, moved);
-    editingRows.clear();
-    sortState = { key: null, dir: 'asc' };
-    markDirty();
-    renderHead();
-    renderTable();
-  }
-  dragRowIdx = null;
-});
-tbody.addEventListener('dragend', () => {
-  tbody.querySelectorAll('tr.drag-over-row').forEach(t => t.classList.remove('drag-over-row'));
-  dragRowIdx = null;
-});
-
-/* ---------------- Translate ---------------- */
-
-async function translateText(text) {
-  if (!text || !text.trim()) return '';
-  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|hi`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('Translate service error');
-  const data = await res.json();
-  const t = data?.responseData?.translatedText;
-  if (!t) throw new Error('No translation returned');
-  return t;
-}
-
-async function translateField(idx, srcField, dstField, btnEl) {
-  const src = rows[idx][srcField];
-  if (!src || !src.trim()) { setStatus('error', 'Nothing to translate — fill in the English field first.'); return; }
-  btnEl && btnEl.classList.add('spin');
-  try {
-    rows[idx][dstField] = await translateText(src);
-    markDirty();
-    renderTable();
-  } catch (err) {
-    setStatus('error', 'Translation failed: ' + err.message + ' (check internet connection)');
-  } finally {
-    btnEl && btnEl.classList.remove('spin');
-  }
-}
-
-document.getElementById('btnTranslateAll').addEventListener('click', async () => {
-  const btn = document.getElementById('btnTranslateAll');
-  btn.disabled = true;
-  const original = btn.textContent;
-  let count = 0, failed = 0;
-  for (const r of rows) {
-    if (r.name && !r.name_hindi.trim()) {
-      btn.textContent = `🌐 Translating (${++count})…`;
-      try { r.name_hindi = await translateText(r.name); } catch { failed++; }
+        case 'price':
+          return `<td><input class="cell-input price-input ${strikeClass}" data-field="price" type="number" min="0" step="1" value="${escAttr(row.price)}" placeholder="0" ${disabledAttr} ${readonlyAttr}></td>`;
+        case 'is_morning':
+          return `<td class="chk-cell"><input type="checkbox" data-field="is_morning" ${row.is_morning ? 'checked' : ''} ${!rowEditable || locked ? 'disabled' : ''}></td>`;
+        case 'available':
+          return `<td class="chk-cell"><input type="checkbox" data-field="available" ${row.available ? 'checked' : ''} ${!rowEditable ? 'disabled' : ''}></td>`;
+        default:
+          return '<td></td>';
+      }
     }
-    if (r.category && !r.category_hindi.trim()) {
-      btn.textContent = `🌐 Translating (${++count})…`;
-      try { r.category_hindi = await translateText(r.category); } catch { failed++; }
+
+    /* ---------------- Body: field/checkbox events ---------------- */
+
+    tbody.addEventListener('input', (e) => {
+      const field = e.target.dataset.field;
+      if (!field) return;
+      const idx = +e.target.closest('tr').dataset.idx;
+      rows[idx][field] = e.target.value;
+      markDirty();
+      if (field === 'category') updateCategoryList();
+    });
+
+    tbody.addEventListener('change', async (e) => {
+      if (e.target.matches('input[type=file]')) {
+        const idx = +e.target.closest('tr').dataset.idx;
+        const file = e.target.files[0];
+        if (file) await handleImageUpload(idx, file, e.target);
+        e.target.value = '';
+        return;
+      }
+      const field = e.target.dataset.field;
+      if (field === 'is_morning' || field === 'available') {
+        const idx = +e.target.closest('tr').dataset.idx;
+        rows[idx][field] = e.target.checked;
+        markDirty();
+        renderTable(); // refresh strike/gray/lock state
+      }
+    });
+
+    // Enter moves focus to the next editable field (one step forward), like Excel/Tab.
+    tbody.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' || !e.target.matches('input')) return;
+      e.preventDefault();
+      const focusables = Array.from(tbody.querySelectorAll('input:not(:disabled)'));
+      const i = focusables.indexOf(e.target);
+      if (i > -1 && i < focusables.length - 1) {
+        const next = focusables[i + 1];
+        next.focus();
+        if (next.select) next.select();
+      }
+    });
+
+    tbody.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const tr = btn.closest('tr');
+      const idx = +tr.dataset.idx;
+      const action = btn.dataset.action;
+
+      if (action === 'toggle-row-edit') {
+        if (editingRows.has(idx)) editingRows.delete(idx); else editingRows.add(idx);
+        renderTable();
+        return;
+      }
+      if (action === 'delete') {
+        const itemName = rows[idx].name || 'this row';
+        const ok = await dangerConfirm(
+          'Delete "' + itemName + '"?',
+          '<strong>You are about to permanently delete this menu item.</strong><br><br>' +
+          'Item: <strong>' + itemName + '</strong><br>' +
+          'Category: ' + (rows[idx].category || '—') + '<br><br>' +
+          'Click <strong>Save All</strong> after to write changes to Menu.xlsx, or <strong>Reload</strong> to undo.',
+          'Delete');
+        if (!ok) return;
+        rows.splice(idx, 1);
+        editingRows.delete(idx);
+        markDirty();
+        renderTable();
+        return;
+      }
+      if (action === 'translate-cat') { await translateField(idx, 'category', 'category_hindi', btn); return; }
+      if (action === 'translate-name') { await translateField(idx, 'name', 'name_hindi', btn); return; }
+      if (action === 'upload-image') { btn.closest('.img-cell').querySelector('input[type=file]').click(); return; }
+      if (action === 'remove-image') {
+        rows[idx].image = '';
+        markDirty();
+        renderTable();
+        return;
+      }
+    });
+
+    /* ---------------- Row drag-and-drop reordering ---------------- */
+
+    let dragRowIdx = null;
+    tbody.addEventListener('dragstart', (e) => {
+      const handle = e.target.closest('.drag-handle');
+      if (!handle) return;
+      dragRowIdx = +handle.closest('tr').dataset.idx;
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    tbody.addEventListener('dragover', (e) => {
+      if (dragRowIdx === null) return;
+      const tr = e.target.closest('tr[data-idx]');
+      if (!tr) return;
+      e.preventDefault();
+      tbody.querySelectorAll('tr.drag-over-row').forEach(t => t.classList.remove('drag-over-row'));
+      tr.classList.add('drag-over-row');
+    });
+    tbody.addEventListener('drop', (e) => {
+      const tr = e.target.closest('tr[data-idx]');
+      tbody.querySelectorAll('tr.drag-over-row').forEach(t => t.classList.remove('drag-over-row'));
+      if (!tr || dragRowIdx === null) return;
+      e.preventDefault();
+      const targetIdx = +tr.dataset.idx;
+      if (targetIdx !== dragRowIdx) {
+        const [moved] = rows.splice(dragRowIdx, 1);
+        rows.splice(targetIdx, 0, moved);
+        editingRows.clear();
+        sortState = { key: null, dir: 'asc' };
+        markDirty();
+        renderHead();
+        renderTable();
+      }
+      dragRowIdx = null;
+    });
+    tbody.addEventListener('dragend', () => {
+      tbody.querySelectorAll('tr.drag-over-row').forEach(t => t.classList.remove('drag-over-row'));
+      dragRowIdx = null;
+    });
+
+    /* ---------------- Translate ---------------- */
+
+    async function translateText(text) {
+      if (!text || !text.trim()) return '';
+      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|hi`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Translate service error');
+      const data = await res.json();
+      const t = data?.responseData?.translatedText;
+      if (!t) throw new Error('No translation returned');
+      return t;
     }
-  }
-  btn.textContent = original;
-  btn.disabled = false;
-  if (count > 0) { markDirty(); renderTable(); }
-  setStatus(failed ? 'error' : 'saved', failed ? `Translated with ${failed} failure(s) — check internet.` : (count ? `Translated ${count} field(s).` : 'Nothing needed translation.'));
-});
 
-/* ---------------- Images ---------------- */
+    async function translateField(idx, srcField, dstField, btnEl) {
+      const src = rows[idx][srcField];
+      if (!src || !src.trim()) { setStatus('error', 'Nothing to translate — fill in the English field first.'); return; }
+      btnEl && btnEl.classList.add('spin');
+      try {
+        rows[idx][dstField] = await translateText(src);
+        markDirty();
+        renderTable();
+      } catch (err) {
+        setStatus('error', 'Translation failed: ' + err.message + ' (check internet connection)');
+      } finally {
+        btnEl && btnEl.classList.remove('spin');
+      }
+    }
 
-function cropToSquareWebp(file, outSize = 640) {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
-      const size = Math.min(img.width, img.height);
-      const sx = (img.width - size) / 2;
-      const sy = (img.height - size) / 2;
-      const canvas = document.createElement('canvas');
-      canvas.width = outSize; canvas.height = outSize;
-      canvas.getContext('2d').drawImage(img, sx, sy, size, size, 0, 0, outSize, outSize);
-      canvas.toBlob((blob) => {
-        URL.revokeObjectURL(url);
-        blob ? resolve(blob) : reject(new Error('This browser could not encode WEBP'));
-      }, 'image/webp', 0.85);
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not read image file')); };
-    img.src = url;
-  });
-}
-function blobToDataUrl(blob) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
-
-async function handleImageUpload(idx, file, inputEl) {
-  const cell = inputEl.closest('.img-cell');
-  cell.classList.add('uploading');
-  try {
-    const blob = await cropToSquareWebp(file);
-    const dataUrl = await blobToDataUrl(blob);
-    const suggestedName = rows[idx].name || rows[idx].category || ('item-' + (idx + 1));
-    const res = await fetch(UPLOAD_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: suggestedName, dataUrl }),
+    document.getElementById('btnTranslateAll').addEventListener('click', async () => {
+      const btn = document.getElementById('btnTranslateAll');
+      btn.disabled = true;
+      const original = btn.textContent;
+      let count = 0, failed = 0;
+      for (const r of rows) {
+        if (r.name && !r.name_hindi.trim()) {
+          btn.textContent = `🌐 Translating (${++count})…`;
+          try { r.name_hindi = await translateText(r.name); } catch { failed++; }
+        }
+        if (r.category && !r.category_hindi.trim()) {
+          btn.textContent = `🌐 Translating (${++count})…`;
+          try { r.category_hindi = await translateText(r.category); } catch { failed++; }
+        }
+      }
+      btn.textContent = original;
+      btn.disabled = false;
+      if (count > 0) { markDirty(); renderTable(); }
+      setStatus(failed ? 'error' : 'saved', failed ? `Translated with ${failed} failure(s) — check internet.` : (count ? `Translated ${count} field(s).` : 'Nothing needed translation.'));
     });
-    const data = await res.json();
-    if (!res.ok || data.error) throw new Error(data.error || ('HTTP ' + res.status));
-    rows[idx].image = data.path;
-    markDirty();
-    renderTable();
-    setStatus('dirty', `Image saved to ${data.path}. Click "Save All" to store the reference in Menu.xlsx.`);
-  } catch (err) {
-    setStatus('error', 'Image upload failed: ' + err.message);
-  } finally {
-    cell.classList.remove('uploading');
-  }
-}
 
-/* ---------------- Toolbar ---------------- */
+    /* ---------------- Images ---------------- */
 
-document.getElementById('btnAddRow').addEventListener('click', () => {
-  rows.push(blankRow());
-  editingRows.add(rows.length - 1);
-  markDirty();
-  renderTable();
-  tbody.lastElementChild?.querySelector('input[data-field="category"]')?.focus();
-});
+    function cropToSquareWebp(file, outSize = 640) {
+      return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+          const size = Math.min(img.width, img.height);
+          const sx = (img.width - size) / 2;
+          const sy = (img.height - size) / 2;
+          const canvas = document.createElement('canvas');
+          canvas.width = outSize; canvas.height = outSize;
+          canvas.getContext('2d').drawImage(img, sx, sy, size, size, 0, 0, outSize, outSize);
+          canvas.toBlob((blob) => {
+            URL.revokeObjectURL(url);
+            blob ? resolve(blob) : reject(new Error('This browser could not encode WEBP'));
+          }, 'image/webp', 0.85);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Could not read image file')); };
+        img.src = url;
+      });
+    }
+    function blobToDataUrl(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
 
-editModeToggle.addEventListener('change', () => {
-  editMode = editModeToggle.checked;
-  renderTable();
-});
+    async function handleImageUpload(idx, file, inputEl) {
+      const cell = inputEl.closest('.img-cell');
+      cell.classList.add('uploading');
+      try {
+        const blob = await cropToSquareWebp(file);
+        const dataUrl = await blobToDataUrl(blob);
+        const suggestedName = rows[idx].name || rows[idx].category || ('item-' + (idx + 1));
+        const res = await fetch(UPLOAD_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: suggestedName, dataUrl }),
+        });
+        const data = await res.json();
+        if (!res.ok || data.error) throw new Error(data.error || ('HTTP ' + res.status));
+        rows[idx].image = data.path;
+        markDirty();
+        renderTable();
+        setStatus('dirty', `Image saved to ${data.path}. Click "Save All" to store the reference in Menu.xlsx.`);
+      } catch (err) {
+        setStatus('error', 'Image upload failed: ' + err.message);
+      } finally {
+        cell.classList.remove('uploading');
+      }
+    }
 
-searchBox.addEventListener('input', renderTable);
-filterSelect.addEventListener('change', renderTable);
+    /* ---------------- Toolbar ---------------- */
 
-document.getElementById('btnReload').addEventListener('click', () => {
-  if (dirty && !confirm('You have unsaved changes. Reload from file and discard them?')) return;
-  loadData();
-});
-
-document.getElementById('btnSaveAll').addEventListener('click', async () => {
-  const btn = document.getElementById('btnSaveAll');
-  btn.disabled = true;
-  setStatus('', 'Saving…');
-  try {
-    const res = await fetch(API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(rows),
+    document.getElementById('btnAddRow').addEventListener('click', () => {
+      rows.push(blankRow());
+      editingRows.add(rows.length - 1);
+      markDirty();
+      renderTable();
+      tbody.lastElementChild?.querySelector('input[data-field="category"]')?.focus();
     });
-    const data = await res.json();
-    if (!res.ok || data.error) throw new Error(data.error || ('HTTP ' + res.status));
-    dirty = false;
-    setStatus('saved', `Saved ${rows.length} items to ${data.path || 'Menu.xlsx'}.`);
-    lastSavedEl.textContent = 'Last saved ' + new Date().toLocaleTimeString() + ' — digital-menu.html will pick up changes automatically.';
-  } catch (e) {
-    setStatus('error', 'Save failed: ' + e.message + ' (close Menu.xlsx if it is open in Excel, then try again)');
-  } finally {
-    btn.disabled = false;
-  }
-});
 
-window.addEventListener('beforeunload', (e) => {
-  if (dirty) { e.preventDefault(); e.returnValue = ''; }
-});
+    editModeToggle.addEventListener('change', () => {
+      editMode = editModeToggle.checked;
+      renderTable();
+    });
 
-loadData();
-</script>
+    searchBox.addEventListener('input', renderTable);
+    filterSelect.addEventListener('change', renderTable);
+
+    document.getElementById('btnReload').addEventListener('click', async () => {
+      if (dirty) {
+        const ok = await dangerConfirm(
+          'Discard unsaved changes?',
+          '<strong>You have unsaved changes that will be lost.</strong><br><br>Reloading will fetch the data from Menu.xlsx and discard everything you have edited since the last save.',
+          'Discard & Reload');
+        if (!ok) return;
+      }
+      loadData();
+    });
+
+    document.getElementById('btnSaveAll').addEventListener('click', async () => {
+      const btn = document.getElementById('btnSaveAll');
+      btn.disabled = true;
+      setStatus('', 'Saving…');
+      try {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(rows),
+        });
+        const data = await res.json();
+        if (!res.ok || data.error) throw new Error(data.error || ('HTTP ' + res.status));
+        dirty = false;
+        setStatus('saved', `Saved ${rows.length} items to ${data.path || 'Menu.xlsx'}.`);
+        lastSavedEl.textContent = 'Last saved ' + new Date().toLocaleTimeString() + ' — digital-menu.html will pick up changes automatically.';
+      } catch (e) {
+        setStatus('error', 'Save failed: ' + e.message + ' (close Menu.xlsx if it is open in Excel, then try again)');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    window.addEventListener('beforeunload', (e) => {
+      if (dirty) { e.preventDefault(); e.returnValue = ''; }
+    });
+
+    loadData();
+  </script>
 </body>
+
 </html>

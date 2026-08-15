@@ -50,8 +50,8 @@ def build_urls(port: int, lan_ip: str) -> dict:
     """
     return {
         "local_admin": f"http://127.0.0.1:{port}/admin.html",
-        "local_menu": f"http://127.0.0.1:{port}/digital-menu.html",
+        "local_menu": f"http://127.0.0.1:{port}/",
         "lan_admin": f"http://{lan_ip}:{port}/admin.html",
-        "lan_menu": f"http://{lan_ip}:{port}/digital-menu.html",
+        "lan_menu": f"http://{lan_ip}:{port}/",
         "lan_root": f"http://{lan_ip}:{port}",
     }

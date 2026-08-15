@@ -143,7 +143,7 @@ class MenuHandler(BaseHTTPRequestHandler):
 
     def _serve_file(self, relative_path):
         if relative_path in {"", "/"}:
-            relative_path = "/admin.html"
+            relative_path = "/index.html"
         safe_path = relative_path.lstrip("/")
         if safe_path.startswith("api/"):
             return None
@@ -296,10 +296,9 @@ if __name__ == "__main__":
         server = ThreadingHTTPServer((host, port), MenuHandler)
     except OSError:
         print(f"Port {port} is already in use — a menu server is probably already running.")
-        print(f"Reusing it: open http://localhost:{port}/admin.html or http://localhost:{port}/digital-menu.html")
+        print(f"Reusing it: open http://localhost:{port}/")
     else:
-        print(f"Menu admin:  http://localhost:{port}/admin.html")
-        print(f"Menu board:  http://localhost:{port}/digital-menu.html")
+        print(f"Menu URL:  http://localhost:{port}/")
 
         # serve_forever() runs on a background thread so the main thread is free to
         # block on shutdown_event — set either by POST /api/shutdown (the launcher's

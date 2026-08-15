@@ -530,3 +530,113 @@ OSError: [WinError 1402] Invalid cursor handle.
 2026-08-15 07:13:38 [INFO] launcher: server is ready
 2026-08-15 07:13:38 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
 LAN: http://192.168.1.37:8080/digital-menu.html
+2026-08-15 21:15:04 [INFO] launcher: Exit requested from tray menu
+2026-08-15 21:15:04 [INFO] launcher: stopping menu_server.py (pid=29412)
+2026-08-15 21:15:04 [INFO] launcher: server exited gracefully
+2026-08-15 21:15:04 [INFO] launcher: server process exited (code=0)
+2026-08-15 21:15:04 [ERROR] launcher: failed to update tray icon for state=stopped
+Traceback (most recent call last):
+  File "E:\digitalmenu\launcher\app.py", line 67, in handle_state_change
+    icon.icon = tray_manager.build_icon_image(state)
+    ^^^^^^^^^
+  File "C:\Users\Ashish Piya\AppData\Roaming\Python\Python314\site-packages\pystray\_base.py", line 134, in icon
+    self._update_icon()
+    ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Ashish Piya\AppData\Roaming\Python\Python314\site-packages\pystray\_win32.py", line 72, in _update_icon
+    self._release_icon()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Ashish Piya\AppData\Roaming\Python\Python314\site-packages\pystray\_win32.py", line 350, in _release_icon
+    win32.DestroyIcon(self._icon_handle)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Ashish Piya\AppData\Roaming\Python\Python314\site-packages\pystray\_util\win32.py", line 204, in _err
+    raise ctypes.WinError()
+OSError: [WinError 1402] Invalid cursor handle.
+2026-08-15 21:15:04 [INFO] launcher: Digital Menu launcher exited
+2026-08-15 21:15:04 [INFO] launcher: notify: Server Stopped — The Digital Menu server has stopped.
+2026-08-15 21:15:10 [INFO] launcher: ============================================================
+2026-08-15 21:15:10 [INFO] launcher: Digital Menu launcher starting (root=E:\digitalmenu)
+2026-08-15 21:15:11 [INFO] launcher: LAN IP detected: 192.168.1.37
+2026-08-15 21:15:11 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-08-15 21:15:12 [INFO] launcher: spawned menu_server.py (pid=12376) on 0.0.0.0:8080
+2026-08-15 21:15:12 [INFO] launcher: server is ready
+2026-08-15 21:15:12 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://192.168.1.37:8080/digital-menu.html
+2026-08-15 21:23:09 [INFO] launcher: Exit requested from tray menu
+2026-08-15 21:23:09 [INFO] launcher: stopping menu_server.py (pid=12376)
+2026-08-15 21:23:10 [INFO] launcher: server exited gracefully
+2026-08-15 21:23:10 [INFO] launcher: server process exited (code=0)
+2026-08-15 21:23:10 [ERROR] launcher: failed to update tray icon for state=stopped
+Traceback (most recent call last):
+  File "E:\digitalmenu\launcher\app.py", line 67, in handle_state_change
+    icon.icon = tray_manager.build_icon_image(state)
+    ^^^^^^^^^
+  File "C:\Users\Ashish Piya\AppData\Roaming\Python\Python314\site-packages\pystray\_base.py", line 134, in icon
+    self._update_icon()
+    ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Ashish Piya\AppData\Roaming\Python\Python314\site-packages\pystray\_win32.py", line 72, in _update_icon
+    self._release_icon()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Ashish Piya\AppData\Roaming\Python\Python314\site-packages\pystray\_win32.py", line 350, in _release_icon
+    win32.DestroyIcon(self._icon_handle)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Ashish Piya\AppData\Roaming\Python\Python314\site-packages\pystray\_util\win32.py", line 204, in _err
+    raise ctypes.WinError()
+OSError: [WinError 1402] Invalid cursor handle.
+2026-08-15 21:23:10 [INFO] launcher: notify: Server Stopped — The Digital Menu server has stopped.
+2026-08-15 21:23:10 [INFO] launcher: Digital Menu launcher exited
+2026-08-15 21:23:20 [INFO] launcher: ============================================================
+2026-08-15 21:23:20 [INFO] launcher: Digital Menu launcher starting (root=E:\digitalmenu)
+2026-08-15 21:23:20 [INFO] launcher: LAN IP detected: 192.168.1.37
+2026-08-15 21:23:20 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-08-15 21:23:21 [INFO] launcher: spawned menu_server.py (pid=1464) on 0.0.0.0:8080
+2026-08-15 21:23:21 [INFO] launcher: server is ready
+2026-08-15 21:23:21 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://192.168.1.37:8080/
+2026-08-15 21:30:09 [INFO] launcher: Exit requested from tray menu
+2026-08-15 21:30:09 [INFO] launcher: stopping menu_server.py (pid=1464)
+2026-08-15 21:30:10 [INFO] launcher: server exited gracefully
+2026-08-15 21:30:10 [INFO] launcher: server process exited (code=0)
+2026-08-15 21:30:10 [INFO] launcher: notify: Server Stopped — The Digital Menu server has stopped.
+2026-08-15 21:30:10 [INFO] launcher: Digital Menu launcher exited
+2026-08-15 21:32:00 [INFO] launcher: ============================================================
+2026-08-15 21:32:00 [INFO] launcher: Digital Menu launcher starting (root=E:\digitalmenu)
+2026-08-15 21:32:01 [INFO] launcher: LAN IP detected: 192.168.1.37
+2026-08-15 21:32:01 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-08-15 21:32:01 [INFO] launcher: spawned menu_server.py (pid=24720) on 0.0.0.0:8080
+2026-08-15 21:32:02 [INFO] launcher: server is ready
+2026-08-15 21:32:02 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://192.168.1.37:8080/
+2026-08-15 22:15:24 [INFO] launcher: Exit requested from tray menu
+2026-08-15 22:15:24 [INFO] launcher: stopping menu_server.py (pid=24720)
+2026-08-15 22:15:25 [INFO] launcher: server exited gracefully
+2026-08-15 22:15:25 [INFO] launcher: server process exited (code=0)
+2026-08-15 22:15:25 [ERROR] launcher: failed to update tray icon for state=stopped
+Traceback (most recent call last):
+  File "E:\digitalmenu\launcher\app.py", line 67, in handle_state_change
+    icon.icon = tray_manager.build_icon_image(state)
+    ^^^^^^^^^
+  File "C:\Users\Ashish Piya\AppData\Roaming\Python\Python314\site-packages\pystray\_base.py", line 134, in icon
+    self._update_icon()
+    ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Ashish Piya\AppData\Roaming\Python\Python314\site-packages\pystray\_win32.py", line 72, in _update_icon
+    self._release_icon()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\Ashish Piya\AppData\Roaming\Python\Python314\site-packages\pystray\_win32.py", line 350, in _release_icon
+    win32.DestroyIcon(self._icon_handle)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Ashish Piya\AppData\Roaming\Python\Python314\site-packages\pystray\_util\win32.py", line 204, in _err
+    raise ctypes.WinError()
+OSError: [WinError 1402] Invalid cursor handle.
+2026-08-15 22:15:25 [INFO] launcher: Digital Menu launcher exited
+2026-08-15 22:15:25 [INFO] launcher: notify: Server Stopped — The Digital Menu server has stopped.
+2026-08-15 22:15:34 [INFO] launcher: ============================================================
+2026-08-15 22:15:34 [INFO] launcher: Digital Menu launcher starting (root=E:\digitalmenu)
+2026-08-15 22:15:34 [INFO] launcher: LAN IP detected: 192.168.1.37
+2026-08-15 22:15:35 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-08-15 22:15:35 [WARNING] launcher: port 8080 already occupied before start — assuming an existing server instance
+2026-08-15 22:15:35 [INFO] launcher: notify: Port Already In Use — Port 8080 is already serving something — reusing the existing server.
+2026-08-15 22:15:35 [INFO] launcher: server is ready
+2026-08-15 22:15:35 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://192.168.1.37:8080/
+2026-08-15 22:27:44 [INFO] launcher: Exit requested from tray menu
+2026-08-15 22:27:44 [INFO] launcher: Digital Menu launcher exited
