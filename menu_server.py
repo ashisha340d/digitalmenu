@@ -104,6 +104,7 @@ def read_menu_items(path):
             "available": str(row[index_map.get("available", 0)] if index_map.get("available") is not None and index_map.get("available") < len(row) else "true").strip().lower() not in {"false", "0", "no", "n"},
             "is_morning": str(row[index_map.get("ismorning", 0)] if index_map.get("ismorning") is not None and index_map.get("ismorning") < len(row) else "false").strip().lower() in {"true", "1", "yes", "y"},
             "image": row[index_map.get("image", 0)] if index_map.get("image") is not None and index_map.get("image") < len(row) else "",
+            "featured": str(row[index_map.get("featured", 0)] if index_map.get("featured") is not None and index_map.get("featured") < len(row) else "false").strip().lower() in {"true", "1", "yes", "y"},
         }
         rows.append(item)
     return rows
@@ -112,9 +113,10 @@ def read_menu_items(path):
 def write_menu_items(path, items):
     wb = openpyxl.load_workbook(path)
     ws = wb.active
-    headers = ["Category", "Category_Hindi", "Name", "Name_Hindi", "Price", "Available", "IsMorning", "Image"]
+    headers = ["Category", "Category_Hindi", "Name", "Name_Hindi", "Price", "Available", "IsMorning", "Image", "Featured"]
     ws.delete_rows(2, ws.max_row)
-    ws.delete_cols(len(headers) + 1, ws.max_column - len(headers))
+    if ws.max_column > len(headers):
+        ws.delete_cols(len(headers) + 1, ws.max_column - len(headers))
     for col_idx, header in enumerate(headers, start=1):
         ws.cell(row=1, column=col_idx, value=header)
     for row_idx, item in enumerate(items, start=2):
@@ -126,6 +128,7 @@ def write_menu_items(path, items):
         ws.cell(row=row_idx, column=6, value="true" if item.get("available", True) else "false")
         ws.cell(row=row_idx, column=7, value="true" if item.get("is_morning", False) else "false")
         ws.cell(row=row_idx, column=8, value=item.get("image", ""))
+        ws.cell(row=row_idx, column=9, value="true" if item.get("featured", False) else "false")
     wb.save(path)
 
 

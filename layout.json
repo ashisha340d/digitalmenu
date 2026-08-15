@@ -1,1 +1,1 @@
-{"columns": [["Chaat", "Counter"], ["Main", "Sweet"], ["मीठा", "Drink", "Prasad"]], "fonts": {"मीठा": 1.2, "Prasad": 1.8, "Drink": 1.8, "Counter": 1.8, "Main": 1.7, "Chaat": 1.8, "Sweet": 1.8}}
+{"fonts": {"Main": 1.8, "Prasads": 1.8, "Sweetiya": 1.8, "Chatiya": 1.4}, "columns": [["Prasads", "Main"], ["Chatiya", "Sweetiya"], ["Drink", "Counter"]]}

@@ -284,8 +284,6 @@ body.idle, body.idle * { cursor: none !important; }
 }
 .cat-block:hover .hover-tools { opacity: 1; pointer-events: auto; }
 .cat-block:hover .cat-count { opacity: 0; }
-body.admin .hover-tools { opacity: 1; pointer-events: auto; }
-body.admin .cat-count { opacity: 0; }
 .drag-grip { font-size: .72rem; letter-spacing: .05em; color: rgba(255,255,255,.85); cursor: grab; }
 .font-btn {
   border: 1px solid rgba(255,255,255,.35); border-radius: 5px;
@@ -387,130 +385,22 @@ body.admin .cat-count { opacity: 0; }
 }
 #resetLayoutBtn:hover { opacity: 1; color: var(--gold); }
 
-/* ── ADMIN LAYER — inert until <body class="admin"> ────────── */
-.adm-badge {
-  display: none; align-items: center; gap: 5px;
-  border-radius: 999px; padding: 4px 10px;
-  font-size: .52rem; letter-spacing: .14em; font-weight: 800; text-transform: uppercase;
-  border: 1px solid rgba(255,120,120,.5); background: rgba(220,60,60,.16); color: #ff9a9a;
-  cursor: pointer; white-space: nowrap;
-}
-body.admin .adm-badge { display: inline-flex; }
-:root[data-theme="day"] .adm-badge { color: #9c1414; background: rgba(220,60,60,.13); }
-body.admin .clock { cursor: pointer; }
-body.admin.idle, body.admin.idle * { cursor: auto !important; }
-body.admin .strip-label { cursor: pointer; }
 
-.adm-btn {
-  border: 1px solid var(--card-brd); background: var(--chip-bg); color: var(--gold);
-  border-radius: 6px; min-width: 22px; height: 22px; padding: 0 6px;
-  font-size: .68rem; font-weight: 700; line-height: 1; font-family: inherit;
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
-  transition: background .15s, transform .15s;
-}
-.adm-btn:hover { background: var(--gold-dim); transform: scale(1.06); }
-.adm-btn.danger { color: #ff9a9a; border-color: rgba(255,120,120,.45); }
-.adm-btn.ok { color: #7fd39b; border-color: rgba(120,200,140,.5); }
-:root[data-theme="day"] .adm-btn.danger { color: #9c1414; }
-:root[data-theme="day"] .adm-btn.ok { color: #1f5f33; }
-.adm-btn:disabled { opacity: .45; cursor: default; }
+/* ═══ INTEGRATED MENU ADMIN ═══ */
+.admin-launch{position:fixed;right:12px;top:12px;z-index:100;background:var(--chip-bg);border:1px solid var(--card-brd);color:var(--gold);border-radius:999px;padding:8px 12px;font:700 12px Poppins,sans-serif;cursor:pointer;display:none}
+.admin-mode .admin-launch{display:block}
+.admin-panel{position:fixed;inset:0;z-index:10000;display:none;background:rgba(10,5,12,.82);backdrop-filter:blur(8px);font-family:Poppins,sans-serif;color:var(--ink)}
+.admin-panel.open{display:flex;flex-direction:column}
+.admin-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--card-brd);background:var(--bg1)}
+.admin-head h2{font-size:16px;color:var(--gold);margin:0}.admin-head .admin-actions{display:flex;gap:8px}
+.admin-btn{border:1px solid var(--card-brd);background:var(--chip-bg);color:var(--ink);border-radius:8px;padding:8px 12px;font:600 12px Poppins,sans-serif;cursor:pointer}.admin-btn.primary{background:var(--gold);color:#241507;border-color:var(--gold)}
+.admin-body{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:14px;padding:14px;min-height:0;flex:1;overflow:hidden}
+.admin-board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;min-width:0;overflow:auto}.admin-col{min-height:180px;border:1px dashed var(--gold-dim);border-radius:12px;padding:8px;background:rgba(255,255,255,.025)}
+.admin-col.drag-over{outline:2px solid var(--gold);background:rgba(240,196,106,.08)}.admin-col-title{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.12em;padding:4px 5px 8px}
+.admin-cat{border:1px solid var(--card-brd);border-radius:10px;background:var(--card);margin-bottom:8px;overflow:hidden}.admin-cat.dragging,.admin-item.dragging{opacity:.35}.admin-cat-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;background:rgba(240,196,106,.08);cursor:grab}.admin-cat-name{font-size:12px;font-weight:800}.admin-cat-items{padding:4px}.admin-item{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:7px;padding:7px 6px;border-radius:7px;cursor:grab}.admin-item:hover{background:var(--row-alt)}.admin-item-name{min-width:0;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.admin-item-meta{font-size:10px;color:var(--gold);white-space:nowrap}.admin-status{width:8px;height:8px;border-radius:50%;background:#4caf50}.admin-status.off{background:#e05252}.admin-status.removed{background:#777}
+.admin-side{border:1px solid var(--card-brd);border-radius:12px;background:var(--card);padding:14px;overflow:auto}.admin-side h3{font-size:13px;color:var(--gold);margin:0 0 10px}.admin-form{display:grid;gap:9px}.admin-form label{font-size:10px;color:var(--ink3)}.admin-form input,.admin-form select{width:100%;margin-top:4px;border:1px solid var(--card-brd);border-radius:7px;background:rgba(0,0,0,.18);color:var(--ink);padding:8px;font:500 12px Poppins,sans-serif}.admin-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.admin-status-buttons{display:flex;gap:6px;flex-wrap:wrap}.admin-status-buttons button.active{border-color:var(--gold);background:var(--gold);color:#241507}.admin-note{font-size:10px;line-height:1.5;color:var(--ink3);margin-top:8px}.admin-list{margin-top:16px;border-top:1px solid var(--row-line);padding-top:12px}.admin-list-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--row-line);font-size:11px}.admin-list-row span:first-child{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.admin-mini{padding:5px 8px;font-size:10px}.admin-hidden{display:none!important}
+@media(max-width:900px){.admin-body{grid-template-columns:1fr}.admin-board{grid-template-columns:1fr 1fr}.admin-side{max-height:42vh}}@media(max-width:600px){.admin-board{grid-template-columns:1fr}.admin-head{padding:10px}.admin-body{padding:8px}}
 
-.adm-row-tools {
-  position: absolute; right: 6px; top: 50%; transform: translateY(-50%); z-index: 3;
-  display: flex; align-items: center; gap: 4px;
-  opacity: 0; pointer-events: none; transition: opacity .15s;
-}
-body.admin .item .adm-row-tools { opacity: 1; pointer-events: auto; }
-body.admin .item .price { opacity: .12; }
-body.admin .item { cursor: grab; }
-.item.adm-off { opacity: .4; }
-.item.adm-off.adm-editing { opacity: 1; }
-.item.adm-off .name-en > span { text-decoration: line-through; }
-.item.adm-dragging { opacity: .3; }
-.cat-block.adm-drop { box-shadow: inset 0 0 0 2px var(--gold), var(--shadow); }
-
-.item.adm-editing { display: flex; flex-direction: column; align-items: stretch; gap: 5px; cursor: default; }
-.adm-erow { display: flex; align-items: center; gap: 6px; }
-.adm-erow .adm-chk { margin-left: auto; }
-.adm-in {
-  min-width: 0; flex: 1 1 80px; font-family: inherit; font-size: .78rem;
-  background: rgba(0,0,0,.24); color: var(--ink);
-  border: 1px solid var(--card-brd); border-radius: 6px; padding: 4px 8px;
-}
-:root[data-theme="day"] .adm-in { background: rgba(255,255,255,.9); }
-.adm-in:focus { outline: none; border-color: var(--gold); }
-.adm-in.hi { font-family: 'Noto Sans Devanagari', sans-serif; }
-.adm-in.adm-f-price { flex: 0 0 78px; text-align: right; font-weight: 800; color: var(--gold); }
-.adm-chk {
-  display: flex; align-items: center; gap: 4px; cursor: pointer; white-space: nowrap;
-  font-size: .58rem; letter-spacing: .06em; text-transform: uppercase; color: var(--ink2);
-}
-.adm-chk input { width: 14px; height: 14px; accent-color: #d9a03f; }
-
-.adm-cat-edit { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
-.adm-cat-edit .adm-in { background: #fff; color: #1a1a1a; border-color: rgba(255,255,255,.6); }
-.adm-cat-edit .adm-btn { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.4); color: #fff; }
-
-.adm-modal {
-  display: none; position: fixed; z-index: 6000; left: 0; top: 0;
-  width: min(600px, 94vw); height: min(620px, 76vh); min-width: 320px; min-height: 220px;
-  flex-direction: column; overflow: hidden; resize: both;
-  background: linear-gradient(180deg, var(--bg1), var(--bg0));
-  border: 1px solid var(--gold-dim); border-radius: 14px;
-  box-shadow: 0 26px 70px rgba(0,0,0,.62);
-}
-:root[data-theme="day"] .adm-modal { background: linear-gradient(180deg, #fffaf0, #f2e5c8); }
-.adm-modal.open { display: flex; }
-.adm-modal-hd {
-  flex-shrink: 0; display: flex; align-items: center; gap: 8px;
-  padding: 9px 12px; cursor: move; user-select: none;
-  border-bottom: 1px solid var(--gold-dim); background: rgba(0,0,0,.24);
-}
-:root[data-theme="day"] .adm-modal-hd { background: rgba(138,92,14,.10); }
-.adm-modal-ttl {
-  flex: 1; font-family: 'Cinzel', serif; font-weight: 700; font-size: .8rem;
-  letter-spacing: .1em; text-transform: uppercase; color: var(--gold);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.adm-modal-bd { flex: 1; overflow: auto; padding: 10px 12px; }
-.adm-msg { flex-shrink: 0; padding: 0 12px 8px; font-size: .62rem; color: var(--ink3); min-height: 14px; }
-.adm-msg.err { color: #ff9a9a; }
-.adm-msg.ok { color: #7fd39b; }
-:root[data-theme="day"] .adm-msg.err { color: #9c1414; }
-:root[data-theme="day"] .adm-msg.ok { color: #1f5f33; }
-
-.adm-grp-h {
-  position: sticky; top: -10px; z-index: 1;
-  display: flex; align-items: center; gap: 8px; padding: 6px 9px; margin: 8px 0 4px;
-  border-radius: 8px; background: var(--card); border: 1px solid var(--card-brd);
-  font-size: .58rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gold);
-  backdrop-filter: blur(6px);
-}
-.adm-grp-h .hi { font-family: 'Noto Sans Devanagari', sans-serif; letter-spacing: 0; text-transform: none; color: var(--ink2); }
-.adm-grp-h .adm-btn { margin-left: auto; }
-.adm-opt {
-  display: flex; align-items: center; gap: 8px; padding: 5px 9px; border-radius: 7px;
-  cursor: pointer; font-size: .78rem; color: var(--ink);
-}
-.adm-opt:hover { background: var(--row-alt); }
-.adm-opt input { width: 15px; height: 15px; accent-color: #d9a03f; flex-shrink: 0; }
-.adm-opt img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid var(--gold-dim); }
-.adm-opt .hi { font-family: 'Noto Sans Devanagari', sans-serif; color: var(--ink2); font-size: .74rem; }
-.adm-opt .pr { margin-left: auto; font-weight: 800; color: var(--gold); font-size: .74rem; white-space: nowrap; }
-.adm-opt.off { opacity: .45; }
-
-.adm-fld { display: flex; flex-direction: column; gap: 4px; margin-bottom: 9px; }
-.adm-fld > label { font-size: .55rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink3); }
-.adm-fld > .adm-in { flex: 0 0 auto; }
-.adm-flag { width: 15px; height: 10px; border-radius: 1px; display: block; }
-.adm-pair { display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px; align-items: center; }
-.adm-flags { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
-.adm-zone {
-  border: 2px dashed var(--gold-dim); border-radius: 10px; padding: 16px; text-align: center;
-  font-size: .64rem; letter-spacing: .06em; color: var(--ink3); cursor: pointer;
-}
-.adm-zone.over { border-color: var(--gold); background: var(--row-alt); color: var(--ink2); }
-.adm-zone img { display: block; max-height: 92px; margin: 8px auto 0; border-radius: 8px; }
 </style>
 </head>
 <body>
@@ -658,60 +548,47 @@ body.admin .item { cursor: grab; }
   <button id="resetLayoutBtn" title="Reset manually-arranged layout">↺</button>
 </div>
 
-<div class="adm-modal" id="admSpecialsModal">
-  <div class="adm-modal-hd">
-    <span class="adm-modal-ttl">आज का विशेष · Today's Specials</span>
-    <button class="adm-btn ok" id="admSpecialsSave">Save all</button>
-    <button class="adm-btn danger" data-close="admSpecialsModal">✕</button>
-  </div>
-  <div class="adm-modal-bd" id="admSpecialsBody"></div>
-  <div class="adm-msg" id="admSpecialsMsg"></div>
-</div>
-
-<div class="adm-modal" id="admItemModal">
-  <div class="adm-modal-hd">
-    <span class="adm-modal-ttl" id="admItemTitle">Add item</span>
-    <button class="adm-btn ok" id="admItemSave">Save</button>
-    <button class="adm-btn danger" data-close="admItemModal">✕</button>
-  </div>
-  <div class="adm-modal-bd">
-    <div class="adm-fld">
-      <label>Category · श्रेणी</label>
-      <div class="adm-pair">
-        <input class="adm-in" id="admItemCat" list="admCatList" placeholder="Sweet">
-        <button class="adm-btn" id="admItemCatXlate" title="Translate to Hindi"></button>
-        <input class="adm-in hi" id="admItemCatHi" placeholder="मीठा">
-      </div>
-      <datalist id="admCatList"></datalist>
-    </div>
-    <div class="adm-fld">
-      <label>Name · नाम</label>
-      <div class="adm-pair">
-        <input class="adm-in" id="admItemName" placeholder="Chowmein">
-        <button class="adm-btn" id="admItemNameXlate" title="Translate to Hindi"></button>
-        <input class="adm-in hi" id="admItemNameHi" placeholder="चाउमिन">
+  <button class="admin-launch" id="adminLaunch">Menu Admin</button>
+  <div class="admin-panel" id="adminPanel">
+    <div class="admin-head">
+      <h2>Integrated Menu Admin</h2>
+      <div class="admin-actions">
+        <button class="admin-btn primary" id="adminAdd">Add Item</button>
+        <button class="admin-btn" id="adminClose">Close</button>
       </div>
     </div>
-    <div class="adm-fld">
-      <label>Price · मूल्य</label>
-      <input class="adm-in" id="admItemPrice" placeholder="70">
-    </div>
-    <div class="adm-flags">
-      <label class="adm-chk"><input type="checkbox" id="admItemAvail" checked>Available</label>
-      <label class="adm-chk"><input type="checkbox" id="admItemMorning">Morning</label>
-      <label class="adm-chk"><input type="checkbox" id="admItemFeatured">Today's special</label>
-    </div>
-    <div class="adm-fld">
-      <label>Image · चित्र</label>
-      <div class="adm-zone" id="admItemZone">
-        Drop a photo here, or click to choose
-        <div id="admItemPreview"></div>
-      </div>
-      <input type="file" id="admItemFile" accept="image/*" hidden>
+    <div class="admin-body">
+      <div class="admin-board" id="adminBoard"></div>
+      <aside class="admin-side">
+        <h3 id="adminFormTitle">Add Item</h3>
+        <form class="admin-form" id="adminForm">
+          <input type="hidden" id="adminId">
+          <label>Name<input id="adminName" required></label>
+          <label>Hindi Name<input id="adminNameHi"></label>
+          <div class="admin-row">
+            <label>Category<input id="adminCategory" required></label>
+            <label>Price<input id="adminPrice" inputmode="decimal"></label>
+          </div>
+          <label>Category Hindi<input id="adminCatHi"></label>
+          <label>Image<input id="adminImage"></label>
+          <div>
+            <label>Availability</label>
+            <div class="admin-status-buttons" id="adminStatusButtons">
+              <button type="button" class="admin-btn active" data-status="available">Available</button>
+              <button type="button" class="admin-btn" data-status="unavailable">Unavailable</button>
+              <button type="button" class="admin-btn" data-status="removed">Remove From List</button>
+            </div>
+          </div>
+          <div class="admin-actions">
+            <button type="submit" class="admin-btn primary">Save Item</button>
+            <button type="button" class="admin-btn" id="adminReset">Clear</button>
+          </div>
+        </form>
+        <div class="admin-note">Drag items between category containers to change category. Drag categories to reorder the menu columns.</div>
+        <div class="admin-list" id="adminList"></div>
+      </aside>
     </div>
   </div>
-  <div class="adm-msg" id="admItemMsg"></div>
-</div>
 
 <script>
 const EXCEL_FILE='Menu.xlsx';
@@ -750,7 +627,6 @@ const ICONS=[
 function gi(cat){const l=(cat||'').toLowerCase();for(const e of ICONS)if(e.k.some(k=>l.includes(k)))return e.i;return 'fa-solid fa-utensils';}
 
 let settings={},menuItems=[];
-let adminMode=false,editingId=null,catEditing=null,dragItemId=null,pendingImage='';
 function S(k,d=''){return k in settings?settings[k]:d;}
 function Sn(k,d=0){const v=parseFloat(S(k,d));return isNaN(v)?d:v;}
 
@@ -794,8 +670,7 @@ updateFsBtn();
 
 // First click anywhere on the board (except the controls) goes full screen.
 function autoFullscreen(e){
-  if(adminMode) return;
-  if(e.target.closest&&(e.target.closest('button')||e.target.closest('.hdr'))) return;
+  if(e.target.closest&&e.target.closest('button')) return;
   if(!isFs()&&!fsDeclined) toggleFullscreen();
   window.removeEventListener('pointerdown',autoFullscreen);
 }
@@ -896,9 +771,8 @@ function computeColumns(cats,bycat){
 }
 function applyManualMove(cat,colEl,targetBlock){
   if(!layoutOverride||!Array.isArray(layoutOverride.columns)){
-    const shown=visibleItems();
-    const currentCats=[...new Set(shown.map(i=>i.category))].filter(Boolean);
-    const bycatNow={}; currentCats.forEach(c=>bycatNow[c]=shown.filter(i=>i.category===c));
+    const currentCats=[...new Set(menuItems.map(i=>i.category))].filter(Boolean);
+    const bycatNow={}; currentCats.forEach(c=>bycatNow[c]=menuItems.filter(i=>i.category===c));
     layoutOverride={...(layoutOverride||{}),columns:balance(currentCats,bycatNow)};
   }
   const cols=layoutOverride.columns;
@@ -918,13 +792,6 @@ function applyManualMove(cat,colEl,targetBlock){
 
 let dragCat=null;
 columnsEl.addEventListener('dragstart',(e)=>{
-  const row=adminMode?e.target.closest('.item'):null;
-  if(row&&row.dataset.id!==undefined){
-    dragItemId=+row.dataset.id;
-    row.classList.add('adm-dragging');
-    e.dataTransfer.effectAllowed='move';
-    return;
-  }
   const block=e.target.closest('.cat-block');
   if(!block) return;
   dragCat=block.dataset.cat;
@@ -934,18 +801,10 @@ columnsEl.addEventListener('dragstart',(e)=>{
 columnsEl.addEventListener('dragend',(e)=>{
   const block=e.target.closest('.cat-block');
   block&&block.classList.remove('dragging');
-  columnsEl.querySelectorAll('.adm-dragging').forEach(el=>el.classList.remove('adm-dragging'));
-  columnsEl.querySelectorAll('.adm-drop').forEach(el=>el.classList.remove('adm-drop'));
   columnsEl.querySelectorAll('.drag-over-block,.drag-over-col').forEach(el=>el.classList.remove('drag-over-block','drag-over-col'));
-  dragCat=null; dragItemId=null;
+  dragCat=null;
 });
 columnsEl.addEventListener('dragover',(e)=>{
-  if(dragItemId!==null){
-    const blk=e.target.closest('.cat-block');
-    columnsEl.querySelectorAll('.adm-drop').forEach(el=>el.classList.remove('adm-drop'));
-    if(blk){ e.preventDefault(); blk.classList.add('adm-drop'); }
-    return;
-  }
   if(!dragCat) return;
   const col=e.target.closest('.col');
   if(!col) return;
@@ -955,22 +814,6 @@ columnsEl.addEventListener('dragover',(e)=>{
   if(block&&block.dataset.cat!==dragCat) block.classList.add('drag-over-block'); else col.classList.add('drag-over-col');
 });
 columnsEl.addEventListener('drop',(e)=>{
-  if(dragItemId!==null){
-    e.preventDefault();
-    columnsEl.querySelectorAll('.adm-drop').forEach(el=>el.classList.remove('adm-drop'));
-    const blk=e.target.closest('.cat-block');
-    const it=itemById(dragItemId);
-    dragItemId=null;
-    if(blk&&it&&blk.dataset.cat!==it.category){
-      const target=blk.dataset.cat;
-      const sib=menuItems.find(x=>x!==it&&x.category===target&&x.cat_hi);
-      it.category=target;
-      it.cat_hi=sib?sib.cat_hi:'';
-      renderBoard();
-      saveMenu().catch(()=>{});
-    }
-    return;
-  }
   if(!dragCat) return;
   const col=e.target.closest('.col');
   if(!col) return;
@@ -1027,8 +870,7 @@ async function loadExcel(){
       image:    col(r,'Image','img','photo','picture'),
       isMorning:/^(true|yes|1)$/i.test(col(r,'IsMorning','ismorning','morning')),
       available:!/^(false|no|0)$/i.test(col(r,'Available','available')||'true'),
-      featured: /^(true|yes|1)$/i.test(col(r,'Featured','featured','special')),
-    })).filter(i=>i.name);
+    })).filter(i=>i.name&&i.available);
     return true;
   }catch(e){
     document.getElementById('load-err').innerHTML=
@@ -1064,7 +906,6 @@ function isMorning(){
   return c>=f&&c<t;
 }
 function visibleItems(){
-  if(adminMode) return menuItems.slice();
   const m=isMorning();
   return m?menuItems.filter(i=>i.isMorning&&i.available):menuItems.filter(i=>i.available);
 }
@@ -1158,11 +999,8 @@ function priceHTML(p){
 }
 
 /* ═══ Specials ribbon ═══ */
-function renderStrip(all){
+function renderStrip(items){
   const track=document.getElementById('mqTrack');
-  const pool=all.filter(i=>i.available);
-  const picked=pool.filter(i=>i.featured);
-  const items=picked.length?picked:pool;
   const withImg=items.filter(i=>i.image);
   let source;
   if(withImg.length){
@@ -1196,7 +1034,6 @@ function renderBoard(animate=false){
   const morning=isMorning();
   const items=visibleItems();
   preloadImages(items);
-  if(adminMode) refreshCatList();
 
   document.getElementById('brandEn').textContent=S('RestaurantName','Radha Govinda Upahar');
   document.getElementById('brandHi').textContent=S('RestaurantName_Hindi','राधा गोविंदा उपहार');
@@ -1316,15 +1153,12 @@ function renderBoard(animate=false){
         </div>
         <span class="cat-meta">
           <span class="cat-count" style="font-size:${countPx}px">${citems.length}</span>
-          <span class="hover-tools">${adminMode?`
-            <button class="adm-btn adm-sort" draggable="false" title="Sort rows: A–Z, then price low–high, then high–low"><i class="fa-solid fa-arrow-down-a-z"></i></button>
-            <button class="adm-btn adm-add-item" draggable="false" title="Add an item to this category">+</button>`:''}
+          <span class="hover-tools">
             <span class="drag-grip" title="Drag this category to another column">⠿</span>
             <button class="font-btn" draggable="false" data-delta="-" title="Smaller font for this category">A−</button>
             <button class="font-btn" draggable="false" data-delta="+" title="Bigger font for this category">A+</button>
           </span>
         </span>`;
-      if(adminMode&&catEditing===cat) ch.innerHTML=admCatEditHTML(cat,catHi);
       block.appendChild(ch);
 
       citems.forEach(item=>{
@@ -1348,18 +1182,6 @@ function renderBoard(animate=false){
           </div>
           <div class="name-hi" style="font-size:${cHI}px;font-family:'${fFHI}',sans-serif">${esc(item.name_hi||'—')}</div>
           <div class="price"   style="font-size:${cPr}px;font-family:'${fFPr}',sans-serif">${priceHTML(item.price)}</div>`;
-        if(adminMode){
-          d.dataset.id=item.id;
-          if(!item.available) d.classList.add('adm-off');
-          if(editingId===item.id){
-            d.classList.add('adm-editing');
-            d.style.gridTemplateColumns='';
-            d.innerHTML=admEditRowHTML(item);
-          }else{
-            d.draggable=true;
-            d.insertAdjacentHTML('beforeend',admRowToolsHTML(item));
-          }
-        }
         block.appendChild(d);
       });
 
@@ -1396,6 +1218,114 @@ function loadFonts(){
 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
+
+/* ═══ Integrated Menu Admin — temporary menu controls ═══ */
+const ADMIN_KEY='digitalMenuAdminOverrides';
+const adminLaunch=document.getElementById('adminLaunch');
+const adminPanel=document.getElementById('adminPanel');
+const adminBoard=document.getElementById('adminBoard');
+const adminForm=document.getElementById('adminForm');
+let adminStatus='available', adminDrag=null;
+
+function adminOverrides(){
+  try{return JSON.parse(localStorage.getItem(ADMIN_KEY)||'{}')||{};}catch{return {};}
+}
+function saveAdminOverrides(o){localStorage.setItem(ADMIN_KEY,JSON.stringify(o));}
+function applyAdminOverrides(){
+  const o=adminOverrides();
+  menuItems=menuItems.map((i)=>{const x=o[i.id];return x?{...i,...x}:i;});
+  Object.keys(o).filter(k=>String(k).startsWith('new:')).forEach(k=>menuItems.push(o[k]));
+}
+function adminStatusOf(i){return i.removed?'removed':(i.available?'available':'unavailable');}
+function adminCategories(){return [...new Set(menuItems.map(i=>i.category).filter(Boolean))];}
+function adminItemsByCat(cat){return menuItems.filter(i=>i.category===cat);}
+function adminEsc(s){return esc(s||'');}
+function adminSetStatus(status){
+  adminStatus=status;
+  document.querySelectorAll('#adminStatusButtons button').forEach(b=>b.classList.toggle('active',b.dataset.status===status));
+}
+function adminResetForm(){
+  adminForm.reset(); document.getElementById('adminId').value=''; document.getElementById('adminFormTitle').textContent='Add Item'; adminSetStatus('available');
+}
+function adminEdit(id){
+  const i=menuItems.find(x=>String(x.id)===String(id)); if(!i)return;
+  document.getElementById('adminFormTitle').textContent='Update Item';
+  document.getElementById('adminId').value=i.id; document.getElementById('adminName').value=i.name||'';
+  document.getElementById('adminNameHi').value=i.name_hi||''; document.getElementById('adminCategory').value=i.category||'';
+  document.getElementById('adminCatHi').value=i.cat_hi||''; document.getElementById('adminPrice').value=i.price||''; document.getElementById('adminImage').value=i.image||'';
+  adminSetStatus(adminStatusOf(i));
+}
+function adminSaveItem(e){
+  e.preventDefault();
+  const id=document.getElementById('adminId').value;
+  const item={id:id||'new:'+Date.now(),category:document.getElementById('adminCategory').value.trim(),cat_hi:document.getElementById('adminCatHi').value.trim(),name:document.getElementById('adminName').value.trim(),name_hi:document.getElementById('adminNameHi').value.trim(),price:document.getElementById('adminPrice').value.trim(),image:document.getElementById('adminImage').value.trim(),isMorning:false,available:adminStatus==='available',removed:adminStatus==='removed'};
+  if(!item.name||!item.category)return;
+  const o=adminOverrides(); o[item.id]=item; saveAdminOverrides(o);
+  const ix=menuItems.findIndex(x=>String(x.id)===String(item.id)); if(ix>-1)menuItems[ix]=item; else menuItems.push(item);
+  adminResetForm(); adminRender(); renderBoard();
+}
+function adminRemove(id){
+  const i=menuItems.find(x=>String(x.id)===String(id)); if(!i)return;
+  const o=adminOverrides(); o[i.id]={...i,removed:true,available:false}; saveAdminOverrides(o); i.removed=true;i.available=false; adminRender();renderBoard();
+}
+function adminMoveItem(id,category,beforeId=null){
+  const i=menuItems.find(x=>String(x.id)===String(id)); if(!i)return;
+  const oldCategory=i.category;
+  const o=adminOverrides();
+  i.category=category;
+  o[i.id]={...i};
+  saveAdminOverrides(o);
+  const from=menuItems.findIndex(x=>String(x.id)===String(id));
+  if(from>-1)menuItems.splice(from,1);
+  let target=menuItems.length;
+  if(beforeId!==null){
+    const bi=menuItems.findIndex(x=>String(x.id)===String(beforeId));
+    if(bi>-1)target=bi;
+  }
+  menuItems.splice(target,0,i);
+  adminRender();renderBoard();
+}
+function adminRender(){
+  const cats=adminCategories();
+  adminBoard.innerHTML='';
+  cats.forEach(cat=>{
+    const col=document.createElement('div'); col.className='admin-col'; col.dataset.category=cat;
+    col.innerHTML='<div class="admin-col-title">'+adminEsc(cat)+'</div>';
+    adminItemsByCat(cat).forEach(i=>{
+      const row=document.createElement('div'); row.className='admin-item'; row.draggable=true; row.dataset.id=i.id;
+      const st=adminStatusOf(i); row.innerHTML='<span class="admin-status '+(st==='available'?'':st==='removed'?'removed':'off')+'"></span><span class="admin-item-name">'+adminEsc(i.name)+'</span><span class="admin-item-meta">'+adminEsc(i.price||'')+'</span>';
+      row.addEventListener('click',()=>adminEdit(i.id));
+      row.addEventListener('dragstart',e=>{adminDrag={type:'item',id:i.id};e.stopPropagation();row.classList.add('dragging');});
+      row.addEventListener('dragend',()=>{row.classList.remove('dragging');adminDrag=null;adminBoard.querySelectorAll('.drag-over').forEach(x=>x.classList.remove('drag-over'));});
+      row.addEventListener('dragover',e=>{if(adminDrag&&adminDrag.type==='item'&&String(adminDrag.id)!==String(i.id)){e.preventDefault();e.stopPropagation();row.classList.add('drag-over');}});
+      row.addEventListener('dragleave',()=>row.classList.remove('drag-over'));
+      row.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();row.classList.remove('drag-over');if(adminDrag&&adminDrag.type==='item'&&String(adminDrag.id)!==String(i.id))adminMoveItem(adminDrag.id,cat,i.id);});
+      col.appendChild(row);
+    });
+    col.addEventListener('dragover',e=>{if(adminDrag&&adminDrag.type==='item'){e.preventDefault();col.classList.add('drag-over');}});
+    col.addEventListener('dragleave',()=>col.classList.remove('drag-over'));
+    col.addEventListener('drop',e=>{e.preventDefault();col.classList.remove('drag-over');if(adminDrag&&adminDrag.type==='item')adminMoveItem(adminDrag.id,cat);});
+    adminBoard.appendChild(col);
+  });
+  document.getElementById('adminList').innerHTML=menuItems.map(i=>`<div class="admin-list-row"><span>${adminEsc(i.name)}</span><button class="admin-btn admin-mini" data-edit="${adminEsc(i.id)}">Edit</button><button class="admin-btn admin-mini" data-remove="${adminEsc(i.id)}">Remove</button></div>`).join('');
+  adminBoard.querySelectorAll('.admin-col').forEach(col=>{
+    col.draggable=false;
+  });
+  document.getElementById('adminList').querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>adminEdit(b.dataset.edit));
+  document.getElementById('adminList').querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>adminRemove(b.dataset.remove));
+}
+adminLaunch.addEventListener('click',()=>{adminPanel.classList.add('open');adminRender();});
+document.getElementById('adminClose').addEventListener('click',()=>adminPanel.classList.remove('open'));
+document.getElementById('adminAdd').addEventListener('click',adminResetForm);
+document.getElementById('adminReset').addEventListener('click',adminResetForm);
+document.querySelectorAll('#adminStatusButtons button').forEach(b=>b.addEventListener('click',()=>adminSetStatus(b.dataset.status)));
+adminForm.addEventListener('submit',adminSaveItem);
+
+/* Enable with ?admin=1 on the same digital-menu.html. */
+if(new URLSearchParams(location.search).get('admin')==='1') document.body.classList.add('admin-mode');
+const _originalLoadExcel=loadExcel;
+loadExcel=async function(){const ok=await _originalLoadExcel();if(ok)applyAdminOverrides();return ok;};
+
 let wsConnected=false;
 function connectLiveUpdates(){
   const proto=location.protocol==='https:'?'wss:':'ws:';
@@ -1406,416 +1336,12 @@ function connectLiveUpdates(){
   ws.onmessage=async(evt)=>{
     try{
       const msg=JSON.parse(evt.data);
-      if(msg.type==='menu-updated'){
-        if(ownSaveInFlight>0){ renderBoard(); return; } // our own save already reflects live in menuItems
-        await loadExcel(); await loadLayout(); renderBoard(!adminMode);
-      }
+      if(msg.type==='menu-updated'){ await loadExcel(); await loadLayout(); renderBoard(true); }
     }catch{}
   };
   ws.onclose=()=>{ wsConnected=false; renderBoard(); setTimeout(connectLiveUpdates,3000); };
   ws.onerror=()=>{ ws.close(); };
 }
-
-/* ═══ Admin mode ═══ */
-const FLAG_IN='<svg class="adm-flag" viewBox="0 0 21 14" aria-hidden="true">'+
-  '<rect width="21" height="14" fill="#f7f7f7"/><rect width="21" height="4.67" fill="#ff9933"/>'+
-  '<rect y="9.33" width="21" height="4.67" fill="#138808"/>'+
-  '<circle cx="10.5" cy="7" r="1.6" fill="none" stroke="#000080" stroke-width=".55"/></svg>';
-function itemById(id){ return menuItems.find(i=>i.id===id); }
-function refreshCatList(){
-  document.getElementById('admCatList').innerHTML=
-    [...new Set(menuItems.map(i=>i.category).filter(Boolean))].map(c=>`<option value="${esc(c)}">`).join('');
-}
-function admMsg(el,text,kind){ el.textContent=text||''; el.className='adm-msg'+(kind?' '+kind:''); }
-
-function setAdmin(on){
-  adminMode=on;
-  editingId=null; catEditing=null;
-  document.body.classList.toggle('admin',adminMode);
-  if(!adminMode){ closeModal('admSpecialsModal'); closeModal('admItemModal'); }
-  renderBoard();
-}
-
-function admRowToolsHTML(item){
-  return `<span class="adm-row-tools">
-    <button class="adm-btn adm-photo" draggable="false" title="${item.image?'Change photo':'Add photo'}"><i class="fa-solid fa-camera"></i></button>
-    <button class="adm-btn adm-edit" draggable="false" title="Edit this item">✎</button>
-    <button class="adm-btn ${item.available?'danger':'ok'} adm-avail" draggable="false"
-      title="${item.available?'Mark unavailable':'Mark available again'}">${item.available?'✕':'↺'}</button>
-  </span>`;
-}
-function admEditRowHTML(item){
-  return `<div class="adm-erow">
-      <input class="adm-in adm-f-cat" list="admCatList" value="${esc(item.category)}" placeholder="Category">
-      <button class="adm-btn adm-rowx" data-src="adm-f-cat" data-dst="adm-f-cathi" title="Translate to Hindi">${FLAG_IN}</button>
-      <input class="adm-in hi adm-f-cathi" value="${esc(item.cat_hi)}" placeholder="श्रेणी">
-    </div>
-    <div class="adm-erow">
-      <input class="adm-in adm-f-name" value="${esc(item.name)}" placeholder="Name">
-      <button class="adm-btn adm-rowx" data-src="adm-f-name" data-dst="adm-f-hi" title="Translate to Hindi">${FLAG_IN}</button>
-      <input class="adm-in hi adm-f-hi" value="${esc(item.name_hi)}" placeholder="हिंदी नाम">
-    </div>
-    <div class="adm-erow">
-      <input class="adm-in adm-f-price" value="${esc(item.price)}" placeholder="₹">
-      <label class="adm-chk"><input type="checkbox" class="adm-f-morning"${item.isMorning?' checked':''}>Morning</label>
-      <button class="adm-btn ok adm-save">Save</button>
-      <button class="adm-btn adm-cancel">✕</button>
-    </div>`;
-}
-function admCatEditHTML(cat,catHi){
-  return `<div class="adm-cat-edit">
-    <input class="adm-in adm-c-en" value="${esc(cat)}" placeholder="Category">
-    <button class="adm-btn adm-c-xlate" title="Translate to Hindi">${FLAG_IN}</button>
-    <input class="adm-in hi adm-c-hi" value="${esc(catHi)}" placeholder="श्रेणी">
-    <button class="adm-btn ok adm-c-save">Save</button>
-    <button class="adm-btn adm-c-cancel">✕</button>
-  </div>`;
-}
-
-let saving=false,ownSaveInFlight=0;
-async function saveMenu(){
-  while(saving) await new Promise(r=>setTimeout(r,60));
-  saving=true; ownSaveInFlight++;
-  try{
-    const res=await fetch('/api/menu',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(menuItems.map(i=>({
-        category:i.category, category_hindi:i.cat_hi, name:i.name, name_hindi:i.name_hi,
-        price:i.price, available:i.available, is_morning:i.isMorning, image:i.image, featured:i.featured,
-      })))});
-    const d=await res.json().catch(()=>({}));
-    if(!res.ok||d.error) throw new Error(d.error||('HTTP '+res.status));
-  } finally { saving=false; setTimeout(()=>{ ownSaveInFlight=Math.max(0,ownSaveInFlight-1); },1200); }
-}
-
-async function translateHi(text){
-  const res=await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(text)+'&langpair=en|hi');
-  if(!res.ok) throw new Error('translate service unavailable');
-  const d=await res.json();
-  const t=d&&d.responseData&&d.responseData.translatedText;
-  if(!t) throw new Error('no translation returned');
-  return t;
-}
-async function xlateInto(btn,src,dst){
-  const v=(src.value||'').trim();
-  if(!v){ src.focus(); return; }
-  const old=btn.innerHTML;
-  btn.disabled=true; btn.textContent='…';
-  try{ dst.value=await translateHi(v); btn.innerHTML=old; }
-  catch{ btn.textContent='⚠'; setTimeout(()=>{ btn.innerHTML=old; },1400); }
-  btn.disabled=false;
-}
-
-function commitRow(row,id){
-  const it=itemById(id);
-  if(!it) return;
-  it.category=(row.querySelector('.adm-f-cat').value||'').trim()||it.category;
-  it.cat_hi=(row.querySelector('.adm-f-cathi').value||'').trim();
-  it.name=(row.querySelector('.adm-f-name').value||'').trim()||it.name;
-  it.name_hi=(row.querySelector('.adm-f-hi').value||'').trim();
-  it.price=(row.querySelector('.adm-f-price').value||'').trim();
-  it.isMorning=row.querySelector('.adm-f-morning').checked;
-  editingId=null;
-  renderBoard();
-  saveMenu().catch(()=>{});
-}
-function commitCat(blk){
-  const oldCat=blk.dataset.cat;
-  const en=(blk.querySelector('.adm-c-en').value||'').trim();
-  const hi=(blk.querySelector('.adm-c-hi').value||'').trim();
-  if(!en) return;
-  menuItems.forEach(i=>{ if(i.category===oldCat){ i.category=en; i.cat_hi=hi; } });
-  if(en!==oldCat){
-    if(oldCat in catColorMap) catColorMap[en]=catColorMap[oldCat];
-    if(layoutOverride){
-      if(Array.isArray(layoutOverride.columns))
-        layoutOverride.columns=layoutOverride.columns.map(col=>col.map(c=>c===oldCat?en:c));
-      if(layoutOverride.fonts&&oldCat in layoutOverride.fonts){
-        layoutOverride.fonts[en]=layoutOverride.fonts[oldCat];
-        delete layoutOverride.fonts[oldCat];
-      }
-      saveLayout();
-    }
-  }
-  catEditing=null;
-  renderBoard();
-  saveMenu().catch(()=>{});
-}
-
-const admBadge=document.createElement('span');
-admBadge.className='adm-badge';
-admBadge.innerHTML='<i class="fa-solid fa-pen-to-square"></i> Admin — tap the time to exit';
-document.querySelector('.hdr-left').appendChild(admBadge);
-admBadge.addEventListener('click',(e)=>{ e.stopPropagation(); setAdmin(false); });
-
-document.querySelector('.clock').addEventListener('click',(e)=>{ e.stopPropagation(); setAdmin(!adminMode); });
-document.getElementById('hdr').addEventListener('click',(e)=>{
-  if(e.target.closest('button')||e.target.closest('.clock')||e.target.closest('.adm-badge')) return;
-  toggleFullscreen();
-});
-document.querySelector('.strip-label').addEventListener('click',()=>{ if(adminMode) openSpecials(); });
-
-let lpTimer=null;
-function cancelLongPress(){ clearTimeout(lpTimer); lpTimer=null; }
-columnsEl.addEventListener('pointerdown',(e)=>{
-  if(!adminMode) return;
-  const hdr=e.target.closest('.cat-hdr');
-  if(!hdr||e.target.closest('button')||e.target.closest('input')) return;
-  const cat=hdr.closest('.cat-block').dataset.cat;
-  cancelLongPress();
-  lpTimer=setTimeout(()=>{ catEditing=cat; editingId=null; renderBoard(); },550);
-});
-['pointerup','pointercancel','pointerleave','dragstart'].forEach(ev=>columnsEl.addEventListener(ev,cancelLongPress,true));
-
-const catSortState={};
-function applySort(cat){
-  const mode=catSortState[cat]=(catSortState[cat]==='name'?'price-asc':catSortState[cat]==='price-asc'?'price-desc':'name');
-  const idxs=[]; menuItems.forEach((it,idx)=>{ if(it.category===cat) idxs.push(idx); });
-  const items=idxs.map(i=>menuItems[i]);
-  items.sort((a,b)=>{
-    if(mode==='name') return a.name.localeCompare(b.name);
-    const pa=parseFloat(a.price)||0, pb=parseFloat(b.price)||0;
-    return mode==='price-asc'?pa-pb:pb-pa;
-  });
-  idxs.forEach((idx,k)=>{ menuItems[idx]=items[k]; });
-  renderBoard();
-  saveMenu().catch(()=>{});
-}
-
-const admRowFile=document.createElement('input');
-admRowFile.type='file'; admRowFile.accept='image/*'; admRowFile.hidden=true;
-document.body.appendChild(admRowFile);
-let admRowFileTarget=null;
-admRowFile.addEventListener('change',async()=>{
-  const f=admRowFile.files[0];
-  admRowFile.value='';
-  const it=admRowFileTarget&&itemById(admRowFileTarget);
-  admRowFileTarget=null;
-  if(!f||!it) return;
-  try{
-    const dataUrl=await blobToDataUrl(await cropToSquareWebp(f));
-    const res=await fetch('/api/upload-image',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name:it.name||'item',dataUrl})});
-    const d=await res.json().catch(()=>({}));
-    if(!res.ok||d.error) throw new Error(d.error||('HTTP '+res.status));
-    it.image=d.path;
-    renderBoard();
-    saveMenu().catch(()=>{});
-  }catch{}
-});
-
-columnsEl.addEventListener('click',async(e)=>{
-  if(!adminMode) return;
-  const blk=e.target.closest('.cat-block');
-  const row=e.target.closest('.item');
-  if(e.target.closest('.adm-add-item')){ e.stopPropagation(); openItemModal(blk&&blk.dataset.cat); return; }
-  if(e.target.closest('.adm-sort')){ e.stopPropagation(); applySort(blk.dataset.cat); return; }
-  if(row){
-    const id=+row.dataset.id;
-    if(e.target.closest('.adm-photo')){ e.stopPropagation(); admRowFileTarget=id; admRowFile.click(); return; }
-    if(e.target.closest('.adm-edit')){ e.stopPropagation(); catEditing=null; editingId=id; renderBoard(); return; }
-    if(e.target.closest('.adm-avail')){
-      e.stopPropagation();
-      const it=itemById(id);
-      if(!it) return;
-      it.available=!it.available;
-      renderBoard();
-      saveMenu().catch(()=>{});
-      return;
-    }
-    if(e.target.closest('.adm-cancel')){ e.stopPropagation(); editingId=null; renderBoard(); return; }
-    if(e.target.closest('.adm-save')){ e.stopPropagation(); commitRow(row,id); return; }
-    if(e.target.closest('.adm-rowx')){
-      e.stopPropagation();
-      const btn=e.target.closest('.adm-rowx');
-      await xlateInto(btn,row.querySelector('.'+btn.dataset.src),row.querySelector('.'+btn.dataset.dst));
-      return;
-    }
-  }
-  if(blk){
-    if(e.target.closest('.adm-c-save')){ e.stopPropagation(); commitCat(blk); return; }
-    if(e.target.closest('.adm-c-cancel')){ e.stopPropagation(); catEditing=null; renderBoard(); return; }
-    if(e.target.closest('.adm-c-xlate')){
-      e.stopPropagation();
-      await xlateInto(e.target.closest('.adm-c-xlate'),blk.querySelector('.adm-c-en'),blk.querySelector('.adm-c-hi'));
-    }
-  }
-});
-
-columnsEl.addEventListener('keydown',(e)=>{
-  if(!adminMode) return;
-  if(e.key==='Escape'){ editingId=null; catEditing=null; renderBoard(); return; }
-  if(e.key!=='Enter') return;
-  const row=e.target.closest('.item.adm-editing');
-  if(row){ e.preventDefault(); commitRow(row,+row.dataset.id); return; }
-  const blk=e.target.closest('.cat-block');
-  if(blk&&e.target.closest('.adm-cat-edit')){ e.preventDefault(); commitCat(blk); }
-});
-
-/* ═══ Modals ═══ */
-function openModal(id){
-  const m=document.getElementById(id);
-  m.classList.add('open');
-  if(!m.dataset.placed){
-    const r=m.getBoundingClientRect();
-    m.style.left=Math.max(8,(window.innerWidth-r.width)/2)+'px';
-    m.style.top=Math.max(8,(window.innerHeight-r.height)/2)+'px';
-    m.dataset.placed='1';
-  }
-}
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.close)));
-document.querySelectorAll('.adm-modal-hd').forEach(hd=>{
-  hd.addEventListener('pointerdown',(e)=>{
-    if(e.target.closest('button')) return;
-    const m=hd.closest('.adm-modal');
-    const r=m.getBoundingClientRect();
-    const ox=e.clientX-r.left, oy=e.clientY-r.top;
-    const move=(ev)=>{
-      m.style.left=Math.max(0,Math.min(window.innerWidth-r.width,ev.clientX-ox))+'px';
-      m.style.top=Math.max(0,Math.min(window.innerHeight-r.height,ev.clientY-oy))+'px';
-    };
-    const up=()=>{ window.removeEventListener('pointermove',move); window.removeEventListener('pointerup',up); };
-    window.addEventListener('pointermove',move);
-    window.addEventListener('pointerup',up);
-  });
-});
-
-function openSpecials(){
-  const groups={};
-  menuItems.forEach(i=>{ const k=i.category||'—'; (groups[k]=groups[k]||[]).push(i); });
-  document.getElementById('admSpecialsBody').innerHTML=Object.keys(groups).map(cat=>{
-    const its=groups[cat];
-    const hi=(its.find(i=>i.cat_hi)||{}).cat_hi||'';
-    return `<div class="adm-grp">
-      <div class="adm-grp-h">
-        <span>${esc(cat)}</span>${hi?`<span class="hi">${esc(hi)}</span>`:''}
-        <button class="adm-btn adm-grp-all">All</button>
-        <button class="adm-btn adm-grp-none">None</button>
-      </div>
-      ${its.map(i=>`<label class="adm-opt${i.available?'':' off'}">
-        <input type="checkbox" data-id="${i.id}"${i.featured?' checked':''}>
-        ${i.image?`<img src="${esc(i.image)}" alt="" onerror="this.remove()">`:''}
-        <span>${esc(i.name)}</span>
-        ${i.name_hi?`<span class="hi">(${esc(i.name_hi)})</span>`:''}
-        <span class="pr">${i.price?'₹ '+esc(i.price)+'/-':''}</span>
-      </label>`).join('')}
-    </div>`;
-  }).join('');
-  admMsg(document.getElementById('admSpecialsMsg'),'Tick the items that should run in the specials ribbon.');
-  openModal('admSpecialsModal');
-}
-document.getElementById('admSpecialsBody').addEventListener('click',(e)=>{
-  const all=e.target.closest('.adm-grp-all'), none=e.target.closest('.adm-grp-none');
-  if(!all&&!none) return;
-  e.preventDefault();
-  e.target.closest('.adm-grp').querySelectorAll('input[type=checkbox]').forEach(c=>{ c.checked=!!all; });
-});
-document.getElementById('admSpecialsSave').addEventListener('click',async()=>{
-  const msg=document.getElementById('admSpecialsMsg');
-  document.querySelectorAll('#admSpecialsBody input[type=checkbox]').forEach(c=>{
-    const it=itemById(+c.dataset.id);
-    if(it) it.featured=c.checked;
-  });
-  admMsg(msg,'Saving…');
-  try{ await saveMenu(); renderBoard(); admMsg(msg,'Saved to Menu.xlsx.','ok'); }
-  catch(err){ admMsg(msg,'Save failed: '+err.message,'err'); }
-});
-
-function openItemModal(cat){
-  pendingImage='';
-  const sib=menuItems.find(i=>i.category===cat&&i.cat_hi);
-  document.getElementById('admItemTitle').textContent=cat?('Add item · '+cat):'Add item';
-  document.getElementById('admItemCat').value=cat||'';
-  document.getElementById('admItemCatHi').value=sib?sib.cat_hi:'';
-  ['admItemName','admItemNameHi','admItemPrice'].forEach(id=>{ document.getElementById(id).value=''; });
-  document.getElementById('admItemAvail').checked=true;
-  document.getElementById('admItemMorning').checked=false;
-  document.getElementById('admItemFeatured').checked=false;
-  document.getElementById('admItemPreview').innerHTML='';
-  document.getElementById('admCatList').innerHTML=
-    [...new Set(menuItems.map(i=>i.category).filter(Boolean))].map(c=>`<option value="${esc(c)}">`).join('');
-  admMsg(document.getElementById('admItemMsg'),'');
-  openModal('admItemModal');
-  document.getElementById('admItemName').focus();
-}
-document.getElementById('admItemCatXlate').innerHTML=FLAG_IN;
-document.getElementById('admItemNameXlate').innerHTML=FLAG_IN;
-document.getElementById('admItemCatXlate').addEventListener('click',(e)=>
-  xlateInto(e.currentTarget,document.getElementById('admItemCat'),document.getElementById('admItemCatHi')));
-document.getElementById('admItemNameXlate').addEventListener('click',(e)=>
-  xlateInto(e.currentTarget,document.getElementById('admItemName'),document.getElementById('admItemNameHi')));
-document.getElementById('admItemSave').addEventListener('click',async()=>{
-  const msg=document.getElementById('admItemMsg');
-  const name=document.getElementById('admItemName').value.trim();
-  const cat=document.getElementById('admItemCat').value.trim();
-  if(!cat){ admMsg(msg,'Category is required.','err'); return; }
-  if(!name){ admMsg(msg,'Name is required.','err'); return; }
-  menuItems.push({
-    id:menuItems.reduce((m,i)=>Math.max(m,i.id),-1)+1,
-    category:cat,
-    cat_hi:document.getElementById('admItemCatHi').value.trim(),
-    name,
-    name_hi:document.getElementById('admItemNameHi').value.trim(),
-    price:document.getElementById('admItemPrice').value.trim(),
-    image:pendingImage,
-    isMorning:document.getElementById('admItemMorning').checked,
-    available:document.getElementById('admItemAvail').checked,
-    featured:document.getElementById('admItemFeatured').checked,
-  });
-  admMsg(msg,'Saving…');
-  try{ await saveMenu(); renderBoard(); closeModal('admItemModal'); }
-  catch(err){ admMsg(msg,'Save failed: '+err.message,'err'); }
-});
-
-function cropToSquareWebp(file,outSize=640){
-  return new Promise((resolve,reject)=>{
-    const url=URL.createObjectURL(file);
-    const img=new Image();
-    img.onload=()=>{
-      const size=Math.min(img.width,img.height);
-      const canvas=document.createElement('canvas');
-      canvas.width=outSize; canvas.height=outSize;
-      canvas.getContext('2d').drawImage(img,(img.width-size)/2,(img.height-size)/2,size,size,0,0,outSize,outSize);
-      canvas.toBlob((blob)=>{
-        URL.revokeObjectURL(url);
-        blob?resolve(blob):reject(new Error('this browser could not encode WEBP'));
-      },'image/webp',0.85);
-    };
-    img.onerror=()=>{ URL.revokeObjectURL(url); reject(new Error('could not read that image file')); };
-    img.src=url;
-  });
-}
-function blobToDataUrl(blob){
-  return new Promise((resolve,reject)=>{
-    const fr=new FileReader();
-    fr.onload=()=>resolve(fr.result);
-    fr.onerror=reject;
-    fr.readAsDataURL(blob);
-  });
-}
-async function takeImage(file){
-  const msg=document.getElementById('admItemMsg');
-  admMsg(msg,'Uploading photo…');
-  try{
-    const dataUrl=await blobToDataUrl(await cropToSquareWebp(file));
-    const res=await fetch('/api/upload-image',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name:document.getElementById('admItemName').value.trim()||'item',dataUrl})});
-    const d=await res.json().catch(()=>({}));
-    if(!res.ok||d.error) throw new Error(d.error||('HTTP '+res.status));
-    pendingImage=d.path;
-    document.getElementById('admItemPreview').innerHTML=`<img src="${esc(pendingImage)}" alt="">`;
-    admMsg(msg,'Photo ready.','ok');
-  }catch(err){ admMsg(msg,'Upload failed: '+err.message,'err'); }
-}
-(function(){
-  const zone=document.getElementById('admItemZone');
-  const file=document.getElementById('admItemFile');
-  zone.addEventListener('click',()=>file.click());
-  file.addEventListener('change',()=>{ if(file.files[0]) takeImage(file.files[0]); });
-  ['dragenter','dragover'].forEach(ev=>zone.addEventListener(ev,(e)=>{ e.preventDefault(); zone.classList.add('over'); }));
-  ['dragleave','drop'].forEach(ev=>zone.addEventListener(ev,(e)=>{ e.preventDefault(); zone.classList.remove('over'); }));
-  zone.addEventListener('drop',(e)=>{ const f=e.dataTransfer.files[0]; if(f) takeImage(f); });
-})();
 
 async function init(){
   const ok=await loadExcel();
@@ -1827,7 +1353,7 @@ async function init(){
   // The width fitter measures text on a canvas, so its first pass runs against
   // fallback metrics. Re-fit once the real web fonts have arrived.
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>renderBoard());
-  setInterval(()=>{ if(editingId===null&&catEditing===null) renderBoard(); },60000); // local re-render only (morning/day boundary) — no network fetch
+  setInterval(()=>renderBoard(),60000); // local re-render only (morning/day boundary) — no network fetch
   window.addEventListener('resize',()=>renderBoard());
   connectLiveUpdates();
 }
