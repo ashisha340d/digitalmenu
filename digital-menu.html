@@ -420,14 +420,16 @@ body.admin .strip-label { cursor: pointer; }
   display: flex; align-items: center; gap: 4px;
   opacity: 0; pointer-events: none; transition: opacity .15s;
 }
-body.admin .item .adm-row-tools { opacity: 1; pointer-events: auto; }
-body.admin .item .price { opacity: .12; }
+body.admin .item:hover .adm-row-tools { opacity: 1; pointer-events: auto; }
+body.admin .item:hover .price { opacity: .1; }
 body.admin .item { cursor: grab; }
 .item.adm-off { opacity: .4; }
 .item.adm-off.adm-editing { opacity: 1; }
 .item.adm-off .name-en > span { text-decoration: line-through; }
 .item.adm-dragging { opacity: .3; }
 .cat-block.adm-drop { box-shadow: inset 0 0 0 2px var(--gold), var(--shadow); }
+.item.adm-row-before { box-shadow: inset 0 2px 0 var(--gold); }
+.item.adm-row-after { box-shadow: inset 0 -2px 0 var(--gold); }
 
 .item.adm-editing { display: flex; flex-direction: column; align-items: stretch; gap: 5px; cursor: default; }
 .adm-erow { display: flex; align-items: center; gap: 6px; }
@@ -935,15 +937,22 @@ columnsEl.addEventListener('dragend',(e)=>{
   const block=e.target.closest('.cat-block');
   block&&block.classList.remove('dragging');
   columnsEl.querySelectorAll('.adm-dragging').forEach(el=>el.classList.remove('adm-dragging'));
-  columnsEl.querySelectorAll('.adm-drop').forEach(el=>el.classList.remove('adm-drop'));
+  columnsEl.querySelectorAll('.adm-drop,.adm-row-before,.adm-row-after').forEach(el=>el.classList.remove('adm-drop','adm-row-before','adm-row-after'));
   columnsEl.querySelectorAll('.drag-over-block,.drag-over-col').forEach(el=>el.classList.remove('drag-over-block','drag-over-col'));
   dragCat=null; dragItemId=null;
 });
 columnsEl.addEventListener('dragover',(e)=>{
   if(dragItemId!==null){
     const blk=e.target.closest('.cat-block');
-    columnsEl.querySelectorAll('.adm-drop').forEach(el=>el.classList.remove('adm-drop'));
-    if(blk){ e.preventDefault(); blk.classList.add('adm-drop'); }
+    const row=e.target.closest('.item[data-id]');
+    columnsEl.querySelectorAll('.adm-drop,.adm-row-before,.adm-row-after').forEach(el=>el.classList.remove('adm-drop','adm-row-before','adm-row-after'));
+    if(row&&+row.dataset.id!==dragItemId){
+      e.preventDefault();
+      const r=row.getBoundingClientRect();
+      row.classList.add(e.clientY<r.top+r.height/2?'adm-row-before':'adm-row-after');
+    }else if(blk){
+      e.preventDefault(); blk.classList.add('adm-drop');
+    }
     return;
   }
   if(!dragCat) return;
@@ -957,11 +966,27 @@ columnsEl.addEventListener('dragover',(e)=>{
 columnsEl.addEventListener('drop',(e)=>{
   if(dragItemId!==null){
     e.preventDefault();
-    columnsEl.querySelectorAll('.adm-drop').forEach(el=>el.classList.remove('adm-drop'));
+    columnsEl.querySelectorAll('.adm-drop,.adm-row-before,.adm-row-after').forEach(el=>el.classList.remove('adm-drop','adm-row-before','adm-row-after'));
+    const row=e.target.closest('.item[data-id]');
     const blk=e.target.closest('.cat-block');
     const it=itemById(dragItemId);
     dragItemId=null;
-    if(blk&&it&&blk.dataset.cat!==it.category){
+    if(!it) return;
+    if(row&&+row.dataset.id!==it.id){
+      const target=itemById(+row.dataset.id);
+      if(!target) return;
+      const r=row.getBoundingClientRect();
+      const before=e.clientY<r.top+r.height/2;
+      it.category=target.category;
+      it.cat_hi=target.cat_hi;
+      const from=menuItems.indexOf(it);
+      menuItems.splice(from,1);
+      let to=menuItems.indexOf(target);
+      if(!before) to+=1;
+      menuItems.splice(to,0,it);
+      renderBoard();
+      saveMenu().catch(()=>{});
+    }else if(blk&&blk.dataset.cat!==it.category){
       const target=blk.dataset.cat;
       const sib=menuItems.find(x=>x!==it&&x.category===target&&x.cat_hi);
       it.category=target;
@@ -986,6 +1011,7 @@ document.getElementById('resetLayoutBtn').addEventListener('click',()=>{
   renderBoard(true);
 });
 columnsEl.addEventListener('click',(e)=>{
+  if(!adminMode) return;
   const btn=e.target.closest('.font-btn');
   if(!btn) return;
   e.stopPropagation();
@@ -1319,9 +1345,9 @@ function renderBoard(animate=false){
           <span class="hover-tools">${adminMode?`
             <button class="adm-btn adm-sort" draggable="false" title="Sort rows: A–Z, then price low–high, then high–low"><i class="fa-solid fa-arrow-down-a-z"></i></button>
             <button class="adm-btn adm-add-item" draggable="false" title="Add an item to this category">+</button>`:''}
-            <span class="drag-grip" title="Drag this category to another column">⠿</span>
+            <span class="drag-grip" title="Drag this category to another column">⠿</span>${adminMode?`
             <button class="font-btn" draggable="false" data-delta="-" title="Smaller font for this category">A−</button>
-            <button class="font-btn" draggable="false" data-delta="+" title="Bigger font for this category">A+</button>
+            <button class="font-btn" draggable="false" data-delta="+" title="Bigger font for this category">A+</button>`:''}
           </span>
         </span>`;
       if(adminMode&&catEditing===cat) ch.innerHTML=admCatEditHTML(cat,catHi);
@@ -1442,6 +1468,7 @@ function admRowToolsHTML(item){
     <button class="adm-btn adm-edit" draggable="false" title="Edit this item">✎</button>
     <button class="adm-btn ${item.available?'danger':'ok'} adm-avail" draggable="false"
       title="${item.available?'Mark unavailable':'Mark available again'}">${item.available?'✕':'↺'}</button>
+    <button class="adm-btn danger adm-delete" draggable="false" title="Delete permanently"><i class="fa-solid fa-trash"></i></button>
   </span>`;
 }
 function admEditRowHTML(item){
@@ -1618,6 +1645,17 @@ columnsEl.addEventListener('click',async(e)=>{
       const it=itemById(id);
       if(!it) return;
       it.available=!it.available;
+      renderBoard();
+      saveMenu().catch(()=>{});
+      return;
+    }
+    if(e.target.closest('.adm-delete')){
+      e.stopPropagation();
+      const it=itemById(id);
+      if(!it) return;
+      if(!confirm('Delete "'+it.name+'" permanently? This removes it from Menu.xlsx and cannot be undone.')) return;
+      menuItems.splice(menuItems.indexOf(it),1);
+      if(editingId===id) editingId=null;
       renderBoard();
       saveMenu().catch(()=>{});
       return;
