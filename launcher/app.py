@@ -154,9 +154,10 @@ def run() -> None:
             )
             if cfg.autoOpenBrowser and not browser_opened.is_set():
                 browser_opened.set()
-                # The board is the customer-facing screen, so it gets its own
-                # full-screen window; the admin editor stays an ordinary tab.
-                open_urls([urls["local_admin"]])
+                # Only the customer-facing board opens on startup, in its own
+                # full-screen window. The admin editor is opened on demand from
+                # the tray menu ("Open Admin") so it never shows up on the
+                # canteen screen.
                 if not open_fullscreen(urls["local_menu"]):
                     launcher_log.info("no Chromium browser found — opening the board in a normal tab")
                     open_urls([urls["local_menu"]])
