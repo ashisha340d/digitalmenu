@@ -640,3 +640,14 @@ OSError: [WinError 1402] Invalid cursor handle.
 LAN: http://192.168.1.37:8080/
 2026-08-15 22:27:44 [INFO] launcher: Exit requested from tray menu
 2026-08-15 22:27:44 [INFO] launcher: Digital Menu launcher exited
+2026-08-15 22:28:06 [INFO] launcher: ============================================================
+2026-08-15 22:28:06 [INFO] launcher: Digital Menu launcher starting (root=E:\digitalmenu)
+2026-08-15 22:28:07 [INFO] launcher: LAN IP detected: 192.168.1.37
+2026-08-15 22:28:07 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-08-15 22:28:07 [WARNING] launcher: port 8080 already occupied before start — assuming an existing server instance
+2026-08-15 22:28:07 [INFO] launcher: notify: Port Already In Use — Port 8080 is already serving something — reusing the existing server.
+2026-08-15 22:28:07 [INFO] launcher: server is ready
+2026-08-15 22:28:07 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://192.168.1.37:8080/
+2026-08-15 22:32:54 [INFO] launcher: Exit requested from tray menu
+2026-08-15 22:32:54 [INFO] launcher: Digital Menu launcher exited
