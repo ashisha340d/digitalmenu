@@ -1885,22 +1885,19 @@
         .adboard {
           position: fixed;
           left: 50%;
-          bottom: clamp(64px, 9vh, 130px);
+          bottom: clamp(50px, 7vh, 110px);
           z-index: var(--z-modal);
-          width: min(560px, 82vw);
+          width: min(1120px, 92vw);
           translate: -50% 0;
           display: none;
           grid-template-columns: auto minmax(0, 1fr) auto;
           align-items: center;
-          gap: clamp(14px, 2.2vw, 26px);
-          padding: clamp(14px, 1.8vw, 24px) clamp(18px, 2.4vw, 30px);
-          border: 1px solid var(--gold-soft);
-          border-radius: 22px;
-          background:
-            radial-gradient(140% 120% at 0% 0%, color-mix(in srgb, var(--gold) 16%, transparent), transparent 55%),
-            color-mix(in srgb, var(--bg-1) 92%, transparent);
-          backdrop-filter: blur(26px) saturate(1.3);
-          box-shadow: var(--elev-3), 0 0 0 1px var(--gold-faint);
+          gap: clamp(24px, 3.2vw, 46px);
+          padding: clamp(26px, 3vw, 44px) clamp(30px, 3.6vw, 52px);
+          border: 1px solid rgba(0, 0, 0, .10);
+          border-radius: 30px;
+          background: #ffffff;
+          box-shadow: 0 30px 80px rgba(0, 0, 0, .30), 0 0 0 1px rgba(0, 0, 0, .05);
           pointer-events: none;
           overflow: hidden;
         }
@@ -1929,13 +1926,13 @@
         }
 
         .ad__media {
-          width: clamp(52px, 6vw, 84px);
-          height: clamp(52px, 6vw, 84px);
-          border-radius: 50%;
+          width: clamp(150px, 17vw, 260px);
+          height: clamp(150px, 17vw, 260px);
+          border-radius: 24px;
           object-fit: cover;
-          border: 2px solid var(--gold);
-          box-shadow: 0 0 0 4px var(--gold-faint);
-          background: var(--surface-2);
+          border: 3px solid var(--gold);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, .18);
+          background: #f4f4f4;
         }
 
         .ad__media[hidden] {
@@ -1945,8 +1942,8 @@
         .ad__eyebrow {
           display: inline-flex;
           align-items: center;
-          gap: 6px;
-          font-size: clamp(8px, .62vw, 11px);
+          gap: 8px;
+          font-size: clamp(11px, .92vw, 16px);
           font-weight: 800;
           letter-spacing: .22em;
           text-transform: uppercase;
@@ -1955,33 +1952,33 @@
 
         .ad__eyebrow::before {
           content: '';
-          width: 16px;
-          height: 1px;
+          width: 26px;
+          height: 2px;
           background: var(--gold);
         }
 
         .ad__title {
-          margin-top: 3px;
+          margin-top: 5px;
           font-family: var(--ff-en);
-          font-size: clamp(18px, 2.1vw, 34px);
+          font-size: clamp(28px, 3.2vw, 52px);
           font-weight: 700;
           line-height: 1.08;
-          color: var(--ink);
+          color: #17120b;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
 
         .ad__hi {
-          font-size: clamp(12px, 1.3vw, 20px);
-          color: var(--ink-2);
+          font-size: clamp(17px, 1.9vw, 29px);
+          color: #4a4a4a;
           line-height: 1.4;
         }
 
         .ad__text {
-          margin-top: 2px;
-          font-size: clamp(10px, 1vw, 15px);
-          color: var(--ink-3);
+          margin-top: 6px;
+          font-size: clamp(14px, 1.45vw, 22px);
+          color: #6a6a6a;
           line-height: 1.45;
           display: -webkit-box;
           -webkit-line-clamp: 2;
@@ -1992,12 +1989,12 @@
         .ad__price {
           display: grid;
           place-items: center;
-          padding: clamp(8px, .9vw, 14px) clamp(12px, 1.3vw, 20px);
-          border-radius: 16px;
-          border: 1px solid var(--gold-soft);
-          background: linear-gradient(180deg, color-mix(in srgb, var(--gold) 20%, transparent), color-mix(in srgb, var(--gold) 6%, transparent));
+          padding: clamp(14px, 1.4vw, 24px) clamp(20px, 2vw, 34px);
+          border-radius: 22px;
+          border: 2px solid var(--gold);
+          background: linear-gradient(180deg, color-mix(in srgb, var(--gold) 16%, #fff), #fff);
           font-family: var(--ff-price);
-          font-size: clamp(16px, 1.8vw, 30px);
+          font-size: clamp(26px, 2.8vw, 46px);
           font-weight: 800;
           color: var(--gold);
           font-variant-numeric: tabular-nums;
@@ -5753,10 +5750,27 @@
       /* ─────────────────────────────────────────────────────────────────────────
          18 · ADMIN
          ───────────────────────────────────────────────────────────────────────── */
+      let adminIdleT = null;
+      function bumpAdminIdle() {
+        clearTimeout(adminIdleT);
+        if (!adminMode) return;
+        adminIdleT = setTimeout(() => {
+          if (!adminMode) return;
+          if (document.querySelector('.modal.is-open')) { bumpAdminIdle(); return; }
+          if (editingId || catEditing || saving) { bumpAdminIdle(); return; }
+          setAdmin(false);
+          Toast.custom('save', 'Admin mode closed', 'Idle for 1 minute', { duration: 4000 });
+        }, 60000);
+      }
+      ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart'].forEach((ev) => {
+        window.addEventListener(ev, () => { if (adminMode) bumpAdminIdle(); }, { passive: true });
+      });
+
       function setAdmin(on) {
         adminMode = on;
         editingId = null;
         catEditing = null;
+        if (on) bumpAdminIdle(); else clearTimeout(adminIdleT);
         document.body.classList.toggle('is-admin', adminMode);
         $('tpanel').setAttribute('aria-label', adminMode
           ? 'Today — drag to move, corner to resize, tap to leave admin mode'
