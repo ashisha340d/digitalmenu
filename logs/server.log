@@ -90,3 +90,28 @@
 2026-08-15 21:30:10 [INFO] server: Server stopped.
 2026-08-15 21:32:02 [INFO] server: Menu URL:  http://localhost:8080/
 2026-08-15 22:15:25 [INFO] server: Server stopped.
+2026-08-16 07:42:48 [INFO] server: Menu URL:  http://localhost:8080/
+2026-08-16 09:32:18 [INFO] server: ----------------------------------------
+2026-08-16 09:32:18 [INFO] server: Exception occurred during processing of request from ('127.0.0.1', 52122)
+2026-08-16 09:32:18 [INFO] server: Traceback (most recent call last):
+2026-08-16 09:32:18 [INFO] server:   File "C:\Python314\Lib\socketserver.py", line 697, in process_request_thread
+2026-08-16 09:32:18 [INFO] server:     self.finish_request(request, client_address)
+2026-08-16 09:32:18 [INFO] server:     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-08-16 09:32:18 [INFO] server:   File "C:\Python314\Lib\socketserver.py", line 362, in finish_request
+2026-08-16 09:32:18 [INFO] server:     self.RequestHandlerClass(request, client_address, self)
+2026-08-16 09:32:18 [INFO] server:     ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-08-16 09:32:18 [INFO] server:   File "C:\Python314\Lib\socketserver.py", line 766, in __init__
+2026-08-16 09:32:18 [INFO] server:     self.handle()
+2026-08-16 09:32:18 [INFO] server:     ~~~~~~~~~~~^^
+2026-08-16 09:32:18 [INFO] server:   File "C:\Python314\Lib\http\server.py", line 496, in handle
+2026-08-16 09:32:18 [INFO] server:     self.handle_one_request()
+2026-08-16 09:32:18 [INFO] server:     ~~~~~~~~~~~~~~~~~~~~~~~^^
+2026-08-16 09:32:18 [INFO] server:   File "C:\Python314\Lib\http\server.py", line 464, in handle_one_request
+2026-08-16 09:32:18 [INFO] server:     self.raw_requestline = self.rfile.readline(65537)
+2026-08-16 09:32:18 [INFO] server:                            ~~~~~~~~~~~~~~~~~~~^^^^^^^
+2026-08-16 09:32:18 [INFO] server:   File "C:\Python314\Lib\socket.py", line 729, in readinto
+2026-08-16 09:32:18 [INFO] server:     return self._sock.recv_into(b)
+2026-08-16 09:32:18 [INFO] server:            ~~~~~~~~~~~~~~~~~~~~^^^
+2026-08-16 09:32:18 [INFO] server: ConnectionResetError: [WinError 10054] An existing connection was forcibly closed by the remote host
+2026-08-16 09:32:18 [INFO] server: ----------------------------------------
+2026-08-16 09:45:59 [INFO] server: Server stopped.

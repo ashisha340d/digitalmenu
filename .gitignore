@@ -1,0 +1,10 @@
+# Per-window browser profiles created by the launcher (see config.isolateProfiles)
+.browser-profiles/
+
+# Excel lock files
+~$*.xlsx
+
+__pycache__/
+*.pyc
+build/
+DigitalMenuLauncher.exe

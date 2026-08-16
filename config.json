@@ -3,5 +3,18 @@
   "port": 8080,
   "autoOpenBrowser": true,
   "autoRestart": true,
-  "maxRestartAttempts": 3
+  "maxRestartAttempts": 3,
+  "screens": [
+    {
+      "screen": 1,
+      "page": "index.html",
+      "state": "fullscreen"
+    },
+    {
+      "screen": 2,
+      "page": "admin.html",
+      "state": "normal"
+    }
+  ],
+  "isolateProfiles": true
 }

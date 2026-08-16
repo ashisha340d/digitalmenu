@@ -1882,18 +1882,21 @@
         }
 
         /* ── ad board flyout ────────────────────────────────────────────────────── */
+        /* Position and size come from the ad's own record (viewport percentages,
+           same model as the today panel), applied as custom properties by Ads.place. */
         .adboard {
           position: fixed;
-          left: 50%;
-          bottom: clamp(50px, 7vh, 110px);
+          left: var(--ad-x, 21%);
+          top: var(--ad-y, 68%);
           z-index: var(--z-modal);
-          width: min(1120px, 92vw);
-          translate: -50% 0;
+          width: var(--ad-w, 58%);
+          height: var(--ad-h, 24%);
+          translate: 0 0;
           display: none;
           grid-template-columns: auto minmax(0, 1fr) auto;
           align-items: center;
           gap: clamp(24px, 3.2vw, 46px);
-          padding: clamp(26px, 3vw, 44px) clamp(30px, 3.6vw, 52px);
+          padding: clamp(14px, 2vw, 40px) clamp(30px, 3.6vw, 52px);
           border: 1px solid rgba(0, 0, 0, .10);
           border-radius: 30px;
           background: #ffffff;
@@ -1914,6 +1917,122 @@
           animation: ad-out 520ms var(--ease-out) both;
         }
 
+        /* Placement mode — the real board, live and draggable, lifted above every
+           other layer (including the settings modal, which is closed first) so the
+           operator arranges it against the actual screen instead of a preview. */
+        .adboard.is-placing {
+          display: grid;
+          z-index: calc(var(--z-boot) + 1);
+          pointer-events: auto;
+          animation: none;
+          cursor: move;
+          touch-action: none;
+          outline: 3px dashed var(--gold);
+          outline-offset: 5px;
+        }
+
+        .adboard.is-placing::after {
+          display: none;                               /* park the sheen while placing */
+        }
+
+        .adplace {
+          position: fixed;
+          left: 50%;
+          bottom: 26px;
+          translate: -50% 0;
+          z-index: calc(var(--z-boot) + 2);
+          display: none;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 14px;
+          border-radius: 999px;
+          background: rgba(20, 16, 10, .93);
+          box-shadow: 0 18px 50px rgba(0, 0, 0, .45);
+          backdrop-filter: blur(6px);
+        }
+
+        .adplace.is-on {
+          display: flex;
+        }
+
+        /* ── ad master grid (settings) ───────────────────────────────────────── */
+        .adgrid {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .adrow {
+          display: grid;
+          grid-template-columns: 30px 34px minmax(0, 1fr) 74px 74px auto;
+          align-items: center;
+          gap: 10px;
+          padding: 7px 10px;
+          border: 1px solid rgba(0, 0, 0, .09);
+          border-radius: 12px;
+          background: rgba(255, 255, 255, .55);
+          cursor: pointer;
+          user-select: none;
+        }
+
+        .adrow:hover {
+          border-color: var(--gold);
+          background: color-mix(in srgb, var(--gold) 8%, #fff);
+        }
+
+        .adrow.is-off {
+          opacity: .5;
+        }
+
+        .adrow__th {
+          width: 34px;
+          height: 34px;
+          border-radius: 8px;
+          object-fit: cover;
+          background: rgba(0, 0, 0, .06);
+        }
+
+        .adrow__t {
+          min-width: 0;
+          font-weight: 700;
+          font-size: .78rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .adrow__t small {
+          display: block;
+          font-weight: 500;
+          font-size: .64rem;
+          color: #7a7a7a;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .adrow__n {
+          font-size: .66rem;
+          color: #6a6a6a;
+          font-variant-numeric: tabular-nums;
+        }
+
+        .adgrid__empty {
+          padding: 22px 12px;
+          text-align: center;
+          font-size: .7rem;
+          color: #8a8a8a;
+        }
+
+        .adplace__rd {
+          padding: 0 8px;
+          color: #f3ead8;
+          font-size: .68rem;
+          letter-spacing: .05em;
+          font-variant-numeric: tabular-nums;
+          white-space: nowrap;
+        }
+
         .adboard::after {
           /* slow gold sheen sweep */
           content: '';
@@ -1925,9 +2044,14 @@
           animation: sheen 4.5s var(--ease-out) infinite;
         }
 
+        /* The board's height is operator-set, so the image tracks the box rather
+           than a fixed clamp — otherwise a short board clips its own picture. */
         .ad__media {
-          width: clamp(150px, 17vw, 260px);
-          height: clamp(150px, 17vw, 260px);
+          align-self: stretch;
+          width: auto;
+          height: auto;
+          aspect-ratio: 1;
+          max-width: clamp(150px, 17vw, 260px);
           border-radius: 24px;
           object-fit: cover;
           border: 3px solid var(--gold);
@@ -2166,10 +2290,12 @@
       }
 
       @layer motion {
+        /* The -50% that used to live here was the centering; the board is now placed
+           by left/top, so these translate purely for the motion. */
         @keyframes ad-in {
           0% {
             opacity: 0;
-            translate: -50% 42px;
+            translate: 0 42px;
             scale: .94;
             filter: blur(6px);
           }
@@ -2181,7 +2307,7 @@
 
           100% {
             opacity: 1;
-            translate: -50% 0;
+            translate: 0 0;
             scale: 1;
           }
         }
@@ -2189,13 +2315,13 @@
         @keyframes ad-out {
           0% {
             opacity: 1;
-            translate: -50% 0;
+            translate: 0 0;
             scale: 1;
           }
 
           100% {
             opacity: 0;
-            translate: -50% 26px;
+            translate: 0 26px;
             scale: .97;
             filter: blur(4px);
           }
@@ -3772,6 +3898,16 @@
     <i class="ad__timer" id="adTimer"></i>
   </aside>
 
+  <!-- ═══ AD PLACEMENT BAR — shown only while dragging an ad into position ═══ -->
+  <div class="adplace" id="adPlaceBar" role="toolbar" aria-label="Ad placement">
+    <span class="adplace__rd" id="adPlaceRead"></span>
+    <button class="abtn" id="adPlaceReset" type="button">Reset</button>
+    <button class="abtn" id="adPlaceCancel" type="button">Cancel</button>
+    <button class="abtn abtn--ok" id="adPlaceDone" type="button"><svg class="ico" aria-hidden="true">
+        <use href="#i-check" />
+      </svg>Done</button>
+  </div>
+
   <!-- ═══ BOARD SETTINGS ═══ -->
   <div class="modal" id="mdSet" role="dialog" aria-modal="true" aria-labelledby="mdSetTtl"
     style="width:min(760px,95vw);height:min(700px,86vh)">
@@ -3805,6 +3941,15 @@
             <label class="chk"><input type="checkbox" id="setFestOn" checked>Show celebration</label>
           </div>
           <button class="abtn" id="setPanelReset" type="button">Reset position &amp; size</button>
+        </div>
+        <div class="card">
+          <h4>Admin Mode</h4>
+          <div class="row2">
+            <div class="fld"><label for="setIdleSec">Close admin after idle (seconds)</label><input class="inp"
+                id="setIdleSec" inputmode="numeric" value="60"></div>
+          </div>
+          <span class="muted" style="font-size:.64rem">An untouched screen leaves admin mode on its own, so the board
+            never sits unlocked. Open dialogs and half-finished edits hold it open.</span>
         </div>
         <div class="card">
           <h4>Weather Location</h4>
@@ -3921,13 +4066,98 @@
 
       <!-- ads -->
       <div class="pane" id="paneAd">
+        <div class="stack-x" style="margin-bottom:8px">
+          <button class="abtn abtn--ok" id="setAdNew" type="button"><svg class="ico" aria-hidden="true">
+              <use href="#i-plus" />
+            </svg>New ad</button>
+          <span class="spacer"></span>
+          <span class="muted" style="font-size:.64rem">Double-click a row to edit it.</span>
+        </div>
         <p class="muted" style="font-size:.66rem;margin-bottom:10px">
-          Three slots, each on its own timer. Only one ever shows at a time — a clash is pushed back automatically.
+          Each ad runs on its own timer. Only one ever shows at a time — a clash is pushed back automatically.
         </p>
-        <div id="setAdList"></div>
+        <div class="adgrid" id="setAdGrid" role="grid" aria-label="Ads"></div>
       </div>
     </div>
     <div class="msg" id="setMsg"></div>
+  </div>
+
+  <!-- ═══ AD DETAIL — one ad, opened from the grid ═══ -->
+  <div class="modal" id="mdAd" role="dialog" aria-modal="true" aria-labelledby="mdAdTtl"
+    style="width:min(760px,95vw);height:min(700px,86vh)">
+    <div class="modal__hd">
+      <span class="modal__ttl" id="mdAdTtl">Edit ad</span>
+      <button class="abtn abtn--ok" id="mdAdSave" type="button"><svg class="ico" aria-hidden="true">
+          <use href="#i-check" />
+        </svg>Save</button>
+      <button class="abtn abtn--danger abtn--sq" data-close="mdAd" type="button" aria-label="Close"><svg class="ico"
+          aria-hidden="true">
+          <use href="#i-x" />
+        </svg></button>
+    </div>
+    <div class="modal__bd">
+      <div class="card">
+        <h4><svg class="ico" aria-hidden="true">
+            <use href="#i-mega" />
+          </svg>Content</h4>
+        <div class="flags">
+          <label class="chk"><input type="checkbox" id="adfOn" checked>Enabled</label>
+        </div>
+        <div class="row2">
+          <div class="fld"><label for="adfTitle">Title</label><input class="inp" id="adfTitle" placeholder="Slushie">
+          </div>
+          <div class="fld"><label for="adfHi">Hindi</label><input class="inp inp--hi" id="adfHi" lang="hi"
+              placeholder="स्लशी"></div>
+        </div>
+        <div class="fld"><label for="adfText">Description</label><input class="inp" id="adfText"
+            placeholder="One short line"></div>
+        <div class="row2">
+          <div class="fld"><label for="adfPrice">Price ₹</label><input class="inp inp--price" id="adfPrice"
+              placeholder="60"></div>
+          <div class="fld"><label for="adfEvery">Every (minutes)</label><input class="inp" id="adfEvery"
+              inputmode="numeric" placeholder="8"></div>
+          <div class="fld"><label for="adfFor">Show for (seconds)</label><input class="inp" id="adfFor"
+              inputmode="numeric" placeholder="10"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4>Image</h4>
+        <div class="stack-x">
+          <img class="ad__media" id="adfThumb" alt="" hidden
+            style="width:52px;height:52px;max-width:52px;aspect-ratio:auto;align-self:auto">
+          <button class="abtn" id="adfPick" type="button"><svg class="ico" aria-hidden="true">
+              <use href="#i-upload" />
+            </svg>Choose image</button>
+          <button class="abtn abtn--danger abtn--sq" id="adfClear" type="button" aria-label="Remove image"><svg
+              class="ico" aria-hidden="true">
+              <use href="#i-x" />
+            </svg></button>
+          <input type="file" id="adfFile" accept="image/*" hidden>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4>Position &amp; Size</h4>
+        <div class="row2">
+          <div class="fld"><label for="adfX">Left %</label><input class="inp" id="adfX" inputmode="decimal"></div>
+          <div class="fld"><label for="adfY">Top %</label><input class="inp" id="adfY" inputmode="decimal"></div>
+          <div class="fld"><label for="adfW">Width %</label><input class="inp" id="adfW" inputmode="decimal"></div>
+          <div class="fld"><label for="adfH">Height %</label><input class="inp" id="adfH" inputmode="decimal"></div>
+        </div>
+        <div class="stack-x" style="margin-top:4px">
+          <button class="abtn abtn--ok" id="adfPlace" type="button"><svg class="ico" aria-hidden="true">
+              <use href="#i-resize" />
+            </svg>Drag on screen</button>
+          <button class="abtn" id="adfPreview" type="button"><svg class="ico" aria-hidden="true">
+              <use href="#i-play" />
+            </svg>Preview</button>
+          <span class="muted" style="font-size:.64rem">Percentages of the screen, so the board scales with any
+            display.</span>
+        </div>
+      </div>
+    </div>
+    <div class="msg" id="adfMsg"></div>
   </div>
 
   <script>
@@ -5447,11 +5677,22 @@
       let fsDeclined = false;
       const isFs = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
 
+      /* Two different full screens can be in play. The Fullscreen API one is ours to
+         undo; the other is the *window* state from the launcher's --start-fullscreen,
+         which reports no fullscreenElement and cannot be left from script at all —
+         only the browser's own F11 closes it. Detected by the window covering the
+         screen with no chrome of its own. */
+      const isWindowFs = () => !isFs()
+        && Math.abs(window.outerHeight - screen.height) < 4
+        && Math.abs(window.outerWidth - screen.width) < 4;
+
       function updateFsBtn() {
-        const on = isFs();
+        /* A launcher-fullscreen window is still full screen to the person looking at
+           it, so the button has to read that way even though the API disagrees. */
+        const on = isFs() || isWindowFs();
         fsBtn.querySelector('use').setAttribute('href', on ? '#i-collapse' : '#i-expand');
         fsBtn.setAttribute('aria-label', on ? 'Exit full screen' : 'Enter full screen');
-        fsBtn.title = (on ? 'Exit full screen' : 'Full screen') + ' (F11)';
+        fsBtn.title = (on ? 'Exit full screen' : 'Full screen') + ' (Esc or F11)';
       }
       function toggleFullscreen() {
         try {
@@ -5466,7 +5707,17 @@
           }
         } catch (e) { }
       }
-      fsBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleFullscreen(); });
+      fsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (isWindowFs()) {
+          fsDeclined = true;
+          Toast.custom('sync', 'Press F11 for a normal window',
+            'This screen was opened full screen by the launcher, which only F11 can leave',
+            { duration: 5000 });
+          return;
+        }
+        toggleFullscreen();
+      });
       document.addEventListener('fullscreenchange', () => { updateFsBtn(); requestWakeLock(); Fit.schedule(); });
       document.addEventListener('webkitfullscreenchange', () => { updateFsBtn(); Fit.schedule(); });
       updateFsBtn();
@@ -5509,6 +5760,9 @@
       let resizeTimer;
       window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
+        /* Leaving a launcher full-screen window fires no fullscreenchange — only a
+           resize — so the button would otherwise still claim to be full screen. */
+        updateFsBtn();
         resizeTimer = setTimeout(() => render(), 140);
       }, { passive: true });
 
@@ -5751,16 +6005,26 @@
          18 · ADMIN
          ───────────────────────────────────────────────────────────────────────── */
       let adminIdleT = null;
+
+      /* "1 minute" / "90 seconds" — the toast should name the setting the operator
+         actually chose, not a number baked in here. */
+      function idleLabel(sec) {
+        if (sec % 60 === 0) { const m = sec / 60; return m + (m === 1 ? ' minute' : ' minutes'); }
+        return sec + ' seconds';
+      }
+
       function bumpAdminIdle() {
         clearTimeout(adminIdleT);
         if (!adminMode) return;
+        const sec = clamp(+cfg.admin.idleSec || 60, 10, 3600);
         adminIdleT = setTimeout(() => {
           if (!adminMode) return;
           if (document.querySelector('.modal.is-open')) { bumpAdminIdle(); return; }
           if (editingId || catEditing || saving) { bumpAdminIdle(); return; }
+          if (Ads.placing) { bumpAdminIdle(); return; }  // mid-drag, with no modal open to vouch for it
           setAdmin(false);
-          Toast.custom('save', 'Admin mode closed', 'Idle for 1 minute', { duration: 4000 });
-        }, 60000);
+          Toast.custom('save', 'Admin mode closed', 'Idle for ' + idleLabel(sec), { duration: 4000 });
+        }, sec * 1000);
       }
       ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart'].forEach((ev) => {
         window.addEventListener(ev, () => { if (adminMode) bumpAdminIdle(); }, { passive: true });
@@ -5776,7 +6040,7 @@
           ? 'Today — drag to move, corner to resize, tap to leave admin mode'
           : 'Today — tap to open admin mode');
         $('btnSettings').hidden = !adminMode;
-        if (!adminMode) { closeModal('mdSpecials'); closeModal('mdItem'); closeModal('mdSet'); }
+        if (!adminMode) { closeModal('mdSpecials'); closeModal('mdItem'); closeModal('mdSet'); closeModal('mdAd'); }
         render();
       }
 
@@ -5914,6 +6178,9 @@
         fx: { on: true, anim: 'pushpa', everyMin: 15, forSec: 9 },
         hol: { key: '', country: 'IN', lastSync: '' },
         divAnim: { on: false, style: 'slide', everyMin: 5 },
+        /* Admin mode closes itself on an untouched screen — this is a board that
+           lives unattended, so a forgotten admin session is a real hazard. */
+        admin: { idleSec: 60 },
         /* MM-DD repeats yearly. Lunar festivals need a full YYYY-MM-DD — their
            dates move every year, so they are left for the admin to enter. */
         days: [
@@ -5924,22 +6191,52 @@
           { d: '10-02', n: 'Gandhi Jayanti', h: 'गांधी जयंती', a: 'pushpa' },
           { d: '12-25', n: 'Christmas', h: 'क्रिसमस', a: 'deep' },
         ],
+        /* Ads are an open-ended list, not fixed slots. Geometry is stored in
+           viewport percentages (like the today panel) so a board authored on the
+           office monitor still lands correctly on the canteen screen. */
         ads: [
-          { on: true, title: 'Slushie', hi: 'स्लशी', text: 'Chilled and fresh — ask at the counter.', price: '60', img: '', everyMin: 4, forSec: 10 },
-          { on: true, title: 'Paneer Pizza', hi: 'पनीर पिज़्ज़ा', text: 'Hand stretched, wood-fired, full of paneer.', price: '350', img: '', everyMin: 7, forSec: 10 },
-          { on: true, title: 'Ghee Dosa', hi: 'घी डोसा', text: 'Crisp dosa roasted in pure desi ghee.', price: '120', img: '', everyMin: 11, forSec: 10 },
+          { id: 'ad-slushie', on: true, title: 'Slushie', hi: 'स्लशी', text: 'Chilled and fresh — ask at the counter.', price: '60', img: '', everyMin: 4, forSec: 10, x: 21, y: 68, w: 58, h: 24 },
+          { id: 'ad-pizza', on: true, title: 'Paneer Pizza', hi: 'पनीर पिज़्ज़ा', text: 'Hand stretched, wood-fired, full of paneer.', price: '350', img: '', everyMin: 7, forSec: 10, x: 21, y: 68, w: 58, h: 24 },
+          { id: 'ad-dosa', on: true, title: 'Ghee Dosa', hi: 'घी डोसा', text: 'Crisp dosa roasted in pure desi ghee.', price: '120', img: '', everyMin: 11, forSec: 10, x: 21, y: 68, w: 58, h: 24 },
         ],
       };
+
+      const AD_GEO = { x: 21, y: 68, w: 58, h: 24 };
+      const AD_LIM = { w: [14, 100], h: [8, 100] };
+      let adSeq = 0;
+      const adUid = () => 'ad-' + Date.now().toString(36) + '-' + (adSeq++).toString(36);
+
+      /* One ad, with every field present and in range. Used for merging saved data,
+         for new rows, and for anything old enough to predate a field. */
+      function normalizeAd(raw, i) {
+        const a = (raw && typeof raw === 'object') ? raw : {};
+        const n = (v, d, lo, hi) => { const f = parseFloat(v); return isNaN(f) ? d : clamp(f, lo, hi); };
+        return {
+          id: String(a.id || '').trim() || ('ad-' + i + '-' + Date.now().toString(36)),
+          on: a.on !== false,
+          title: String(a.title == null ? '' : a.title),
+          hi: String(a.hi == null ? '' : a.hi),
+          text: String(a.text == null ? '' : a.text),
+          price: String(a.price == null ? '' : a.price),
+          img: String(a.img == null ? '' : a.img),
+          everyMin: n(a.everyMin, 8, 1, 720),
+          forSec: n(a.forSec, 10, 3, 60),
+          x: n(a.x, AD_GEO.x, 0, 100),
+          y: n(a.y, AD_GEO.y, 0, 100),
+          w: n(a.w, AD_GEO.w, AD_LIM.w[0], AD_LIM.w[1]),
+          h: n(a.h, AD_GEO.h, AD_LIM.h[0], AD_LIM.h[1]),
+        };
+      }
 
       let cfg = JSON.parse(JSON.stringify(DEFAULT_CFG));
 
       function mergeCfg(saved) {
         if (!saved || typeof saved !== 'object') return;
-        ['panel', 'wx', 'fx', 'hol', 'divAnim'].forEach((k) => { if (saved[k] && typeof saved[k] === 'object') Object.assign(cfg[k], saved[k]); });
+        ['panel', 'wx', 'fx', 'hol', 'divAnim', 'admin'].forEach((k) => { if (saved[k] && typeof saved[k] === 'object') Object.assign(cfg[k], saved[k]); });
         if (Array.isArray(saved.days)) cfg.days = saved.days.filter(x => x && x.d && x.n);
-        if (Array.isArray(saved.ads)) {
-          saved.ads.slice(0, 3).forEach((a, i) => { if (a && typeof a === 'object') Object.assign(cfg.ads[i], a); });
-        }
+        /* The saved list is authoritative for length — an empty array means the
+           operator deleted every ad, not that the file is missing data. */
+        if (Array.isArray(saved.ads)) cfg.ads = saved.ads.map(normalizeAd);
       }
 
       function loadConfig() {
@@ -6615,14 +6912,17 @@
         };
       })();
 
-      /* Scheduler: the festival day's own animation wins over the default. */
+      /* Scheduler: the festival day's own animation wins over the default.
+         Celebrations run on their own layer and answer to nobody — the canvas
+         sits below the ad board (--z-drag vs --z-modal) and is pointer-transparent,
+         so it can paint behind an ad or a div sweep without disturbing either. */
       let fxTimer = null;
       function scheduleFX() {
         clearInterval(fxTimer);
         if (!cfg.fx.on || reduced) return;
         const every = clamp(+cfg.fx.everyMin || 15, 1, 720);
         fxTimer = setInterval(() => {
-          if (adminMode || document.hidden || Ads.busy || DivAnim.busy) return;
+          if (adminMode || document.hidden) return;
           playFX();
         }, every * 60000);
       }
@@ -6680,10 +6980,14 @@
           running = false;
         }
 
+        /* The sweep shares a lane with the ad board: it plays after an ad exits
+           (Ads chains into it) and otherwise fills the gaps on its own interval.
+           FX is deliberately not consulted — celebrations are a background layer. */
         function play(force) {
           if (running) return false;
           if (reduced) return false;
-          if (!force && (adminMode || document.hidden || FX.busy || Ads.busy)) return false;
+          if (!force && !cfg.divAnim.on) return false;
+          if (!force && (adminMode || document.hidden || Ads.busy)) return false;
 
           const cats = Array.from(grid.querySelectorAll('.cat'));
           if (!cats.length) return false;
@@ -6708,6 +7012,9 @@
 
           const total = (ordered.length - 1) * STEP + Math.max(DUR, GLITTER) + PAD;
           endT = setTimeout(cancel, total);
+          /* Re-base the idle interval off this play, so a sweep chained from an ad
+             isn't followed seconds later by the one the interval had already queued. */
+          schedule();
           return true;
         }
 
@@ -6723,6 +7030,8 @@
 
       /* ═════════════════════════════════════════════════════════════════════════
    29 · AD BOARD — three slots, three timers, one at a time.
+        Paired with the div sweep: an ad never opens mid-sweep, and every ad
+        hands off to a sweep once it has finished leaving.
    ═════════════════════════════════════════════════════════════════════════ */
       const Ads = (function () {
         const node = $('adboard');
@@ -6730,8 +7039,30 @@
         let showing = false;
         let hiding = false;
         let hideAt = 0;
-        let next = [0, 0, 0];
+        let live = null;                               // the ad currently on screen
         let ticker = null;
+        let hideT = null;                              // the in-flight exit transition
+
+        /* Next-fire times are keyed by ad id, never by index: deleting a row must
+           not hand its countdown to whichever ad shifted up into its place. */
+        let next = Object.create(null);
+
+        const eligible = () => cfg.ads.filter(a => a && a.on && a.title);
+
+        /* Rebuild the schedule over the current ads: unknown ids get a staggered
+           first appearance, departed ids are dropped, survivors keep their place
+           in the queue unless `base` pushes them later. */
+        function seed(base, step, reset) {
+          const now = Date.now();
+          const fresh = Object.create(null);
+          eligible().forEach((a, i) => {
+            const at = now + base + i * step;
+            fresh[a.id] = (!reset && next[a.id]) ? Math.max(next[a.id], at) : at;
+          });
+          next = fresh;
+        }
+
+        function reseed() { seed(8000, 6000, false); }
 
         function fill(a) {
           const img = $('adImg');
@@ -6746,10 +7077,22 @@
           price.hidden = !p;
         }
 
+        /* Geometry rides on custom properties so the entry/exit keyframes stay free
+           to own `translate` without fighting the position. */
+        function place(a) {
+          const g = (k) => { const v = parseFloat(a && a[k]); return isNaN(v) ? AD_GEO[k] : v; };
+          node.style.setProperty('--ad-x', g('x') + '%');
+          node.style.setProperty('--ad-y', g('y') + '%');
+          node.style.setProperty('--ad-w', g('w') + '%');
+          node.style.setProperty('--ad-h', g('h') + '%');
+        }
+
         function show(a) {
           if (showing || hiding) return;
           if (!a || !a.title) return;
           showing = true;
+          live = a;
+          place(a);
           fill(a);
           const secs = clamp(+a.forSec || 10, 3, 60);
           node.classList.remove('is-out');
@@ -6763,44 +7106,195 @@
 
         /* Idempotent: the ticker keeps firing during the 540ms exit, and re-entering
            here would restart the animation every second. */
-        function hide() {
+        function hide(chain) {
           if (!showing || hiding) return;
           hiding = true;
           node.classList.remove('is-in');
           node.classList.add('is-out');
-          const done = () => { node.classList.remove('is-live', 'is-out'); showing = false; hiding = false; };
-          if (reduced) done(); else setTimeout(done, 540);
+          const done = () => {
+            node.classList.remove('is-live', 'is-out');
+            showing = false; hiding = false; live = null; hideT = null;
+            /* Hand off only once the board is fully out — chaining at the start of
+               the 540ms exit would overlap the two instead of sequencing them. */
+            if (chain) DivAnim.play();
+          };
+          if (reduced) done(); else hideT = setTimeout(done, 540);
         }
+
+        /* ── placement mode ───────────────────────────────────────────────────
+           Drag the board itself to set one ad's position and size. Geometry is
+           written straight onto the ad record as it moves so the readout and the
+           board never disagree; Cancel restores the snapshot taken on entry. */
+        const placer = (function () {
+          const bar = $('adPlaceBar');
+          const readout = $('adPlaceRead');
+          const DIRS = ['n', 's', 'w', 'e', 'nw', 'ne', 'sw', 'se'];
+          let target = null;
+          let backup = null;
+          let drag = null;
+          let handles = [];
+          let done = null;
+
+          const r1 = (v) => Math.round(v * 10) / 10;
+
+          function paint() {
+            if (!target) return;
+            readout.textContent = Math.round(target.x) + '% , ' + Math.round(target.y) + '%'
+              + '   ·   ' + Math.round(target.w) + '% × ' + Math.round(target.h) + '%';
+          }
+
+          function begin(dir, e) {
+            if (!target) return;
+            drag = { dir, sx: e.clientX, sy: e.clientY, o: { x: target.x, y: target.y, w: target.w, h: target.h } };
+            window.addEventListener('pointermove', onMove);
+            window.addEventListener('pointerup', onUp);
+            window.addEventListener('pointercancel', onUp);
+          }
+
+          /* Same model as the today panel: the opposite edge stays pinned, so
+             pulling the west edge grows the box leftwards instead of sliding it. */
+          function onMove(e) {
+            if (!drag || !target) return;
+            e.preventDefault();
+            const px = ((e.clientX - drag.sx) / window.innerWidth) * 100;
+            const py = ((e.clientY - drag.sy) / window.innerHeight) * 100;
+            const o = drag.o;
+            const d = drag.dir;
+
+            if (!d) {
+              target.x = r1(clamp(o.x + px, 0, Math.max(0, 100 - o.w)));
+              target.y = r1(clamp(o.y + py, 0, Math.max(0, 100 - o.h)));
+            } else {
+              if (d.includes('e')) target.w = r1(clamp(o.w + px, AD_LIM.w[0], 100 - o.x));
+              if (d.includes('s')) target.h = r1(clamp(o.h + py, AD_LIM.h[0], 100 - o.y));
+              if (d.includes('w')) {
+                const w = clamp(o.w - px, AD_LIM.w[0], o.x + o.w);
+                target.w = r1(w);
+                target.x = r1(o.x + o.w - w);
+              }
+              if (d.includes('n')) {
+                const h = clamp(o.h - py, AD_LIM.h[0], o.y + o.h);
+                target.h = r1(h);
+                target.y = r1(o.y + o.h - h);
+              }
+            }
+            place(target);
+            paint();
+          }
+
+          function onUp() {
+            window.removeEventListener('pointermove', onMove);
+            window.removeEventListener('pointerup', onUp);
+            window.removeEventListener('pointercancel', onUp);
+            drag = null;
+          }
+
+          function onBody(e) {
+            if (e.target.closest('.tp__h')) return;
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            e.preventDefault();
+            begin('', e);
+          }
+
+          function open(ad, after) {
+            if (!ad || target) return;
+            target = ad;
+            done = after || null;
+            backup = { x: ad.x, y: ad.y, w: ad.w, h: ad.h };
+
+            /* Clear any rotating ad instantly — a 540ms exit would fight the
+               placement board for the same element. */
+            clearTimeout(hideT);
+            showing = false; hiding = false; live = null;
+
+            fill(ad);
+            place(ad);
+            node.classList.remove('is-in', 'is-out');
+            node.classList.add('is-live', 'is-placing');
+
+            DIRS.forEach((d) => {
+              const h = el('i', 'tp__h');
+              h.dataset.dir = d;
+              h.style.display = 'block';               // handles exist only while placing
+              h.addEventListener('pointerdown', (ev) => {
+                ev.preventDefault();
+                ev.stopPropagation();
+                begin(d, ev);
+              });
+              node.appendChild(h);
+              handles.push(h);
+            });
+
+            node.addEventListener('pointerdown', onBody);
+            bar.classList.add('is-on');
+            paint();
+          }
+
+          function close(commit) {
+            if (!target) return;
+            if (!commit && backup) Object.assign(target, backup);
+            onUp();
+            node.removeEventListener('pointerdown', onBody);
+            handles.forEach(h => h.remove());
+            handles = [];
+            node.classList.remove('is-live', 'is-placing');
+            bar.classList.remove('is-on');
+            const ad = target, ok = !!commit, after = done;
+            target = null; backup = null; done = null;
+            /* Placement held the board hostage; give the rotation a fresh start. */
+            reseed();
+            if (after) after(ad, ok);
+          }
+
+          $('adPlaceDone').addEventListener('click', () => close(true));
+          $('adPlaceCancel').addEventListener('click', () => close(false));
+          $('adPlaceReset').addEventListener('click', () => {
+            if (!target) return;
+            Object.assign(target, AD_GEO);
+            place(target);
+            paint();
+          });
+          window.addEventListener('keydown', (e) => {
+            if (!target) return;
+            if (e.key === 'Escape') { e.preventDefault(); close(false); }
+            if (e.key === 'Enter') { e.preventDefault(); close(true); }
+          });
+
+          return { open, close, get on() { return !!target; } };
+        })();
 
         function tick() {
           const now = Date.now();
-          if (showing) { if (now >= hideAt) hide(); return; }
-          if (adminMode || document.hidden || FX.busy || DivAnim.busy) return;
+          if (placer.on) return;                       // the board is being arranged
+          if (showing) { if (now >= hideAt) hide(true); return; }
+          if (adminMode || document.hidden || DivAnim.busy) return;
 
-          for (let i = 0; i < 3; i++) {
-            const a = cfg.ads[i];
-            if (!a || !a.on || !a.title) continue;
-            if (now < next[i]) continue;
-            next[i] = now + clamp(+a.everyMin || 8, 1, 720) * 60000;
+          const due = eligible();
+          for (let i = 0; i < due.length; i++) {
+            const a = due[i];
+            if (next[a.id] == null) { next[a.id] = now + clamp(+a.everyMin || 8, 1, 720) * 60000; continue; }
+            if (now < next[a.id]) continue;
+            next[a.id] = now + clamp(+a.everyMin || 8, 1, 720) * 60000;
             show(a);
             return;                                    // one at a time, always
           }
         }
 
         return {
-          get busy() { return showing; },
-          preview(i) { if (showing) hide(); setTimeout(() => show(cfg.ads[i]), showing ? 560 : 0); },
+          /* Placement counts as busy: the div sweep must not run under a board the
+             operator is dragging. */
+          get busy() { return showing || placer.on; },
+          get placing() { return placer.on; },
+          /* No chain on preview — the operator asked for an ad, not a board sweep. */
+          preview(ad) { if (placer.on) return; if (showing) hide(false); setTimeout(() => show(ad), showing ? 560 : 0); },
+          place(ad, after) { placer.open(ad, after); },
           /* Stagger the first appearance so the board isn't noisy right after boot. */
           start() {
             clearInterval(ticker);
-            const now = Date.now();
-            next = cfg.ads.map((a, i) => now + 25000 + i * 18000);
+            seed(25000, 18000, true);
             ticker = setInterval(tick, 1000);
           },
-          reschedule() {
-            const now = Date.now();
-            next = cfg.ads.map((a, i) => Math.max(next[i] || 0, now + 8000 + i * 6000));
-          },
+          reschedule() { reseed(); },
         };
       })();
 
@@ -6894,96 +7388,198 @@
           $('setDayList').lastElementChild.querySelector('[data-f="n"]').select();
         });
 
-        /* ---- ad slots ---- */
+        /* ---- ads: master grid ----
+           The grid is the list; the detail modal is the editor. Row toggles and
+           deletes write straight to cfg and persist immediately, so the grid never
+           holds unsaved state the way the old slot cards did. */
         function buildAds() {
-          const wrap = $('setAdList');
+          const wrap = $('setAdGrid');
           wrap.textContent = '';
-          cfg.ads.forEach((ad, i) => {
-            const card = el('div', 'card');
-            card.dataset.slot = String(i);
 
-            const head = el('h4');
-            head.appendChild(svgIcon('i-mega'));
-            head.appendChild(document.createTextNode('Slot ' + (i + 1)));
-            const sp = el('span', 'spacer');
+          if (!cfg.ads.length) {
+            wrap.appendChild(el('div', 'adgrid__empty', 'No ads yet — “New ad” adds one.'));
+            return;
+          }
+
+          cfg.ads.forEach((ad) => {
+            const row = el('div', 'adrow' + (ad.on ? '' : ' is-off'));
+            row.dataset.id = ad.id;
+            row.setAttribute('role', 'row');
+            row.tabIndex = 0;
+
             const on = el('label', 'chk');
             const cb = document.createElement('input');
-            cb.type = 'checkbox'; cb.checked = !!ad.on; cb.dataset.f = 'on';
-            on.append(cb, document.createTextNode('On'));
-            const prev = el('button', 'abtn', 'Preview');
-            prev.type = 'button';
-            prev.addEventListener('click', () => { readInto(i); Ads.preview(i); });
-            head.append(sp, on, prev);
-            card.appendChild(head);
-
-            const mk = (label, f, value, cls, ph) => {
-              const fld = el('div', 'fld');
-              fld.appendChild(el('label', null, label));
-              const inp = el('input', 'inp' + (cls ? ' ' + cls : ''));
-              inp.value = value == null ? '' : value;
-              inp.dataset.f = f;
-              if (ph) inp.placeholder = ph;
-              if (cls === 'inp--hi') inp.lang = 'hi';
-              fld.appendChild(inp);
-              return fld;
-            };
-
-            const r1 = el('div', 'row2');
-            r1.append(mk('Title', 'title', ad.title, '', 'Slushie'), mk('Hindi', 'hi', ad.hi, 'inp--hi', 'स्लशी'));
-            card.appendChild(r1);
-            card.appendChild(mk('Description', 'text', ad.text, '', 'One short line'));
-
-            const r2 = el('div', 'row2');
-            r2.append(
-              mk('Price ₹', 'price', ad.price, 'inp--price', '60'),
-              mk('Every (min)', 'everyMin', ad.everyMin, '', '7'),
-              mk('Show for (sec)', 'forSec', ad.forSec, '', '10')
-            );
-            card.appendChild(r2);
-
-            const media = el('div', 'stack-x');
-            const btn = el('button', 'abtn', 'Choose image');
-            btn.type = 'button';
-            const clear = el('button', 'abtn abtn--danger abtn--sq'); clear.type = 'button';
-            clear.title = 'Remove image'; clear.appendChild(svgIcon('i-x'));
-            const thumb = document.createElement('img');
-            thumb.className = 'ad__media';
-            thumb.style.width = thumb.style.height = '44px';
-            thumb.alt = '';
-            thumb.hidden = !ad.img;
-            if (ad.img) thumb.src = ad.img;
-            const file = document.createElement('input');
-            file.type = 'file'; file.accept = 'image/*'; file.hidden = true;
-            btn.addEventListener('click', () => file.click());
-            clear.addEventListener('click', () => { cfg.ads[i].img = ''; thumb.hidden = true; thumb.removeAttribute('src'); });
-            file.addEventListener('change', async () => {
-              const f = file.files[0]; file.value = '';
-              if (!f) return;
-              setMsg($('setMsg'), 'Uploading image…');
-              try {
-                cfg.ads[i].img = await uploadImage(f, cfg.ads[i].title || 'ad');
-                thumb.src = cfg.ads[i].img; thumb.hidden = false;
-                setMsg($('setMsg'), 'Image ready.', 'ok');
-              } catch (err) {
-                setMsg($('setMsg'), 'Upload failed: ' + err.message, 'err');
-              }
+            cb.type = 'checkbox';
+            cb.checked = !!ad.on;
+            cb.title = 'Enable / disable';
+            cb.addEventListener('click', (e) => e.stopPropagation());
+            cb.addEventListener('change', () => {
+              ad.on = cb.checked;
+              row.classList.toggle('is-off', !ad.on);
+              Ads.reschedule();
+              saveConfig();
             });
-            media.append(thumb, btn, clear, file);
-            card.appendChild(media);
-            wrap.appendChild(card);
+            on.appendChild(cb);
+
+            const thumb = document.createElement('img');
+            thumb.className = 'adrow__th';
+            thumb.alt = '';
+            if (ad.img) thumb.src = ad.img;
+
+            const title = el('div', 'adrow__t', ad.title || '(untitled)');
+            title.appendChild(el('small', null, ad.hi || ad.text || ''));
+
+            const every = el('div', 'adrow__n', 'every ' + ad.everyMin + 'm');
+            const forr = el('div', 'adrow__n', 'for ' + ad.forSec + 's');
+
+            const tools = el('div', 'stack-x');
+            const mkBtn = (cls, icon, label, fn) => {
+              const b = el('button', 'abtn abtn--sq' + (cls ? ' ' + cls : ''));
+              b.type = 'button';
+              b.title = label;
+              b.setAttribute('aria-label', label + ' ' + (ad.title || 'ad'));
+              b.appendChild(svgIcon(icon));
+              b.addEventListener('click', (e) => { e.stopPropagation(); fn(); });
+              return b;
+            };
+            tools.append(
+              mkBtn('', 'i-resize', 'Position and size', () => placeAd(ad)),
+              mkBtn('', 'i-pencil', 'Edit', () => Detail.open(ad)),
+              mkBtn('abtn--danger', 'i-trash', 'Delete', () => removeAd(ad))
+            );
+
+            row.append(on, thumb, title, every, forr, tools);
+            row.addEventListener('dblclick', () => Detail.open(ad));
+            row.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter') { e.preventDefault(); Detail.open(ad); }
+            });
+            wrap.appendChild(row);
           });
         }
 
-        function readInto(i) {
-          const card = $('setAdList').querySelector('[data-slot="' + i + '"]');
-          if (!card) return;
-          const g = (f) => { const n = card.querySelector('[data-f="' + f + '"]'); return n ? n.value.trim() : ''; };
-          const a = cfg.ads[i];
-          a.on = card.querySelector('[data-f="on"]').checked;
-          a.title = g('title'); a.hi = g('hi'); a.text = g('text'); a.price = g('price');
-          a.everyMin = clamp(parseFloat(g('everyMin')) || 8, 1, 720);
-          a.forSec = clamp(parseFloat(g('forSec')) || 10, 3, 60);
+        function removeAd(ad) {
+          if (!confirm('Delete “' + (ad.title || 'this ad') + '”?')) return;
+          const i = cfg.ads.indexOf(ad);
+          if (i < 0) return;
+          cfg.ads.splice(i, 1);
+          buildAds();
+          Ads.reschedule();
+          saveConfig();
+          Toast.save('Ad deleted');
         }
+
+        /* Placement needs the whole screen, so the settings modal steps aside and
+           comes back when the operator is done. */
+        function placeAd(ad, reopen) {
+          const back = reopen || 'mdSet';
+          closeModal('mdSet');
+          closeModal('mdAd');
+          Ads.place(ad, (a, committed) => {
+            if (committed) { saveConfig(); Toast.save('Ad position saved'); }
+            buildAds();
+            openModal(back);
+            if (back === 'mdAd') Detail.geo(a);
+          });
+        }
+
+        /* ---- ads: detail editor ---- */
+        const Detail = (function () {
+          let current = null;
+
+          function fillGeo(a) {
+            $('adfX').value = a.x; $('adfY').value = a.y;
+            $('adfW').value = a.w; $('adfH').value = a.h;
+          }
+
+          function open(ad) {
+            current = ad;
+            $('mdAdTtl').textContent = ad.title ? 'Edit — ' + ad.title : 'Edit ad';
+            $('adfOn').checked = !!ad.on;
+            $('adfTitle').value = ad.title;
+            $('adfHi').value = ad.hi;
+            $('adfText').value = ad.text;
+            $('adfPrice').value = ad.price;
+            $('adfEvery').value = ad.everyMin;
+            $('adfFor').value = ad.forSec;
+            fillGeo(ad);
+            const th = $('adfThumb');
+            th.hidden = !ad.img;
+            if (ad.img) th.src = ad.img; else th.removeAttribute('src');
+            setMsg($('adfMsg'), '');
+            openModal('mdAd');
+            setTimeout(() => $('adfTitle').focus(), 0);
+          }
+
+          /* Read the form onto the record. Geometry is included so typed numbers
+             and dragged numbers are the same field, not two competing sources. */
+          function read() {
+            if (!current) return null;
+            const a = current;
+            const g = (id) => $(id).value.trim();
+            const n = (id, d, lo, hi) => { const f = parseFloat(g(id)); return isNaN(f) ? d : clamp(f, lo, hi); };
+            a.on = $('adfOn').checked;
+            a.title = g('adfTitle'); a.hi = g('adfHi'); a.text = g('adfText'); a.price = g('adfPrice');
+            a.everyMin = n('adfEvery', 8, 1, 720);
+            a.forSec = n('adfFor', 10, 3, 60);
+            a.x = n('adfX', AD_GEO.x, 0, 100);
+            a.y = n('adfY', AD_GEO.y, 0, 100);
+            a.w = n('adfW', AD_GEO.w, AD_LIM.w[0], AD_LIM.w[1]);
+            a.h = n('adfH', AD_GEO.h, AD_LIM.h[0], AD_LIM.h[1]);
+            return a;
+          }
+
+          $('mdAdSave').addEventListener('click', async () => {
+            const a = read();
+            if (!a) return;
+            if (!a.title) { setMsg($('adfMsg'), 'An ad needs a title before it can show.', 'err'); return; }
+            buildAds();
+            Ads.reschedule();
+            setMsg($('adfMsg'), 'Saving…');
+            try {
+              await saveConfig();
+              /* A save that lands after the operator has moved to another ad must
+                 not close the editor out from under them. */
+              if (current === a) closeModal('mdAd');
+              Toast.save('Ad saved');
+            } catch (err) {
+              setMsg($('adfMsg'), 'Saved on this screen only: ' + err.message, 'err');
+            }
+          });
+
+          $('adfPlace').addEventListener('click', () => { const a = read(); if (a) placeAd(a, 'mdAd'); });
+          $('adfPreview').addEventListener('click', () => { const a = read(); if (a) { closeModal('mdAd'); Ads.preview(a); } });
+
+          $('adfPick').addEventListener('click', () => $('adfFile').click());
+          $('adfClear').addEventListener('click', () => {
+            if (!current) return;
+            current.img = '';
+            $('adfThumb').hidden = true;
+            $('adfThumb').removeAttribute('src');
+          });
+          $('adfFile').addEventListener('change', async () => {
+            const f = $('adfFile').files[0];
+            $('adfFile').value = '';
+            if (!f || !current) return;
+            setMsg($('adfMsg'), 'Uploading image…');
+            try {
+              current.img = await uploadImage(f, current.title || 'ad');
+              $('adfThumb').src = current.img;
+              $('adfThumb').hidden = false;
+              setMsg($('adfMsg'), 'Image ready.', 'ok');
+            } catch (err) {
+              setMsg($('adfMsg'), 'Upload failed: ' + err.message, 'err');
+            }
+          });
+
+          return { open, geo: fillGeo };
+        })();
+
+        $('setAdNew').addEventListener('click', () => {
+          const ad = normalizeAd({ id: adUid(), title: '', everyMin: 8, forSec: 10 }, cfg.ads.length);
+          cfg.ads.push(ad);
+          buildAds();
+          Detail.open(ad);
+        });
 
         function open() {
           $('setDaOn').checked = cfg.divAnim.on;
@@ -6994,6 +7590,7 @@
           $('setHolMsg').textContent = cfg.hol.lastSync
             ? 'Last synced ' + new Date(cfg.hol.lastSync).toLocaleDateString()
             : '';
+          $('setIdleSec').value = cfg.admin.idleSec;
           $('setPanelOn').checked = cfg.panel.on;
           $('setWxOn').checked = cfg.panel.wx;
           $('setFestOn').checked = cfg.panel.fest;
@@ -7031,7 +7628,7 @@
           cfg.hol.key = val('setHolKey');
           cfg.hol.country = val('setHolCountry').toUpperCase() || 'IN';
           cfg.days = readDays();
-          [0, 1, 2].forEach(readInto);
+          cfg.admin.idleSec = clamp(num('setIdleSec', 60), 10, 3600);
 
           Panel.render();
           scheduleFX();
@@ -7201,13 +7798,36 @@
       });
       document.querySelector('.head').addEventListener('click', (e) => {
         if (e.target.closest('button') || e.target.closest('.pill')) return;
-        if (!isFs()) toggleFullscreen();
+        /* Once somebody has deliberately left full screen, a stray header tap must
+           not drag them straight back into it. */
+        if (!isFs() && !fsDeclined) toggleFullscreen();
       });
 
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'F11') { e.preventDefault(); toggleFullscreen(); return; }
+        if (e.key === 'F11') {
+          /* Leave native F11 alone when the launcher put the window in full screen:
+             it is the only thing that can bring that window back down. */
+          if (isWindowFs()) return;
+          e.preventDefault();
+          toggleFullscreen();
+          return;
+        }
         if (e.key === 'Escape') {
-          ['mdSpecials', 'mdItem'].forEach((id) => { if ($(id).classList.contains('is-open')) closeModal(id); });
+          /* Escape unwinds one layer at a time: whatever is open first, then full
+             screen. Placement runs with no modal open and cancels on its own Escape
+             handler, so this one has to stand back or it would also drop full screen. */
+          if (Ads.placing) return;
+          /* Last one in DOM order is the one painted on top — every modal shares the
+             same z-index, so the detail editor opened over settings must close first. */
+          const stack = document.querySelectorAll('.modal.is-open');
+          if (stack.length) { closeModal(stack[stack.length - 1].id); return; }
+          if (isFs()) { toggleFullscreen(); return; }   // toggleFullscreen sets fsDeclined
+          if (isWindowFs()) {
+            fsDeclined = true;                          // don't re-grab on the next tap
+            Toast.custom('sync', 'Press F11 for a normal window',
+              'This screen was opened full screen by the launcher, which only F11 can leave',
+              { duration: 5000 });
+          }
           return;
         }
         if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {

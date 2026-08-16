@@ -651,3 +651,41 @@ LAN: http://192.168.1.37:8080/
 LAN: http://192.168.1.37:8080/
 2026-08-15 22:32:54 [INFO] launcher: Exit requested from tray menu
 2026-08-15 22:32:54 [INFO] launcher: Digital Menu launcher exited
+2026-08-16 05:30:13 [INFO] launcher: ============================================================
+2026-08-16 05:30:13 [INFO] launcher: Digital Menu launcher starting (root=E:\digitalmenu)
+2026-08-16 05:30:13 [INFO] launcher: LAN IP detected: 192.168.1.37
+2026-08-16 05:30:13 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-08-16 05:30:13 [WARNING] launcher: port 8080 already occupied before start — assuming an existing server instance
+2026-08-16 05:30:13 [INFO] launcher: notify: Port Already In Use — Port 8080 is already serving something — reusing the existing server.
+2026-08-16 05:30:14 [INFO] launcher: server is ready
+2026-08-16 05:30:14 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://192.168.1.37:8080/
+2026-08-16 07:42:40 [INFO] launcher: ============================================================
+2026-08-16 07:42:40 [INFO] launcher: Digital Menu launcher starting (root=E:\digitalmenu)
+2026-08-16 07:42:45 [INFO] launcher: LAN IP detected: 192.168.1.13
+2026-08-16 07:42:47 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-08-16 07:42:48 [INFO] launcher: spawned menu_server.py (pid=26628) on 0.0.0.0:8080
+2026-08-16 07:42:48 [INFO] launcher: server is ready
+2026-08-16 07:42:48 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://192.168.1.13:8080/
+2026-08-16 09:38:58 [INFO] launcher: ============================================================
+2026-08-16 09:38:58 [INFO] launcher: Digital Menu launcher starting (root=E:\digitalmenu)
+2026-08-16 09:38:59 [INFO] launcher: LAN IP detected: 192.168.1.13
+2026-08-16 09:38:59 [INFO] launcher: notify: Digital Menu Started — Starting the server...
+2026-08-16 09:38:59 [WARNING] launcher: port 8080 already occupied before start — assuming an existing server instance
+2026-08-16 09:38:59 [INFO] launcher: notify: Port Already In Use — Port 8080 is already serving something — reusing the existing server.
+2026-08-16 09:38:59 [INFO] launcher: server is ready
+2026-08-16 09:38:59 [INFO] launcher: notify: Server Running — Digital Menu is live on port 8080.
+LAN: http://192.168.1.13:8080/
+2026-08-16 09:38:59 [INFO] launcher: displays detected — 1: 1536x864 @0,0 (primary)
+2026-08-16 09:38:59 [INFO] launcher: opened http://127.0.0.1:8080/index.html (fullscreen) on screen 1
+2026-08-16 09:38:59 [INFO] launcher: screen 2 is not attached — opening admin.html without positioning it
+2026-08-16 09:39:00 [INFO] launcher: opened http://127.0.0.1:8080/admin.html (normal) on wherever the browser puts it
+2026-08-16 09:45:57 [INFO] launcher: Exit requested from tray menu
+2026-08-16 09:45:57 [INFO] launcher: Digital Menu launcher exited
+2026-08-16 09:45:59 [INFO] launcher: Exit requested from tray menu
+2026-08-16 09:45:59 [INFO] launcher: stopping menu_server.py (pid=26628)
+2026-08-16 09:45:59 [INFO] launcher: server exited gracefully
+2026-08-16 09:45:59 [INFO] launcher: server process exited (code=0)
+2026-08-16 09:45:59 [INFO] launcher: notify: Server Stopped — The Digital Menu server has stopped.
+2026-08-16 09:46:00 [INFO] launcher: Digital Menu launcher exited

@@ -1,1 +1,480 @@
-{"board": {"panel": {"x": 67.5, "y": 2, "w": 25.3, "h": 7.1, "on": true, "wx": true, "fest": true}, "wx": {"lat": 25.77, "lon": 81.4934, "place": "Mangarh", "unit": "C"}, "fx": {"on": false, "anim": "fireworks", "everyMin": 2, "forSec": 10}, "hol": {"key": "CFIJPxqY2GwFPKXB4IPdSUqUDl435rnO", "country": "IN", "lastSync": ""}, "divAnim": {"on": true, "style": "slide", "everyMin": 1}, "days": [{"d": "2026-08-02", "n": "Friendship Day", "h": "", "a": "pushpa"}, {"d": "2026-08-15", "n": "Independence Day", "h": "", "a": "fireworks"}, {"d": "2026-08-26", "n": "Milad un-Nabi", "h": "", "a": "shankh"}, {"d": "2026-08-26", "n": "Onam", "h": "", "a": "pushpa"}, {"d": "2026-08-28", "n": "Raksha Bandhan", "h": "", "a": "pushpa"}, {"d": "2026-09-04", "n": "Janmashtami", "h": "", "a": "morpankh"}, {"d": "2026-09-04", "n": "Janmashtami (Smarta)", "h": "", "a": "morpankh"}, {"d": "2026-09-14", "n": "Ganesh Chaturthi", "h": "", "a": "rangoli"}, {"d": "2026-09-23", "n": "September Equinox", "h": "", "a": "pushpa"}, {"d": "2026-10-02", "n": "Mahatma Gandhi Jayanti", "h": "", "a": "om"}, {"d": "2026-10-11", "n": "First Day of Sharad Navratri", "h": "", "a": "fireworks"}, {"d": "2026-10-17", "n": "First Day of Durga Puja Festivities", "h": "", "a": "fireworks"}, {"d": "2026-10-18", "n": "Maha Saptami", "h": "", "a": "pushpa"}, {"d": "2026-10-19", "n": "Maha Ashtami", "h": "", "a": "pushpa"}, {"d": "2026-10-20", "n": "Dussehra", "h": "", "a": "fireworks"}, {"d": "2026-10-26", "n": "Maharishi Valmiki Jayanti", "h": "", "a": "om"}, {"d": "2026-10-29", "n": "Karaka Chaturthi", "h": "", "a": "rangoli"}, {"d": "2026-10-31", "n": "Halloween", "h": "", "a": "pushpa"}, {"d": "2026-11-08", "n": "Naraka Chaturdasi", "h": "", "a": "pushpa"}, {"d": "2026-11-08", "n": "Diwali/Deepavali", "h": "", "a": "deep"}, {"d": "2026-11-09", "n": "Govardhan Puja", "h": "", "a": "pushpa"}, {"d": "2026-11-11", "n": "Bhai Duj", "h": "", "a": "pushpa"}, {"d": "2026-11-15", "n": "Chhat Puja (Pratihar Sashthi/Surya Sashthi)", "h": "", "a": "pushpa"}, {"d": "2026-11-24", "n": "Guru Nanak Jayanti", "h": "", "a": "om"}, {"d": "2026-11-24", "n": "Guru Tegh Bahadur's Martyrdom Day", "h": "", "a": "om"}, {"d": "2026-12-05", "n": "First Day of Hanukkah", "h": "", "a": "pushpa"}, {"d": "2026-12-12", "n": "Last day of Hanukkah", "h": "", "a": "pushpa"}, {"d": "2026-12-22", "n": "December Solstice", "h": "", "a": "pushpa"}, {"d": "2026-12-23", "n": "Hazarat Ali's Birthday", "h": "", "a": "pushpa"}, {"d": "2026-12-24", "n": "Christmas Eve", "h": "", "a": "deep"}, {"d": "2026-12-25", "n": "Christmas", "h": "", "a": "deep"}, {"d": "2026-12-31", "n": "New Year's Eve", "h": "", "a": "kanak"}, {"d": "2027-01-01", "n": "New Year's Day", "h": "", "a": "kanak"}, {"d": "2027-01-15", "n": "Pongal", "h": "", "a": "kanak"}, {"d": "2027-01-15", "n": "Makar Sankranti", "h": "", "a": "kanak"}, {"d": "2027-01-26", "n": "Republic Day", "h": "", "a": "fireworks"}, {"d": "2027-02-06", "n": "Lunar New Year", "h": "", "a": "kanak"}, {"d": "2027-02-09", "n": "Ramadan Start", "h": "", "a": "shankh"}, {"d": "2027-02-11", "n": "Vasant Panchami", "h": "", "a": "pushpa"}, {"d": "2027-02-14", "n": "Valentine's Day", "h": "", "a": "rose"}, {"d": "2027-02-19", "n": "Shivaji Jayanti", "h": "", "a": "om"}, {"d": "2027-03-06", "n": "Maha Shivaratri/Shivaratri", "h": "", "a": "shankh"}, {"d": "2027-03-10", "n": "Ramzan Id", "h": "", "a": "shankh"}, {"d": "2027-03-21", "n": "March Equinox", "h": "", "a": "pushpa"}, {"d": "2027-03-22", "n": "Holi", "h": "", "a": "gulal"}, {"d": "2027-03-25", "n": "Maundy Thursday", "h": "", "a": "pushpa"}, {"d": "2027-03-26", "n": "Good Friday", "h": "", "a": "deep"}, {"d": "2027-03-28", "n": "Easter Day", "h": "", "a": "deep"}, {"d": "2027-04-07", "n": "Ugadi", "h": "", "a": "kanak"}, {"d": "2027-04-07", "n": "Gudi Padwa", "h": "", "a": "kanak"}, {"d": "2027-04-14", "n": "Ambedkar Jayanti", "h": "", "a": "om"}, {"d": "2027-04-15", "n": "Rama Navami", "h": "", "a": "pushpa"}, {"d": "2027-04-22", "n": "First day of Passover", "h": "", "a": "pushpa"}, {"d": "2027-05-01", "n": "International Worker's Day", "h": "", "a": "pushpa"}, {"d": "2027-05-09", "n": "Mother's Day", "h": "", "a": "pushpa"}, {"d": "2027-05-17", "n": "Bakrid", "h": "", "a": "pushpa"}, {"d": "2027-06-16", "n": "Muharram/Ashura", "h": "", "a": "shankh"}, {"d": "2027-06-20", "n": "Father's Day", "h": "", "a": "pushpa"}, {"d": "2027-06-21", "n": "June Solstice", "h": "", "a": "pushpa"}, {"d": "2027-07-05", "n": "Rath Yatra", "h": "", "a": "pushpa"}, {"d": "2027-08-01", "n": "Friendship Day", "h": "", "a": "pushpa"}, {"d": "2027-08-15", "n": "Independence Day", "h": "", "a": "fireworks"}, {"d": "2027-08-17", "n": "Raksha Bandhan (Rakhi)", "h": "", "a": "pushpa"}, {"d": "2027-08-25", "n": "Janmashtami", "h": "", "a": "morpankh"}, {"d": "2027-08-25", "n": "Janmashtami (Smarta)", "h": "", "a": "morpankh"}], "ads": [{"on": true, "title": "Slushie", "hi": "स्लशी", "text": "Icy chilled & fresh — ask @ the counter", "price": "50", "img": "images/slushie.webp", "everyMin": 1, "forSec": 3}, {"on": false, "title": "Paneer Pizza", "hi": "पनीर पिज़्ज़ा", "text": "Hand stretched, wood-fired, full of paneer.", "price": "350", "img": "", "everyMin": 7, "forSec": 10}, {"on": false, "title": "Ghee Dosa", "hi": "घी डोसा", "text": "Crisp dosa roasted in pure desi ghee.", "price": "120", "img": "", "everyMin": 11, "forSec": 10}]}, "fonts": {"Sweet": 1.3, "Main": 1.4, "Prasad": 1.4}, "columns": [["Drinks"], ["Prasad", "Main"], ["Chaat Paat", "Sweet"]]}
+{
+  "board": {
+    "panel": {
+      "x": 70.4,
+      "y": 1.1,
+      "w": 25.3,
+      "h": 8.8,
+      "on": true,
+      "wx": true,
+      "fest": true
+    },
+    "wx": {
+      "lat": 25.77,
+      "lon": 81.4934,
+      "place": "Mangarh",
+      "unit": "C"
+    },
+    "fx": {
+      "on": false,
+      "anim": "fireworks",
+      "everyMin": 5,
+      "forSec": 10
+    },
+    "hol": {
+      "key": "CFIJPxqY2GwFPKXB4IPdSUqUDl435rnO",
+      "country": "IN",
+      "lastSync": ""
+    },
+    "divAnim": {
+      "on": true,
+      "style": "drawer",
+      "everyMin": 2
+    },
+    "admin": {
+      "idleSec": 60
+    },
+    "days": [
+      {
+        "d": "2026-08-02",
+        "n": "Friendship Day",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2026-08-15",
+        "n": "Independence Day",
+        "h": "",
+        "a": "fireworks"
+      },
+      {
+        "d": "2026-08-26",
+        "n": "Milad un-Nabi",
+        "h": "",
+        "a": "shankh"
+      },
+      {
+        "d": "2026-08-26",
+        "n": "Onam",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2026-08-28",
+        "n": "Raksha Bandhan",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2026-09-04",
+        "n": "Janmashtami",
+        "h": "",
+        "a": "morpankh"
+      },
+      {
+        "d": "2026-09-04",
+        "n": "Janmashtami (Smarta)",
+        "h": "",
+        "a": "morpankh"
+      },
+      {
+        "d": "2026-09-14",
+        "n": "Ganesh Chaturthi",
+        "h": "",
+        "a": "rangoli"
+      },
+      {
+        "d": "2026-09-23",
+        "n": "September Equinox",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2026-10-02",
+        "n": "Mahatma Gandhi Jayanti",
+        "h": "",
+        "a": "om"
+      },
+      {
+        "d": "2026-10-11",
+        "n": "First Day of Sharad Navratri",
+        "h": "",
+        "a": "fireworks"
+      },
+      {
+        "d": "2026-10-17",
+        "n": "First Day of Durga Puja Festivities",
+        "h": "",
+        "a": "fireworks"
+      },
+      {
+        "d": "2026-10-18",
+        "n": "Maha Saptami",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2026-10-19",
+        "n": "Maha Ashtami",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2026-10-20",
+        "n": "Dussehra",
+        "h": "",
+        "a": "fireworks"
+      },
+      {
+        "d": "2026-10-26",
+        "n": "Maharishi Valmiki Jayanti",
+        "h": "",
+        "a": "om"
+      },
+      {
+        "d": "2026-10-29",
+        "n": "Karaka Chaturthi",
+        "h": "",
+        "a": "rangoli"
+      },
+      {
+        "d": "2026-10-31",
+        "n": "Halloween",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2026-11-08",
+        "n": "Naraka Chaturdasi",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2026-11-08",
+        "n": "Diwali/Deepavali",
+        "h": "",
+        "a": "deep"
+      },
+      {
+        "d": "2026-11-09",
+        "n": "Govardhan Puja",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2026-11-11",
+        "n": "Bhai Duj",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2026-11-15",
+        "n": "Chhat Puja (Pratihar Sashthi/Surya Sashthi)",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2026-11-24",
+        "n": "Guru Nanak Jayanti",
+        "h": "",
+        "a": "om"
+      },
+      {
+        "d": "2026-11-24",
+        "n": "Guru Tegh Bahadur's Martyrdom Day",
+        "h": "",
+        "a": "om"
+      },
+      {
+        "d": "2026-12-05",
+        "n": "First Day of Hanukkah",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2026-12-12",
+        "n": "Last day of Hanukkah",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2026-12-22",
+        "n": "December Solstice",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2026-12-23",
+        "n": "Hazarat Ali's Birthday",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2026-12-24",
+        "n": "Christmas Eve",
+        "h": "",
+        "a": "deep"
+      },
+      {
+        "d": "2026-12-25",
+        "n": "Christmas",
+        "h": "",
+        "a": "deep"
+      },
+      {
+        "d": "2026-12-31",
+        "n": "New Year's Eve",
+        "h": "",
+        "a": "kanak"
+      },
+      {
+        "d": "2027-01-01",
+        "n": "New Year's Day",
+        "h": "",
+        "a": "kanak"
+      },
+      {
+        "d": "2027-01-15",
+        "n": "Pongal",
+        "h": "",
+        "a": "kanak"
+      },
+      {
+        "d": "2027-01-15",
+        "n": "Makar Sankranti",
+        "h": "",
+        "a": "kanak"
+      },
+      {
+        "d": "2027-01-26",
+        "n": "Republic Day",
+        "h": "",
+        "a": "fireworks"
+      },
+      {
+        "d": "2027-02-06",
+        "n": "Lunar New Year",
+        "h": "",
+        "a": "kanak"
+      },
+      {
+        "d": "2027-02-09",
+        "n": "Ramadan Start",
+        "h": "",
+        "a": "shankh"
+      },
+      {
+        "d": "2027-02-11",
+        "n": "Vasant Panchami",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2027-02-14",
+        "n": "Valentine's Day",
+        "h": "",
+        "a": "rose"
+      },
+      {
+        "d": "2027-02-19",
+        "n": "Shivaji Jayanti",
+        "h": "",
+        "a": "om"
+      },
+      {
+        "d": "2027-03-06",
+        "n": "Maha Shivaratri/Shivaratri",
+        "h": "",
+        "a": "shankh"
+      },
+      {
+        "d": "2027-03-10",
+        "n": "Ramzan Id",
+        "h": "",
+        "a": "shankh"
+      },
+      {
+        "d": "2027-03-21",
+        "n": "March Equinox",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2027-03-22",
+        "n": "Holi",
+        "h": "",
+        "a": "gulal"
+      },
+      {
+        "d": "2027-03-25",
+        "n": "Maundy Thursday",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2027-03-26",
+        "n": "Good Friday",
+        "h": "",
+        "a": "deep"
+      },
+      {
+        "d": "2027-03-28",
+        "n": "Easter Day",
+        "h": "",
+        "a": "deep"
+      },
+      {
+        "d": "2027-04-07",
+        "n": "Ugadi",
+        "h": "",
+        "a": "kanak"
+      },
+      {
+        "d": "2027-04-07",
+        "n": "Gudi Padwa",
+        "h": "",
+        "a": "kanak"
+      },
+      {
+        "d": "2027-04-14",
+        "n": "Ambedkar Jayanti",
+        "h": "",
+        "a": "om"
+      },
+      {
+        "d": "2027-04-15",
+        "n": "Rama Navami",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2027-04-22",
+        "n": "First day of Passover",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2027-05-01",
+        "n": "International Worker's Day",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2027-05-09",
+        "n": "Mother's Day",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2027-05-17",
+        "n": "Bakrid",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2027-06-16",
+        "n": "Muharram/Ashura",
+        "h": "",
+        "a": "shankh"
+      },
+      {
+        "d": "2027-06-20",
+        "n": "Father's Day",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2027-06-21",
+        "n": "June Solstice",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2027-07-05",
+        "n": "Rath Yatra",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2027-08-01",
+        "n": "Friendship Day",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2027-08-15",
+        "n": "Independence Day",
+        "h": "",
+        "a": "fireworks"
+      },
+      {
+        "d": "2027-08-17",
+        "n": "Raksha Bandhan (Rakhi)",
+        "h": "",
+        "a": "pushpa"
+      },
+      {
+        "d": "2027-08-25",
+        "n": "Janmashtami",
+        "h": "",
+        "a": "morpankh"
+      },
+      {
+        "d": "2027-08-25",
+        "n": "Janmashtami (Smarta)",
+        "h": "",
+        "a": "morpankh"
+      }
+    ],
+    "ads": [
+      {
+        "on": true,
+        "title": "Slushie",
+        "hi": "स्लशी",
+        "text": "Icy chilled & fresh — ask @ the counter",
+        "price": "50",
+        "img": "images/slushie.webp",
+        "everyMin": 1,
+        "forSec": 3
+      },
+      {
+        "on": false,
+        "title": "Paneer Pizza",
+        "hi": "पनीर पिज़्ज़ा",
+        "text": "Hand stretched, wood-fired, full of paneer.",
+        "price": "350",
+        "img": "images/paneer-pizza-2.webp",
+        "everyMin": 7,
+        "forSec": 10
+      },
+      {
+        "on": false,
+        "title": "Ghee Dosa",
+        "hi": "घी डोसा",
+        "text": "Crisp dosa roasted in pure desi ghee.",
+        "price": "120",
+        "img": "",
+        "everyMin": 11,
+        "forSec": 10
+      }
+    ]
+  },
+  "fonts": {
+    "Sweet": 1.3,
+    "Main": 1.4,
+    "Prasad": 1.4
+  },
+  "columns": [
+    [
+      "Drinks"
+    ],
+    [
+      "Prasad",
+      "Main"
+    ],
+    [
+      "Chaat Paat",
+      "Sweet"
+    ]
+  ]
+}

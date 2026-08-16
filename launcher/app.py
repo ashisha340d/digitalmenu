@@ -4,14 +4,69 @@ from __future__ import annotations
 import os
 import threading
 
-from . import network_utils, notifications, tray_manager
-from .browser_utils import open_fullscreen, open_urls, wait_for_server
+from . import display_utils, network_utils, notifications, tray_manager
+from .browser_utils import open_fullscreen, open_page, open_urls, wait_for_server
 from .config import load_config
 from .logger import setup_logging
 from .preflight import PreflightError, check_menu_workbook, ensure_openpyxl, resolve_python_executable
 from .process_manager import ProcessManager
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROFILE_ROOT = os.path.join(ROOT, ".browser-profiles")
+
+
+def _profile_dir(cfg, index: int, page: str) -> str | None:
+    """Per-window browser profile path, or None when profile isolation is off."""
+    if not cfg.isolateProfiles:
+        return None
+    safe = "".join(ch if ch.isalnum() else "-" for ch in page).strip("-") or "page"
+    path = os.path.join(PROFILE_ROOT, f"{index + 1}-{safe}")
+    try:
+        os.makedirs(path, exist_ok=True)
+    except OSError:
+        return None
+    return path
+
+
+def open_configured_screens(cfg, log) -> None:
+    """Opens each configured page on its screen, degrading rather than failing.
+
+    The fallbacks, in order: a screen that isn't attached means that page opens
+    unpositioned; no Chromium at all means every page opens as an ordinary tab in
+    the default browser. Either way the board still comes up, which matters more on
+    an unattended canteen PC than getting the arrangement right.
+    """
+    base = f"http://127.0.0.1:{cfg.port}/"
+    screens = cfg.screens or []
+    if not screens:
+        log.info("no screens configured — nothing opened on startup")
+        return
+
+    monitors = display_utils.list_monitors(log)
+    log.info("displays detected — %s", display_utils.describe(monitors))
+
+    urls = [base + entry["page"] for entry in screens]
+
+    if not monitors:
+        log.info("no displays resolved — opening every page without positioning")
+
+    opened_any = False
+    for i, entry in enumerate(screens):
+        monitor = display_utils.pick(monitors, entry["screen"])
+        if monitor is None and monitors:
+            log.info(
+                "screen %s is not attached — opening %s without positioning it",
+                entry["screen"], entry["page"],
+            )
+        if open_page(urls[i], monitor, entry["state"], _profile_dir(cfg, i, entry["page"]), log):
+            opened_any = True
+        else:
+            log.info("no Chromium browser found — falling back to the default browser")
+            open_urls(urls)
+            return
+
+    if not opened_any:
+        open_urls(urls)
 
 
 def run() -> None:
@@ -154,13 +209,7 @@ def run() -> None:
             )
             if cfg.autoOpenBrowser and not browser_opened.is_set():
                 browser_opened.set()
-                # Only the customer-facing board opens on startup, in its own
-                # full-screen window. The admin editor is opened on demand from
-                # the tray menu ("Open Admin") so it never shows up on the
-                # canteen screen.
-                if not open_fullscreen(urls["local_menu"]):
-                    launcher_log.info("no Chromium browser found — opening the board in a normal tab")
-                    open_urls([urls["local_menu"]])
+                open_configured_screens(cfg, launcher_log)
         else:
             launcher_log.error("server did not become ready within timeout")
             notifier.notify(
