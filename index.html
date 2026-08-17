@@ -2209,6 +2209,46 @@
         }
 
         .adboard { position: fixed; }
+
+        .adboard.is-freeform { display: block; }
+        .adboard.is-freeform > div { display: contents; }
+        .adboard.is-freeform .ad__eyebrow,
+        .adboard.is-freeform .ad__items { display: none; }
+        .adboard.is-freeform .adel {
+          position: absolute;
+          left: var(--el-x, 0%);
+          top: var(--el-y, 0%);
+          width: var(--el-w, auto);
+          margin: 0;
+          font-size: calc(var(--el-base, 24px) * var(--el-fs, 1));
+        }
+        .adboard.is-freeform .ad__media {
+          left: var(--el-x, 0%);
+          top: var(--el-y, 0%);
+          width: var(--el-w, 34%);
+          height: var(--el-h, 100%);
+        }
+        body.is-editing .adboard.is-freeform .adel:hover,
+        body.is-editing .adboard.is-freeform .ad__media:hover {
+          outline: 2px dashed rgba(109,94,240,.8);
+          outline-offset: 3px;
+        }
+        body.is-editing .adboard .adel.is-ed-sel,
+        body.is-editing .adboard .ad__media.is-ed-sel {
+          outline: 2px solid #6d5ef0;
+          outline-offset: 3px;
+        }
+        body.is-editing .adboard [contenteditable="true"] { cursor: text; }
+
+        body.is-editing .adboard.is-live {
+          z-index: 2147482950;
+          pointer-events: auto;
+          cursor: move;
+          overflow: visible;
+        }
+        .edad.is-ed-sel { pointer-events: none; }
+        .edad.is-ed-sel .edh,
+        .edad.is-ed-sel .edad__t { pointer-events: auto; }
         .ad__media {
           position: absolute;
           left: var(--ad-img-x, 0%);
@@ -4333,12 +4373,12 @@
     <img class="ad__media" id="adImg" alt="" hidden>
     <div style="min-width:0">
       <span class="ad__eyebrow" id="adEyebrow">Today’s Offering</span>
-      <div class="ad__title" id="adTitle"></div>
-      <div class="ad__hi" id="adHi" lang="hi"></div>
-      <div class="ad__text" id="adText"></div>
+      <div class="ad__title adel" id="adTitle" data-el="title"></div>
+      <div class="ad__hi adel" id="adHi" lang="hi" data-el="hi"></div>
+      <div class="ad__text adel" id="adText" data-el="text"></div>
       <ul class="ad__items" id="adItems" hidden></ul>
     </div>
-    <div class="ad__price" id="adPrice"></div>
+    <div class="ad__price adel" id="adPrice" data-el="price"></div>
     <i class="ad__timer" id="adTimer"></i>
   </aside>
 
@@ -5825,6 +5865,7 @@
           // Menu Master item ids this ad advertises; resolved against the live menu at
           // render time, so an id naming a retired dish simply drops out.
           items: Array.isArray(a.items) ? a.items.map(String).filter(Boolean).slice(0, 8) : [],
+          els: (a.els && typeof a.els === 'object') ? a.els : undefined,
           fs: n(a.fs, 1, 0.6, 2),
           fsTitle: n(a.fsTitle, 1, 0.6, 2),
           fsHi: n(a.fsHi, 1, 0.6, 2),
@@ -6757,6 +6798,25 @@
           node.style.setProperty('--ad-fs-hi', String(clamp(parseFloat(a && a.fsHi) || 1, 0.6, 2)));
           node.style.setProperty('--ad-fs-text', String(clamp(parseFloat(a && a.fsText) || 1, 0.6, 2)));
           node.style.setProperty('--ad-fs-price', String(clamp(parseFloat(a && a.fsPrice) || 1, 0.6, 2)));
+          const els = (a && a.els) || {};
+          node.classList.toggle('is-freeform', !!a && !!a.els);
+          [['title', 'adTitle'], ['hi', 'adHi'], ['text', 'adText'], ['price', 'adPrice']].forEach(([k, id]) => {
+            const el2 = $(id);
+            if (!el2) return;
+            const e = els[k] || {};
+            el2.style.setProperty('--el-x', (e.x == null ? 0 : e.x) + '%');
+            el2.style.setProperty('--el-y', (e.y == null ? 0 : e.y) + '%');
+            el2.style.setProperty('--el-w', e.w == null ? 'auto' : e.w + '%');
+            el2.style.setProperty('--el-fs', String(e.fs == null ? 1 : e.fs));
+          });
+          const imgEl = $('adImg');
+          if (imgEl) {
+            const e = els.img || {};
+            imgEl.style.setProperty('--el-x', (e.x == null ? 0 : e.x) + '%');
+            imgEl.style.setProperty('--el-y', (e.y == null ? 0 : e.y) + '%');
+            imgEl.style.setProperty('--el-w', (e.w == null ? 34 : e.w) + '%');
+            imgEl.style.setProperty('--el-h', (e.h == null ? 100 : e.h) + '%');
+          }
           const im = (a && a.img) || {};
           node.style.setProperty('--ad-img-x', (im.x == null ? 0 : im.x) + '%');
           node.style.setProperty('--ad-img-y', (im.y == null ? 0 : im.y) + '%');
@@ -7178,6 +7238,7 @@
               if (e.target.closest('.edh')) return;
               selAd = ad.id;
               select('ads');
+              editAdInline(ad);
               drag(e, box, 'ad', 'move', read, write);
             });
             addHandles(box, 'ad', read, write);
@@ -7247,6 +7308,223 @@
             repaint();
             if (tab === 'layout') renderDock();
           });
+        }
+
+        const AD_EL_KEYS = { adTitle: 'title', adHi: 'hi', adText: 'text', adPrice: 'price', adImg: 'img' };
+        let inlineAd = null;
+        let inlineSel = null;
+
+        function adEl(ad, key) {
+          if (!ad.els) ad.els = {};
+          if (!ad.els[key]) {
+            ad.els[key] = key === 'img'
+              ? { x: 0, y: 0, w: 34, h: 100 }
+              : { x: 38, y: key === 'title' ? 12 : key === 'hi' ? 34 : key === 'text' ? 52 : 74, w: 56, fs: 1 };
+          }
+          return ad.els[key];
+        }
+
+        function inlineSelect(node) {
+          document.querySelectorAll('.adel.is-ed-sel, .ad__media.is-ed-sel').forEach(n => n.classList.remove('is-ed-sel'));
+          inlineSel = node;
+          if (node) node.classList.add('is-ed-sel');
+        }
+
+        function inlineDrag(event, node, ad, key, mode) {
+          event.preventDefault();
+          event.stopPropagation();
+          inlineSelect(node);
+          const rect = $('adboard').getBoundingClientRect();
+          const e0 = adEl(ad, key);
+          const origin = {
+            x: +e0.x || 0, y: +e0.y || 0,
+            w: e0.w == null ? 34 : +e0.w,
+            h: e0.h == null ? 100 : +e0.h,
+            fs: +e0.fs || 1
+          };
+          const start = { x: event.clientX, y: event.clientY };
+          let frame = 0, next = origin;
+
+          document.body.classList.add('is-dragbox');
+          try { node.setPointerCapture(event.pointerId); } catch (err) { }
+
+          const paint = () => {
+            frame = 0;
+            node.style.setProperty('--el-x', next.x + '%');
+            node.style.setProperty('--el-y', next.y + '%');
+            node.style.setProperty('--el-w', next.w + '%');
+            if (key === 'img') node.style.setProperty('--el-h', next.h + '%');
+            else node.style.setProperty('--el-fs', String(next.fs));
+            placeInlineHandles();
+          };
+
+          const onMove = (ev) => {
+            const dx = ((ev.clientX - start.x) / rect.width) * 100;
+            const dy = ((ev.clientY - start.y) / rect.height) * 100;
+            const r1 = (v) => Math.round(v * 10) / 10;
+            if (mode === 'move') {
+              next = Object.assign({}, origin, {
+                x: r1(clamp(origin.x + dx, -20, 100)),
+                y: r1(clamp(origin.y + dy, -20, 100))
+              });
+            } else if (key === 'img') {
+              next = Object.assign({}, origin, {
+                w: r1(clamp(origin.w + dx, 5, 100)),
+                h: r1(clamp(origin.h + dy, 5, 100))
+              });
+            } else {
+              next = Object.assign({}, origin, {
+                w: r1(clamp(origin.w + dx, 10, 100)),
+                fs: Math.round(clamp(origin.fs * (1 + dy / 60), 0.4, 4) * 100) / 100
+              });
+            }
+            if (!frame) frame = requestAnimationFrame(paint);
+          };
+
+          const onUp = () => {
+            node.removeEventListener('pointermove', onMove);
+            node.removeEventListener('pointerup', onUp);
+            node.removeEventListener('pointercancel', onUp);
+            if (frame) cancelAnimationFrame(frame);
+            paint();
+            document.body.classList.remove('is-dragbox');
+            Object.assign(adEl(ad, key), next);
+            markDirty();
+          };
+
+          node.addEventListener('pointermove', onMove);
+          node.addEventListener('pointerup', onUp);
+          node.addEventListener('pointercancel', onUp);
+        }
+
+        function clearInline() {
+          document.querySelectorAll('.adboard .edh').forEach(h => h.remove());
+          document.querySelectorAll('.adel, .ad__media').forEach((n) => {
+            n.removeAttribute('contenteditable');
+            n.classList.remove('is-ed-sel');
+          });
+          inlineAd = null;
+          inlineSel = null;
+        }
+
+        function editAdInline(ad) {
+          clearInline();
+          inlineAd = ad;
+          ['title', 'hi', 'text', 'price', 'img'].forEach(k => adEl(ad, k));
+          Ads.sample(ad);
+
+          const boardNode = $('adboard');
+          if (!boardNode.dataset.inlineWired) {
+            boardNode.dataset.inlineWired = '1';
+            boardNode.addEventListener('pointerdown', (e) => {
+              if (!inlineAd) return;
+              if (e.target !== boardNode) return;
+              e.preventDefault();
+              inlineSelect(null);
+              const vw = window.innerWidth, vh = window.innerHeight;
+              const start = { x: e.clientX, y: e.clientY };
+              const o = { x: +inlineAd.x, y: +inlineAd.y, w: +inlineAd.w, h: +inlineAd.h };
+              let frame = 0, next = o;
+              document.body.classList.add('is-dragbox');
+              try { boardNode.setPointerCapture(e.pointerId); } catch (err) { }
+              const paint = () => {
+                frame = 0;
+                boardNode.style.setProperty('--ad-x', next.x + '%');
+                boardNode.style.setProperty('--ad-y', next.y + '%');
+              };
+              const mv = (ev) => {
+                const r1 = (v) => Math.round(v * 10) / 10;
+                next = Object.assign({}, o, {
+                  x: r1(clamp(o.x + ((ev.clientX - start.x) / vw) * 100, 0, Math.max(0, 100 - o.w))),
+                  y: r1(clamp(o.y + ((ev.clientY - start.y) / vh) * 100, 0, Math.max(0, 100 - o.h)))
+                });
+                if (!frame) frame = requestAnimationFrame(paint);
+              };
+              const up = () => {
+                boardNode.removeEventListener('pointermove', mv);
+                boardNode.removeEventListener('pointerup', up);
+                boardNode.removeEventListener('pointercancel', up);
+                if (frame) cancelAnimationFrame(frame);
+                paint();
+                document.body.classList.remove('is-dragbox');
+                inlineAd.x = next.x; inlineAd.y = next.y;
+                drawAdBoxes();
+                markDirty();
+              };
+              boardNode.addEventListener('pointermove', mv);
+              boardNode.addEventListener('pointerup', up);
+              boardNode.addEventListener('pointercancel', up);
+            });
+          }
+
+          Object.keys(AD_EL_KEYS).forEach((id) => {
+            const node = $(id);
+            if (!node) return;
+            const key = AD_EL_KEYS[id];
+
+            if (!node.dataset.inlineWired) {
+              node.dataset.inlineWired = '1';
+              node.addEventListener('pointerdown', (e) => {
+                if (!inlineAd) return;
+                if (e.target.classList && e.target.classList.contains('edh')) return;
+                if (node.getAttribute('contenteditable') === 'true') return;
+                inlineDrag(e, node, inlineAd, key, 'move');
+              });
+              if (key !== 'img') {
+                node.addEventListener('dblclick', () => {
+                  if (!inlineAd) return;
+                  node.setAttribute('contenteditable', 'true');
+                  node.focus();
+                  inlineSelect(node);
+                });
+                node.addEventListener('blur', () => {
+                  if (!inlineAd) return;
+                  node.removeAttribute('contenteditable');
+                  const txt = (node.textContent || '').trim();
+                  if (key === 'title') inlineAd.title = txt;
+                  else if (key === 'hi') inlineAd.hi = txt;
+                  else if (key === 'text') inlineAd.text = txt;
+                  else if (key === 'price') inlineAd.price = txt.replace(/^\u20B9\s*/, '');
+                  markDirty();
+                  renderDock();
+                });
+              }
+            }
+
+          });
+
+          placeInlineHandles();
+        }
+
+        /* Handles live in the ad, not inside each element: an <img> cannot hold children,
+           and a handle nested in a text node inherits its font size. They track their
+           element's box instead. */
+        function placeInlineHandles() {
+          const boardNode = $('adboard');
+          if (!inlineAd) return;
+          const br = boardNode.getBoundingClientRect();
+          Object.keys(AD_EL_KEYS).forEach((id) => {
+            const node = $(id);
+            if (!node || node.hidden) return;
+            const key = AD_EL_KEYS[id];
+            let h = boardNode.querySelector('.edh[data-for="' + id + '"]');
+            if (!h) {
+              h = document.createElement('span');
+              h.className = 'edh';
+              h.dataset.dir = 'se';
+              h.dataset.for = id;
+              h.style.zIndex = '7';
+              h.title = key === 'img' ? 'Resize the photo' : 'Right widens, down grows the type';
+              h.addEventListener('pointerdown', (e) => inlineDrag(e, node, inlineAd, key, 'size'));
+              boardNode.appendChild(h);
+            }
+            const r = node.getBoundingClientRect();
+            h.style.left = (r.right - br.left) + 'px';
+            h.style.top = (r.bottom - br.top) + 'px';
+            h.style.right = 'auto';
+            h.style.bottom = 'auto';
+          });
+          markDirty();
         }
 
         function wirePicks() {
@@ -7747,6 +8025,7 @@
                 fs: num(a.fs), fsTitle: num(a.fsTitle), fsHi: num(a.fsHi), fsText: num(a.fsText), fsPrice: num(a.fsPrice),
                 anim: a.anim,
                 img: a.img ? clean({ x: num(a.img.x), y: num(a.img.y), w: num(a.img.w), h: num(a.img.h), fit: a.img.fit }) : undefined,
+                els: a.els || undefined,
                 images: (a.images || []).filter(Boolean),
                 items: (a.items || []).filter(Boolean),
                 everyMin: num(a.everyMin), forSec: num(a.forSec),
