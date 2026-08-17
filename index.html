@@ -2240,6 +2240,46 @@
         }
         body.is-editing .adboard [contenteditable="true"] { cursor: text; }
 
+        body.is-editing .adboard.is-inline-edit .adel,
+        body.is-editing .adboard.is-inline-edit .ad__media {
+          min-width: 42px;
+          min-height: 26px;
+          outline: 1px dashed rgba(109,94,240,.55);
+          outline-offset: 2px;
+          cursor: move;
+        }
+        body.is-editing .adboard.is-inline-edit .ad__price { display: block; }
+        body.is-editing .adboard.is-inline-edit .adel:empty::after {
+          content: attr(data-ph);
+          opacity: .45;
+        }
+
+        /* Out of the way while the ad is being arranged on the board. */
+        .edp.is-tucked { opacity: 0; pointer-events: none; }
+        .eddone {
+          position: fixed;
+          right: 18px;
+          top: 18px;
+          z-index: 2147483600;
+          display: none;
+          gap: 8px;
+          align-items: center;
+          padding: 8px 12px;
+          border-radius: 10px;
+          background: #12131af2;
+          border: 1px solid #6d5ef0;
+          color: #e8e9f0;
+          font: 600 13px/1 system-ui, sans-serif;
+          box-shadow: 0 8px 30px rgba(0,0,0,.5);
+        }
+        .eddone.is-on { display: flex; }
+        .eddone button {
+          min-height: 28px; padding: 0 12px;
+          border: 0; border-radius: 8px;
+          background: #6d5ef0; color: #fff;
+          font: inherit; cursor: pointer;
+        }
+
         body.is-editing .adboard.is-inline-edit {
           z-index: 2147482950;
           pointer-events: auto;
@@ -3345,11 +3385,13 @@
       /* Resize handles shared by the ad boxes and the floating weather card. */
       .edh {
         position: absolute;
-        width: 12px; height: 12px;
-        border: 2px solid #fff; border-radius: 50%;
+        width: 18px; height: 18px;
+        border: 3px solid #fff; border-radius: 50%;
         background: #6d5ef0;
-        box-shadow: 0 1px 3px rgba(0,0,0,.5);
+        box-shadow: 0 2px 8px rgba(0,0,0,.55);
+        touch-action: none;
       }
+      .edh:hover { background: #8b7dff; transform-origin: center; }
       .edh[data-dir="nw"] { left: 0; top: 0; transform: translate(-50%,-50%); cursor: nwse-resize; }
       .edh[data-dir="n"]  { left: 50%; top: 0; transform: translate(-50%,-50%); cursor: ns-resize; }
       .edh[data-dir="ne"] { right: 0; top: 0; transform: translate(50%,-50%); cursor: nesw-resize; }
@@ -4356,6 +4398,10 @@
 
   <!-- ═══ LAYOUT EDITOR (inert unless opened from the Admin Portal with ?edit=1) ═══ -->
   <div class="ed" id="editor" hidden>
+    <div class="eddone" id="edDone">
+      <span>Editing the ad on the board</span>
+      <button type="button" id="edDoneBtn">Done</button>
+    </div>
     <section class="edp" id="edPanel">
       <header class="edp__hd" id="edGrab">
         <span class="ed__screen" id="edScreen"></span>
@@ -7499,10 +7545,14 @@
                 y: r1(clamp(origin.y + dy, -20, 100))
               });
             } else if (key === 'img') {
-              next = Object.assign({}, origin, {
-                w: r1(clamp(origin.w + dx, 5, 100)),
-                h: r1(clamp(origin.h + dy, 5, 100))
-              });
+              const right = origin.x + origin.w;
+              const bottom = origin.y + origin.h;
+              const n2 = { x: origin.x, y: origin.y, w: origin.w, h: origin.h, fs: origin.fs };
+              if (mode.indexOf('e') >= 0) n2.w = clamp(origin.w + dx, 5, 100);
+              if (mode.indexOf('s') >= 0) n2.h = clamp(origin.h + dy, 5, 100);
+              if (mode.indexOf('w') >= 0) { n2.w = clamp(origin.w - dx, 5, right); n2.x = right - n2.w; }
+              if (mode.indexOf('n') >= 0) { n2.h = clamp(origin.h - dy, 5, bottom); n2.y = bottom - n2.h; }
+              next = { x: r1(n2.x), y: r1(n2.y), w: r1(n2.w), h: r1(n2.h), fs: origin.fs };
             } else {
               next = Object.assign({}, origin, {
                 w: r1(clamp(origin.w + dx, 10, 100)),
@@ -7531,6 +7581,8 @@
         function clearInline() {
           const ab = $('adboard');
           if (ab) ab.classList.remove('is-inline-edit');
+          const pnl = $('edPanel'); if (pnl) pnl.classList.remove('is-tucked');
+          const dn = $('edDone'); if (dn) dn.classList.remove('is-on');
           document.querySelectorAll('.adboard .edh').forEach(h => h.remove());
           document.querySelectorAll('.adel, .ad__media').forEach((n) => {
             n.removeAttribute('contenteditable');
@@ -7546,6 +7598,12 @@
           $('adboard').classList.add('is-inline-edit');
           ['title', 'hi', 'text', 'price', 'img'].forEach(k => adEl(ad, k));
           Ads.sample(ad);
+          $('adTitle').dataset.ph = 'Title';
+          $('adHi').dataset.ph = 'Hindi';
+          $('adText').dataset.ph = 'Description';
+          $('adPrice').dataset.ph = 'Price';
+          $('edPanel').classList.add('is-tucked');
+          $('edDone').classList.add('is-on');
 
           const boardNode = $('adboard');
           if (!boardNode.dataset.inlineWired) {
@@ -7641,24 +7699,27 @@
             const node = $(id);
             if (!node || node.hidden) return;
             const key = AD_EL_KEYS[id];
-            let h = boardNode.querySelector('.edh[data-for="' + id + '"]');
-            if (!h) {
-              h = document.createElement('span');
-              h.className = 'edh';
-              h.dataset.dir = 'se';
-              h.dataset.for = id;
-              h.style.zIndex = '7';
-              h.title = key === 'img' ? 'Resize the photo' : 'Right widens, down grows the type';
-              h.addEventListener('pointerdown', (e) => inlineDrag(e, node, inlineAd, key, 'size'));
-              boardNode.appendChild(h);
-            }
-            const r = node.getBoundingClientRect();
-            h.style.left = (r.right - br.left) + 'px';
-            h.style.top = (r.bottom - br.top) + 'px';
-            h.style.right = 'auto';
-            h.style.bottom = 'auto';
+            const dirs = key === 'img' ? ['nw', 'ne', 'sw', 'se'] : ['se'];
+            dirs.forEach((dir) => {
+              let h = boardNode.querySelector('.edh[data-for="' + id + '"][data-dir="' + dir + '"]');
+              if (!h) {
+                h = document.createElement('span');
+                h.className = 'edh';
+                h.dataset.dir = dir;
+                h.dataset.for = id;
+                h.style.zIndex = '7';
+                h.style.cursor = (dir === 'ne' || dir === 'sw') ? 'nesw-resize' : 'nwse-resize';
+                h.title = key === 'img' ? 'Drag to resize the photo' : 'Right widens, down grows the type';
+                h.addEventListener('pointerdown', (e) => inlineDrag(e, node, inlineAd, key, dir));
+                boardNode.appendChild(h);
+              }
+              const r = node.getBoundingClientRect();
+              h.style.left = ((dir.indexOf('w') >= 0 ? r.left : r.right) - br.left) + 'px';
+              h.style.top = ((dir.indexOf('n') >= 0 ? r.top : r.bottom) - br.top) + 'px';
+              h.style.right = 'auto';
+              h.style.bottom = 'auto';
+            });
           });
-          markDirty();
         }
 
         /* The Hindi already on file in Menu Master is the board's default, so it is filled in
@@ -7717,12 +7778,15 @@
                 cfg.cats[cat].fs = Math.round(clamp(getCatFontScale(cat) + 0.05, 0.7, 1.8) * 100) / 100;
                 setCatScale(cat, cfg.cats[cat].fs);
               }));
-              bar.appendChild(mk(FLAG, 'Load Hindi from Menu Master', () => {
+              bar.appendChild(mk(FLAG, 'Translate this heading to Hindi', () => {
                 const src = menuItems.find(m => effCategory(m) === cat && m.cat_hi);
-                const hi = (src && src.cat_hi) || hindiFor(cfg.cats[cat].label || cat);
-                if (!hi) { Toast.error('No Hindi on file', 'Menu Master has no Hindi for this category.'); return; }
-                cfg.cats[cat].labelHi = hi;
-                repaint();
+                const label = cfg.cats[cat].label || cat;
+                const seed = (!cfg.cats[cat].label && src && src.cat_hi) ? src.cat_hi : '';
+                if (seed) { cfg.cats[cat].labelHi = seed; repaint(); return; }
+                translateToHindi(label).then((hi) => {
+                  cfg.cats[cat].labelHi = hi;
+                  repaint();
+                }).catch((err) => Toast.error('Could not translate', (err && err.message) || String(err)));
               }));
               hd.appendChild(bar);
             }
@@ -7853,6 +7917,20 @@
           return row;
         }
 
+        /* Menu Master first — the Hindi a dish already carries is the right answer and needs
+           no network. Only when nothing matches does it ask a translator. */
+        async function translateToHindi(text) {
+          const local = hindiFor(text);
+          if (local) return local;
+          const q = String(text || '').trim();
+          if (!q) return '';
+          const res = await fetch('https://api.mymemory.translated.net/get?langpair=en%7Chi&q=' + encodeURIComponent(q));
+          const body = await res.json();
+          const out = body && body.responseData && body.responseData.translatedText;
+          if (!out || /^[\x00-\x7F]*$/.test(out)) throw new Error('no translation returned');
+          return out;
+        }
+
         function hindiFor(text) {
           const q = String(text || '').trim().toLowerCase();
           if (!q) return '';
@@ -7875,11 +7953,17 @@
           btn.className = 'ed__btn ed__btn--icon';
           btn.title = 'Load Hindi from Menu Master';
           btn.textContent = FLAG;
-          btn.addEventListener('click', () => {
-            const hi = hindiFor(readEnglish());
-            if (!hi) { Toast.error('No Hindi on file', 'Menu Master has no Hindi for that text.'); return; }
-            input.value = hi;
-            write(hi);
+          btn.addEventListener('click', async () => {
+            btn.disabled = true;
+            try {
+              const hi = await translateToHindi(readEnglish());
+              input.value = hi;
+              write(hi);
+            } catch (err) {
+              Toast.error('Could not translate', (err && err.message) || String(err));
+            } finally {
+              btn.disabled = false;
+            }
           });
           input.parentNode.insertBefore(bar, input);
           input.style.flex = '1';
@@ -8044,7 +8128,7 @@
         }
 
         function renderAds(body) {
-          const s = section('Ads', 'Drag each box on the board to place it. Tag a dish and the board draws its live name and price.');
+          const s = section('Ads', 'Click an ad on the board to write and arrange it there. This list is for adding, timing and tagging.');
           (cfg.ads || []).forEach((ad, i) => {
             const card = document.createElement('div');
             card.className = 'ed__card' + (selAd === ad.id ? ' is-on' : '');
@@ -8065,21 +8149,6 @@
             hd.appendChild(x);
             card.appendChild(hd);
 
-            card.appendChild(field('Title', ad.title || '', v => { ad.title = v; hd.firstElementChild.textContent = v || ('Ad ' + (i + 1)); repaint(); }));
-            card.appendChild(withFlag(
-              field('Title (Hindi)', ad.hi || '', v => { ad.hi = v; repaint(); }, { lang: 'hi' }),
-              () => ad.title || '',
-              v => { ad.hi = v; repaint(); }));
-            card.appendChild(field('Text', ad.text || '', v => { ad.text = v; markDirty(); }));
-            card.appendChild(grid(
-              field('Price', ad.price || '', v => { ad.price = v; markDirty(); }),
-              field('Every (min)', ad.everyMin, v => { ad.everyMin = +v || 8; markDirty(); }, { type: 'number', min: 1, max: 720 }),
-            ));
-            card.appendChild(grid(
-              field('For (sec)', ad.forSec, v => { ad.forSec = +v || 10; markDirty(); }, { type: 'number', min: 3, max: 60 }),
-              field('Photo URL', '', v => { if (v.trim()) { ad.images = (ad.images || []).concat(v.trim()).slice(0, 6); markDirty(); } }, { placeholder: 'Paste and it is added' }),
-            ));
-
             card.appendChild(selectField('Entrance', ad.anim || 'ad-in', AD_ANIM_LABELS, v => { ad.anim = v; repaint(); }));
 
             const play = document.createElement('div');
@@ -8092,22 +8161,6 @@
             bStop.addEventListener('click', () => Ads.stop());
             play.append(bSample, bPlay, bStop);
             card.appendChild(play);
-
-            card.appendChild(slider('Title size', ad.fsTitle || 1, 0.6, 2, v => { ad.fsTitle = v; repaint(); }));
-            card.appendChild(slider('Hindi size', ad.fsHi || 1, 0.6, 2, v => { ad.fsHi = v; repaint(); }));
-            card.appendChild(slider('Text size', ad.fsText || 1, 0.6, 2, v => { ad.fsText = v; repaint(); }));
-            card.appendChild(slider('Price size', ad.fsPrice || 1, 0.6, 2, v => { ad.fsPrice = v; repaint(); }));
-
-            if (!ad.img) ad.img = { x: 0, y: 0, w: 34, h: 100, fit: 'cover' };
-            card.appendChild(grid(
-              field('Photo x %', ad.img.x, v => { ad.img.x = +v || 0; repaint(); }, { type: 'number' }),
-              field('Photo y %', ad.img.y, v => { ad.img.y = +v || 0; repaint(); }, { type: 'number' }),
-            ));
-            card.appendChild(grid(
-              field('Photo w %', ad.img.w, v => { ad.img.w = +v || 34; repaint(); }, { type: 'number' }),
-              field('Photo h %', ad.img.h, v => { ad.img.h = +v || 100; repaint(); }, { type: 'number' }),
-            ));
-            card.appendChild(selectField('Photo fit', ad.img.fit || 'cover', [['cover', 'Fill the box'], ['contain', 'Fit inside']], v => { ad.img.fit = v; repaint(); }));
 
             /* Tagged dishes, picked out of the menu this board is already showing. */
             const tagWrap = document.createElement('div');
@@ -8353,6 +8406,7 @@
           Array.from($('edTabs').children).forEach((b) => {
             b.addEventListener('click', () => { selAd = null; select(b.dataset.tab); });
           });
+          $('edDoneBtn').addEventListener('click', () => { clearInline(); Ads.stop(); });
           $('edSave').addEventListener('click', () => { void save(); });
           $('edClose').addEventListener('click', () => {
             if (dirty && !confirm('Close without saving? The changes since the last save are lost.')) return;
