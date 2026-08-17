@@ -2212,8 +2212,7 @@
 
         .adboard.is-freeform { display: block; }
         .adboard.is-freeform > div { display: contents; }
-        .adboard.is-freeform .ad__eyebrow,
-        .adboard.is-freeform .ad__items { display: none; }
+        .adboard.is-freeform .ad__eyebrow { display: none; }
         .adboard.is-freeform .adel {
           position: absolute;
           left: var(--el-x, 0%);
@@ -4484,7 +4483,7 @@
       <div class="ad__title adel" id="adTitle" data-el="title"></div>
       <div class="ad__hi adel" id="adHi" lang="hi" data-el="hi"></div>
       <div class="ad__text adel" id="adText" data-el="text"></div>
-      <ul class="ad__items" id="adItems" hidden></ul>
+      <ul class="ad__items adel" id="adItems" data-el="items" hidden></ul>
     </div>
     <div class="ad__price adel" id="adPrice" data-el="price"></div>
     <i class="ad__timer" id="adTimer"></i>
@@ -6820,46 +6819,51 @@
         function fill(a, tagged) {
           const first = tagged.length ? tagged[0] : null;
 
-          /* A tagged ad that was never given its own words borrows the dish's — that is the
-             whole point of tagging one, and it keeps the ad correct after a rename. */
+          /* The ad's own words are the heading and stay the heading. An ad with no words of
+             its own falls back to the dish it is advertising. */
           $('adTitle').textContent = a.title || (first ? first.name : '');
-          $('adHi').textContent = a.hi || (first ? (first.name_hi || '') : '');
+          $('adHi').textContent = a.hi || (first && !a.title ? (first.name_hi || '') : '');
           $('adText').textContent = a.text || '';
 
-          /* Two or more dishes list; a single one is already said by the title and the
-             price beside it, so listing it again would just repeat itself. */
+          /* Every tagged dish is listed under the heading with its live name, its Hindi and
+             its price — one dish included. That is the point of tagging: what the wall shows
+             is Menu Master's own detail, not a copy of it that goes stale. */
           const list = $('adItems');
           list.textContent = '';
-          if (tagged.length > 1) {
-            for (const it of tagged) {
-              const li = document.createElement('li');
-              li.className = 'ad__item';
-              const name = document.createElement('span');
-              name.className = 'ad__item-name';
-              name.textContent = it.name;
-              li.appendChild(name);
-              if (it.name_hi) {
-                const hi = document.createElement('span');
-                hi.className = 'ad__item-hi';
-                hi.lang = 'hi';
-                hi.textContent = it.name_hi;
-                li.appendChild(hi);
-              }
-              if (it.price) {
-                const pr = document.createElement('span');
-                pr.className = 'ad__item-price';
-                pr.textContent = '₹' + it.price;
-                li.appendChild(pr);
-              }
-              list.appendChild(li);
-            }
-          }
-          list.hidden = tagged.length < 2;
+          for (const it of tagged) {
+            const li = document.createElement('li');
+            li.className = 'ad__item';
 
+            const name = document.createElement('span');
+            name.className = 'ad__item-name';
+            name.textContent = it.name;
+            li.appendChild(name);
+
+            if (it.name_hi) {
+              const hi = document.createElement('span');
+              hi.className = 'ad__item-hi';
+              hi.lang = 'hi';
+              hi.textContent = it.name_hi;
+              li.appendChild(hi);
+            }
+
+            if (it.price) {
+              const pr = document.createElement('span');
+              pr.className = 'ad__item-price';
+              pr.textContent = '₹' + it.price;
+              li.appendChild(pr);
+            }
+
+            list.appendChild(li);
+          }
+          list.hidden = tagged.length === 0;
+
+          /* The big price plate is for an ad priced by hand. A tagged ad carries its prices
+             on the lines above, so showing it again would only say the same thing twice. */
           const price = $('adPrice');
-          const p = String(a.price || '').trim() || (tagged.length === 1 && first.price ? first.price : '');
+          const p = String(a.price || '').trim();
           price.textContent = p ? (/^[0-9]/.test(p) ? '₹' + p : p) : '';
-          price.hidden = !p;
+          price.hidden = !p || tagged.length > 0;
         }
 
         /* One photo holds for the whole slot; several split it evenly and crossfade —
@@ -6910,7 +6914,7 @@
           node.style.setProperty('--ad-fs-price', String(clamp(parseFloat(a && a.fsPrice) || 1, 0.6, 2)));
           const els = (a && a.els) || {};
           node.classList.toggle('is-freeform', !!a && !!a.els);
-          [['title', 'adTitle'], ['hi', 'adHi'], ['text', 'adText'], ['price', 'adPrice']].forEach(([k, id]) => {
+          [['title', 'adTitle'], ['hi', 'adHi'], ['text', 'adText'], ['price', 'adPrice'], ['items', 'adItems']].forEach(([k, id]) => {
             const el2 = $(id);
             if (!el2) return;
             const e = els[k] || {};
@@ -7493,16 +7497,21 @@
           });
         }
 
-        const AD_EL_KEYS = { adTitle: 'title', adHi: 'hi', adText: 'text', adPrice: 'price', adImg: 'img' };
+        const AD_EL_KEYS = { adTitle: 'title', adHi: 'hi', adText: 'text', adPrice: 'price', adItems: 'items', adImg: 'img' };
         let inlineAd = null;
         let inlineSel = null;
 
         function adEl(ad, key) {
           if (!ad.els) ad.els = {};
           if (!ad.els[key]) {
+            const y = key === 'title' ? 8
+              : key === 'hi' ? 26
+                : key === 'text' ? 42
+                  : key === 'items' ? 58
+                    : 84;
             ad.els[key] = key === 'img'
               ? { x: 0, y: 0, w: 34, h: 100 }
-              : { x: 38, y: key === 'title' ? 12 : key === 'hi' ? 34 : key === 'text' ? 52 : 74, w: 56, fs: 1 };
+              : { x: 38, y: y, w: 56, fs: 1 };
           }
           return ad.els[key];
         }
@@ -7607,12 +7616,13 @@
           clearInline();
           inlineAd = ad;
           $('adboard').classList.add('is-inline-edit');
-          ['title', 'hi', 'text', 'price', 'img'].forEach(k => adEl(ad, k));
+          ['title', 'hi', 'text', 'price', 'items', 'img'].forEach(k => adEl(ad, k));
           Ads.sample(ad);
           $('adTitle').dataset.ph = 'Title';
           $('adHi').dataset.ph = 'Hindi';
           $('adText').dataset.ph = 'Description';
           $('adPrice').dataset.ph = 'Price';
+          $('adItems').dataset.ph = 'Tagged dishes';
           $('edPanel').classList.add('is-tucked');
           $('edDone').classList.add('is-on');
 
