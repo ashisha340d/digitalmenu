@@ -2279,6 +2279,11 @@
           background: #6d5ef0; color: #fff;
           font: inherit; cursor: pointer;
         }
+        .eddone button.is-ghost { background: #2a2d3a; border: 1px solid #4a4d5e; }
+
+        /* Temporarily out of sight so the menu underneath can be judged, without
+           losing the ad's selection or anything typed into it. */
+        .adboard.is-peek { visibility: hidden; }
 
         body.is-editing .adboard.is-inline-edit {
           z-index: 2147482950;
@@ -4399,7 +4404,8 @@
   <!-- ═══ LAYOUT EDITOR (inert unless opened from the Admin Portal with ?edit=1) ═══ -->
   <div class="ed" id="editor" hidden>
     <div class="eddone" id="edDone">
-      <span>Editing the ad on the board</span>
+      <span id="edDoneLabel">Editing the ad on the board</span>
+      <button type="button" id="edPeekBtn">Hide ad</button>
       <button type="button" id="edDoneBtn">Done</button>
     </div>
     <section class="edp" id="edPanel">
@@ -7583,6 +7589,11 @@
           if (ab) ab.classList.remove('is-inline-edit');
           const pnl = $('edPanel'); if (pnl) pnl.classList.remove('is-tucked');
           const dn = $('edDone'); if (dn) dn.classList.remove('is-on');
+          if (ab) ab.classList.remove('is-peek');
+          const pk = $('edPeekBtn');
+          if (pk) pk.textContent = 'Hide ad';
+          const lb = $('edDoneLabel');
+          if (lb) lb.textContent = 'Editing the ad on the board';
           document.querySelectorAll('.adboard .edh').forEach(h => h.remove());
           document.querySelectorAll('.adel, .ad__media').forEach((n) => {
             n.removeAttribute('contenteditable');
@@ -8405,6 +8416,14 @@
 
           Array.from($('edTabs').children).forEach((b) => {
             b.addEventListener('click', () => { selAd = null; select(b.dataset.tab); });
+          });
+          $('edPeekBtn').className = 'is-ghost';
+          $('edPeekBtn').addEventListener('click', () => {
+            const ab = $('adboard');
+            const hidden = ab.classList.toggle('is-peek');
+            $('edPeekBtn').textContent = hidden ? 'Show ad' : 'Hide ad';
+            $('edDoneLabel').textContent = hidden ? 'Ad hidden — still editing' : 'Editing the ad on the board';
+            if (!hidden) placeInlineHandles();
           });
           $('edDoneBtn').addEventListener('click', () => { clearInline(); Ads.stop(); });
           $('edSave').addEventListener('click', () => { void save(); });
