@@ -2240,7 +2240,7 @@
         }
         body.is-editing .adboard [contenteditable="true"] { cursor: text; }
 
-        body.is-editing .adboard.is-live {
+        body.is-editing .adboard.is-inline-edit {
           z-index: 2147482950;
           pointer-events: auto;
           cursor: move;
@@ -3241,6 +3241,59 @@
       }
 
       body.is-editing .row { cursor: grab; }
+      body.is-editing .cat { cursor: grab; }
+      body.is-editing .cat.is-ed-drag { opacity: .5; }
+
+      .edcat { display: none; }
+      body.is-editing .edcat {
+        position: absolute;
+        right: 6px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 6;
+        display: flex;
+        gap: 3px;
+      }
+      body.is-editing .edcat button {
+        min-width: 26px;
+        height: 22px;
+        padding: 0 4px;
+        border: 1px solid rgba(255,255,255,.6);
+        border-radius: 6px;
+        background: rgba(18,19,26,.75);
+        color: #fff;
+        font: 700 11px/1 system-ui, sans-serif;
+        cursor: pointer;
+      }
+      body.is-editing .edcat button:hover { background: #6d5ef0; border-color: #6d5ef0; }
+      body.is-editing .cat__en[contenteditable="true"],
+      body.is-editing .cat__hi[contenteditable="true"] {
+        outline: 2px solid #6d5ef0;
+        outline-offset: 2px;
+        cursor: text;
+      }
+
+      .edfs { display: none; }
+      body.is-editing .edfs {
+        position: absolute;
+        right: 4px;
+        bottom: 4px;
+        z-index: 6;
+        display: flex;
+        gap: 3px;
+      }
+      body.is-editing .edfs button {
+        min-width: 26px;
+        height: 22px;
+        padding: 0;
+        border: 1px solid #6d5ef0;
+        border-radius: 6px;
+        background: rgba(18,19,26,.92);
+        color: #fff;
+        font: 700 11px/1 system-ui, sans-serif;
+        cursor: pointer;
+      }
+      body.is-editing .edfs button:hover { background: #6d5ef0; }
       body.is-editing .row.is-ed-drag { opacity: .45; }
       body.is-editing .cat.is-ed-drop { outline: 3px solid #6d5ef0; outline-offset: 3px; }
 
@@ -3265,18 +3318,21 @@
         border: 2px solid #f0a93a;
         border-radius: 12px;
         background: rgba(240, 169, 58, .14);
-        cursor: move;
+        pointer-events: none;
       }
+      .edad .edh { pointer-events: auto; }
       .edad.is-ed-sel { border-color: #6d5ef0; background: rgba(109, 94, 240, .16); }
       .edad.is-off { opacity: .45; border-style: dashed; }
       .edad__t {
         position: absolute; top: 4px; left: 6px;
-        padding: 2px 7px; border-radius: 6px;
-        background: rgba(0,0,0,.72); color: #fff;
+        padding: 3px 9px; border-radius: 6px;
+        background: rgba(0,0,0,.82); color: #fff;
         font: 600 11px/1.3 var(--ff-ui, system-ui, sans-serif);
         max-width: calc(100% - 16px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        pointer-events: none;
+        pointer-events: auto;
+        cursor: move;
       }
+      .edad__t:hover { background: #6d5ef0; }
       .edad__d {
         position: absolute; right: 5px; bottom: 4px;
         padding: 1px 5px; border-radius: 5px;
@@ -5386,6 +5442,7 @@
         node.dataset.hue = String(hueFor(m.cat));
         node.dataset.thumbs = m.hasThumbs ? '1' : '0';
         node.style.setProperty('--cat-scale', String(getCatFontScale(m.cat)));
+        if (document.body.classList.contains('is-editing')) node.draggable = true;
         node.style.setProperty('--i', String(m.order));
         if (supportsVT()) node.style.viewTransitionName = m.vtName;
         else node.style.viewTransitionName = '';
@@ -6662,6 +6719,7 @@
       const Ads = (function () {
         const node = $('adboard');
         const timerBar = $('adTimer');
+        let paused = false;
         let showing = false;
         let hiding = false;
         let hideAt = 0;
@@ -6904,6 +6962,7 @@
         }
 
         function tick() {
+          if (paused) return;
           const now = Date.now();
           if (showing) { if (now >= hideAt) hide(true); return; }
           if (document.hidden || DivAnim.busy) return;
@@ -6929,6 +6988,7 @@
           },
           reschedule() { reseed(); },
           /* Used only by the editor. */
+          pause(v) { paused = !!v; if (v) stop(); },
           sample(a) { sample(a); },
           preview(a) { preview(a); },
           stop() { stop(); },
@@ -7058,6 +7118,7 @@
           Panel.render();
           render();
           drawAdBoxes();
+          wireCategoryChrome();
           markDirty();
         }
 
@@ -7175,8 +7236,30 @@
 
         /* ── the placeable things on the board ────────────────────────────────── */
 
+        function fontStepper(host, read, write) {
+          if (host.querySelector('.edfs')) return;
+          const bar = document.createElement('span');
+          bar.className = 'edfs';
+          [['A-', -0.1], ['A+', 0.1]].forEach(([label, step]) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.textContent = label;
+            b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); });
+            b.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              write(Math.round(clamp(read() + step, 0.6, 2) * 100) / 100);
+            });
+            bar.appendChild(b);
+          });
+          host.appendChild(bar);
+        }
+
         function wirePanel() {
           const node = $('tpanel');
+          fontStepper(node,
+            () => +cfg.panel.fs || 1,
+            (v) => { cfg.panel.fs = v; repaint(); });
           node.dataset.edMove = '1';
           node.addEventListener('pointerdown', (e) => {
             if (e.target.closest('.edh')) return;
@@ -7192,6 +7275,9 @@
 
         function wireWeather() {
           const card = $('wxCard');
+          fontStepper(card,
+            () => +cfg.wx.fs || 1,
+            (v) => { cfg.wx.fs = v; repaint(); });
           if (card.dataset.edWired) return;
           card.dataset.edWired = '1';
           card.addEventListener('pointerdown', (e) => {
@@ -7234,8 +7320,7 @@
             const read = () => ({ x: +ad.x, y: +ad.y, w: +ad.w, h: +ad.h });
             const write = (b) => { Object.assign(ad, b); repaint(); };
 
-            box.addEventListener('pointerdown', (e) => {
-              if (e.target.closest('.edh')) return;
+            t.addEventListener('pointerdown', (e) => {
               selAd = ad.id;
               select('ads');
               editAdInline(ad);
@@ -7267,17 +7352,55 @@
         /* A row can be dragged onto another category card. Native HTML drag and drop
            rather than pointer maths: the rows scroll inside their card, and the browser's
            own implementation already handles auto-scroll and the drop target. */
+        function columnsFromDom() {
+          const g = board();
+          const cols = Array.from(g.querySelectorAll('.col'));
+          if (cols.length) {
+            return cols.map(c => Array.from(c.querySelectorAll('.cat')).map(n => n.dataset.cat));
+          }
+          const all = Array.from(g.querySelectorAll('.cat')).map(n => n.dataset.cat);
+          const out = [[], [], []];
+          all.forEach((c, i) => out[i % 3].push(c));
+          return out;
+        }
+
+        function moveCategory(from, to) {
+          if (!from || !to || from === to) return;
+          const cols = columnsFromDom();
+          let fc = -1, fi = -1, tc = -1, ti = -1;
+          cols.forEach((col, ci) => {
+            col.forEach((c, i) => {
+              if (c === from) { fc = ci; fi = i; }
+              if (c === to) { tc = ci; ti = i; }
+            });
+          });
+          if (fc < 0 || tc < 0) return;
+          cols[fc].splice(fi, 1);
+          if (fc === tc && fi < ti) ti -= 1;
+          cols[tc].splice(ti, 0, from);
+          if (!layoutOverride) layoutOverride = {};
+          layoutOverride.columns = cols;
+          render();
+          wireCategoryChrome();
+          markDirty();
+        }
+
         function wireRowDrag() {
           const g = board();
           if (!g) return;
           g.addEventListener('dragstart', (e) => {
             const row = e.target.closest && e.target.closest('.row');
-            if (!row) return;
-            const id = row.dataset.itemId;
-            if (!id) return;
-            e.dataTransfer.setData('text/plain', id);
+            if (row && row.dataset.itemId) {
+              e.dataTransfer.setData('text/plain', 'item:' + row.dataset.itemId);
+              e.dataTransfer.effectAllowed = 'move';
+              row.classList.add('is-ed-drag');
+              return;
+            }
+            const cat = e.target.closest && e.target.closest('.cat');
+            if (!cat || !cat.dataset.cat) return;
+            e.dataTransfer.setData('text/plain', 'cat:' + cat.dataset.cat);
             e.dataTransfer.effectAllowed = 'move';
-            row.classList.add('is-ed-drag');
+            cat.classList.add('is-ed-drag');
           });
           g.addEventListener('dragend', () => {
             g.querySelectorAll('.is-ed-drag').forEach(n => n.classList.remove('is-ed-drag'));
@@ -7295,10 +7418,18 @@
             const cat = e.target.closest && e.target.closest('.cat');
             if (!cat) return;
             e.preventDefault();
-            const id = e.dataTransfer.getData('text/plain');
+            const payload = e.dataTransfer.getData('text/plain');
             const target = cat.dataset.cat;
             g.querySelectorAll('.is-ed-drop').forEach(n => n.classList.remove('is-ed-drop'));
-            if (!id || !target) return;
+            if (!payload || !target) return;
+
+            if (payload.indexOf('cat:') === 0) {
+              moveCategory(payload.slice(4), target);
+              if (tab === 'layout') renderDock();
+              return;
+            }
+
+            const id = payload.slice(5);
             const item = menuItems.find(m => m.id === id);
             if (!item) return;
             if (!cfg.moves) cfg.moves = {};
@@ -7398,6 +7529,8 @@
         }
 
         function clearInline() {
+          const ab = $('adboard');
+          if (ab) ab.classList.remove('is-inline-edit');
           document.querySelectorAll('.adboard .edh').forEach(h => h.remove());
           document.querySelectorAll('.adel, .ad__media').forEach((n) => {
             n.removeAttribute('contenteditable');
@@ -7410,6 +7543,7 @@
         function editAdInline(ad) {
           clearInline();
           inlineAd = ad;
+          $('adboard').classList.add('is-inline-edit');
           ['title', 'hi', 'text', 'price', 'img'].forEach(k => adEl(ad, k));
           Ads.sample(ad);
 
@@ -7527,6 +7661,113 @@
           markDirty();
         }
 
+        /* The Hindi already on file in Menu Master is the board's default, so it is filled in
+           rather than left blank with the master value only showing through as a placeholder. */
+        function seedHindiDefaults() {
+          if (!cfg.cats) cfg.cats = {};
+          [...new Set(menuItems.map(effCategory))].filter(Boolean).forEach((cat) => {
+            if (!cfg.cats[cat]) cfg.cats[cat] = {};
+            if (!cfg.cats[cat].labelHi) {
+              const src = menuItems.find(m => effCategory(m) === cat && m.cat_hi);
+              if (src) cfg.cats[cat].labelHi = src.cat_hi;
+            }
+          });
+          (cfg.ads || []).forEach((ad) => {
+            if (!ad.hi && ad.title) {
+              const hi = hindiFor(ad.title);
+              if (hi) ad.hi = hi;
+            }
+          });
+          baseline = snapshotCfg();
+        }
+
+        /* Everything about a category is done on the card: A-/A+ for its type, the flag for
+           its Hindi, and a long press on either heading to type a new one. */
+        function wireCategoryChrome() {
+          const g = board();
+          if (!g) return;
+          g.querySelectorAll('.cat').forEach((node) => {
+            const cat = node.dataset.cat;
+            if (!cat) return;
+            const hd = node.querySelector('.cat__hd');
+            if (!hd) return;
+            if (!cfg.cats) cfg.cats = {};
+            if (!cfg.cats[cat]) cfg.cats[cat] = {};
+
+            if (!hd.querySelector('.edcat')) {
+              hd.style.position = 'relative';
+              const bar = document.createElement('span');
+              bar.className = 'edcat';
+              bar.draggable = false;
+              const mk = (label, title, fn) => {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.textContent = label;
+                b.title = title;
+                b.draggable = false;
+                b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); });
+                b.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); fn(); });
+                return b;
+              };
+              bar.appendChild(mk('A-', 'Smaller type', () => {
+                cfg.cats[cat].fs = Math.round(clamp(getCatFontScale(cat) - 0.05, 0.7, 1.8) * 100) / 100;
+                setCatScale(cat, cfg.cats[cat].fs);
+              }));
+              bar.appendChild(mk('A+', 'Larger type', () => {
+                cfg.cats[cat].fs = Math.round(clamp(getCatFontScale(cat) + 0.05, 0.7, 1.8) * 100) / 100;
+                setCatScale(cat, cfg.cats[cat].fs);
+              }));
+              bar.appendChild(mk(FLAG, 'Load Hindi from Menu Master', () => {
+                const src = menuItems.find(m => effCategory(m) === cat && m.cat_hi);
+                const hi = (src && src.cat_hi) || hindiFor(cfg.cats[cat].label || cat);
+                if (!hi) { Toast.error('No Hindi on file', 'Menu Master has no Hindi for this category.'); return; }
+                cfg.cats[cat].labelHi = hi;
+                repaint();
+              }));
+              hd.appendChild(bar);
+            }
+
+            [['.cat__en', 'label'], ['.cat__hi', 'labelHi']].forEach(([sel, key]) => {
+              const el2 = node.querySelector(sel);
+              if (!el2 || el2.dataset.edWired) return;
+              el2.dataset.edWired = '1';
+              let press = null;
+              const begin = (e) => {
+                if (el2.getAttribute('contenteditable') === 'true') return;
+                press = setTimeout(() => { openEdit(); }, 450);
+              };
+              const cancel = () => { clearTimeout(press); press = null; };
+              const openEdit = () => {
+                node.draggable = false;
+                el2.setAttribute('contenteditable', 'true');
+                el2.focus();
+                const r = document.createRange();
+                r.selectNodeContents(el2);
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(r);
+              };
+              el2.addEventListener('dblclick', (e) => { e.preventDefault(); e.stopPropagation(); openEdit(); });
+              el2.addEventListener('pointerdown', begin);
+              el2.addEventListener('pointerup', cancel);
+              el2.addEventListener('pointermove', cancel);
+              el2.addEventListener('pointerleave', cancel);
+              el2.addEventListener('blur', () => {
+                if (el2.getAttribute('contenteditable') !== 'true') return;
+                el2.removeAttribute('contenteditable');
+                node.draggable = true;
+                const txt = (el2.textContent || '').trim();
+                cfg.cats[cat][key] = txt;
+                repaint();
+              });
+              el2.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); el2.blur(); }
+                if (e.key === 'Escape') { el2.textContent = key === 'label' ? catLabel(cat) : catLabelHi(cat, ''); el2.blur(); }
+              });
+            });
+          });
+        }
+
         function wirePicks() {
           const head = document.querySelector('header.head');
           if (head) {
@@ -7536,6 +7777,7 @@
         }
 
         function select(which) {
+          if (which !== 'ads') { clearInline(); Ads.stop(); }
           tab = which;
           Array.from($('edTabs').children).forEach(b => b.classList.toggle('is-on', b.dataset.tab === which));
           document.querySelectorAll('.is-ed-sel').forEach(n => { if (!n.classList.contains('edad')) n.classList.remove('is-ed-sel'); });
@@ -7780,28 +8022,6 @@
           ], v => { cfg.sort = v; repaint(); }));
           body.appendChild(s1);
 
-          const s2 = section('Categories', 'Rename a heading for this screen only, and scale its type. The menu itself is untouched.');
-          const cats = [...new Set(menuItems.map(effCategory))].filter(Boolean);
-          cats.forEach((cat) => {
-            const card = document.createElement('div');
-            card.className = 'ed__card';
-            const hd = el('<div class="ed__cardhd"><strong></strong></div>');
-            hd.firstElementChild.textContent = cat;
-            card.appendChild(hd);
-            if (!cfg.cats) cfg.cats = {};
-            if (!cfg.cats[cat]) cfg.cats[cat] = {};
-            const ov = cfg.cats[cat];
-            card.appendChild(field('Heading', ov.label || '', v => { ov.label = v; repaint(); }, { placeholder: cat }));
-            const src = menuItems.find(m => effCategory(m) === cat);
-            card.appendChild(withFlag(
-              field('Heading (Hindi)', ov.labelHi || '', v => { ov.labelHi = v; repaint(); }, { lang: 'hi', placeholder: (src && src.cat_hi) || '' }),
-              () => ov.label || cat,
-              v => { ov.labelHi = v; repaint(); }));
-            card.appendChild(slider('Type size', getCatFontScale(cat), 0.7, 1.8, v => { ov.fs = v; setCatScale(cat, v); }));
-            s2.appendChild(card);
-          });
-          if (!cats.length) s2.appendChild(el('<p class="ed__note">This board has no categories yet.</p>'));
-          body.appendChild(s2);
 
           const s3 = section('Moved items', 'Drag a row from one category card to another to show it there — on this screen only. Menu Master, the till and every other screen keep it where it was.');
           const moved = Object.keys(cfg.moves || {});
@@ -8121,6 +8341,9 @@
           $('edScreen').textContent = SCREEN ? SCREEN + (screenName ? ' · ' + screenName : '') : 'default screen';
           baseline = snapshotCfg();
 
+          Ads.pause(true);
+          seedHindiDefaults();
+          wireCategoryChrome();
           wirePanel();
           wireWeather();
           wirePicks();
