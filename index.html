@@ -2208,10 +2208,20 @@
           background: var(--gold);
         }
 
+        .adboard { position: fixed; }
+        .ad__media {
+          position: absolute;
+          left: var(--ad-img-x, 0%);
+          top: var(--ad-img-y, 0%);
+          width: var(--ad-img-w, 34%);
+          height: var(--ad-img-h, 100%);
+          object-fit: var(--ad-img-fit, cover);
+        }
+
         .ad__title {
           margin-top: 5px;
           font-family: var(--ff-en);
-          font-size: clamp(28px, 3.2vw, 52px);
+          font-size: calc(clamp(28px, 3.2vw, 52px) * var(--ad-fs-title, 1));
           font-weight: 700;
           line-height: 1.08;
           color: #17120b;
@@ -2221,14 +2231,14 @@
         }
 
         .ad__hi {
-          font-size: clamp(17px, 1.9vw, 29px);
+          font-size: calc(clamp(17px, 1.9vw, 29px) * var(--ad-fs-hi, 1));
           color: #4a4a4a;
           line-height: 1.4;
         }
 
         .ad__text {
           margin-top: 6px;
-          font-size: clamp(14px, 1.45vw, 22px);
+          font-size: calc(clamp(14px, 1.45vw, 22px) * var(--ad-fs-text, 1));
           color: #6a6a6a;
           line-height: 1.45;
           display: -webkit-box;
@@ -2295,7 +2305,7 @@
           border: 2px solid var(--gold);
           background: linear-gradient(180deg, color-mix(in srgb, var(--gold) 16%, #fff), #fff);
           font-family: var(--ff-price);
-          font-size: clamp(26px, 2.8vw, 46px);
+          font-size: calc(clamp(26px, 2.8vw, 46px) * var(--ad-fs-price, 1));
           font-weight: 800;
           color: var(--gold);
           font-variant-numeric: tabular-nums;
@@ -4981,7 +4991,21 @@
          ───────────────────────────────────────────────────────────────────────── */
       const CANON_COLS = 3;
 
+      function catOverride(cat) {
+        return (cfg.cats && cfg.cats[cat]) || {};
+      }
+      function catLabel(cat) {
+        const v = catOverride(cat).label;
+        return (v && String(v)) || cat;
+      }
+      function catLabelHi(cat, fallback) {
+        const v = catOverride(cat).labelHi;
+        return (v && String(v)) || fallback || '';
+      }
+
       function getCatFontScale(cat) {
+        const ov = catOverride(cat).fs;
+        if (typeof ov === 'number' && ov > 0) return ov;
         const v = layoutOverride && layoutOverride.fonts && layoutOverride.fonts[cat];
         return (typeof v === 'number' && v > 0) ? v : 1;
       }
@@ -5330,8 +5354,9 @@
         const want = '#' + iconFor(m.cat);
         const use = r.iconSvg.querySelector('use');
         if (use && use.getAttribute('href') !== want) use.setAttribute('href', want);
-        if (r.nameEn.textContent !== m.cat) r.nameEn.textContent = m.cat;
-        const hi = m.catHi || '';
+        const label = catLabel(m.cat);
+        if (r.nameEn.textContent !== label) r.nameEn.textContent = label;
+        const hi = catLabelHi(m.cat, m.catHi || '');
         if (r.nameHi.textContent !== hi) r.nameHi.textContent = hi;
         r.nameHi.hidden = !hi;
         const n = String(m.items.length);
@@ -5735,6 +5760,7 @@
            category on this screen only. Both are presentation, not menu data. */
         sort: 'menu',
         moves: {},
+        cats: {},
         fx: { on: true, anim: 'pushpa', everyMin: 15, forSec: 9 },
         hol: { key: '', country: 'IN', lastSync: '' },
         divAnim: { on: false, style: 'slide', everyMin: 5 },
@@ -5800,6 +5826,18 @@
           // render time, so an id naming a retired dish simply drops out.
           items: Array.isArray(a.items) ? a.items.map(String).filter(Boolean).slice(0, 8) : [],
           fs: n(a.fs, 1, 0.6, 2),
+          fsTitle: n(a.fsTitle, 1, 0.6, 2),
+          fsHi: n(a.fsHi, 1, 0.6, 2),
+          fsText: n(a.fsText, 1, 0.6, 2),
+          fsPrice: n(a.fsPrice, 1, 0.6, 2),
+          img: (function () {
+            const i = (a.img && typeof a.img === 'object') ? a.img : {};
+            return {
+              x: n(i.x, 0, 0, 100), y: n(i.y, 0, 0, 100),
+              w: n(i.w, 34, 5, 100), h: n(i.h, 100, 5, 100),
+              fit: i.fit === 'contain' ? 'contain' : 'cover',
+            };
+          })(),
           anim: AD_ANIMS.indexOf(a.anim) >= 0 ? a.anim : 'ad-in',
           everyMin: n(a.everyMin, 8, 1, 720),
           forSec: n(a.forSec, 10, 3, 60),
@@ -6715,6 +6753,16 @@
           node.style.setProperty('--ad-w', g('w') + '%');
           node.style.setProperty('--ad-h', g('h') + '%');
           node.style.setProperty('--ad-fs', String(clamp(parseFloat(a && a.fs) || 1, 0.6, 2)));
+          node.style.setProperty('--ad-fs-title', String(clamp(parseFloat(a && a.fsTitle) || 1, 0.6, 2)));
+          node.style.setProperty('--ad-fs-hi', String(clamp(parseFloat(a && a.fsHi) || 1, 0.6, 2)));
+          node.style.setProperty('--ad-fs-text', String(clamp(parseFloat(a && a.fsText) || 1, 0.6, 2)));
+          node.style.setProperty('--ad-fs-price', String(clamp(parseFloat(a && a.fsPrice) || 1, 0.6, 2)));
+          const im = (a && a.img) || {};
+          node.style.setProperty('--ad-img-x', (im.x == null ? 0 : im.x) + '%');
+          node.style.setProperty('--ad-img-y', (im.y == null ? 0 : im.y) + '%');
+          node.style.setProperty('--ad-img-w', (im.w == null ? 34 : im.w) + '%');
+          node.style.setProperty('--ad-img-h', (im.h == null ? 100 : im.h) + '%');
+          node.style.setProperty('--ad-img-fit', im.fit === 'contain' ? 'contain' : 'cover');
           const anim = AD_ANIMS.indexOf(a && a.anim) >= 0 ? a.anim : 'ad-in';
           node.style.setProperty('--ad-in', anim);
           node.style.setProperty('--ad-in-dur', anim === 'ad-bounce' ? '1100ms' : '760ms');
@@ -6922,6 +6970,8 @@
         ['tulsi', 'Tulsi leaves'], ['om', 'Om'], ['shankh', 'Shankh'],
         ['rangoli', 'Rangoli'], ['gulal', 'Gulal'], ['kanak', 'Golden shower'],
       ];
+
+      const FLAG = String.fromCodePoint(0x1F1EE) + String.fromCodePoint(0x1F1F3);
 
       const Editor = (function () {
         let token = '';
@@ -7263,6 +7313,60 @@
           return wrap;
         }
 
+        function slider(label, value, min, max, onInput) {
+          const row = document.createElement('div');
+          row.className = 'ed__row';
+          const lab = document.createElement('label');
+          lab.textContent = label;
+          const val = document.createElement('span');
+          val.style.cssText = 'width:34px;text-align:right;color:#8e93a8;font-variant-numeric:tabular-nums';
+          const rng = document.createElement('input');
+          rng.type = 'range'; rng.min = String(min); rng.max = String(max); rng.step = '0.05';
+          rng.style.flex = '1';
+          rng.value = String(value);
+          val.textContent = Number(value).toFixed(2);
+          rng.addEventListener('input', () => {
+            val.textContent = Number(rng.value).toFixed(2);
+            onInput(parseFloat(rng.value));
+          });
+          row.append(lab, rng, val);
+          return row;
+        }
+
+        function hindiFor(text) {
+          const q = String(text || '').trim().toLowerCase();
+          if (!q) return '';
+          let hit = menuItems.find(m => String(m.name || '').trim().toLowerCase() === q);
+          if (!hit) hit = menuItems.find(m => String(m.name || '').trim().toLowerCase().indexOf(q) === 0);
+          if (!hit) hit = menuItems.find(m => q.indexOf(String(m.name || '').trim().toLowerCase()) === 0);
+          if (!hit) {
+            const cat = menuItems.find(m => String(m.category || '').trim().toLowerCase() === q);
+            if (cat) return cat.cat_hi || '';
+          }
+          return (hit && hit.name_hi) || '';
+        }
+
+        function withFlag(fieldEl, readEnglish, write) {
+          const input = fieldEl.querySelector('input, textarea');
+          const bar = document.createElement('div');
+          bar.style.cssText = 'display:flex;gap:6px;align-items:center';
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'ed__btn ed__btn--icon';
+          btn.title = 'Load Hindi from Menu Master';
+          btn.textContent = FLAG;
+          btn.addEventListener('click', () => {
+            const hi = hindiFor(readEnglish());
+            if (!hi) { Toast.error('No Hindi on file', 'Menu Master has no Hindi for that text.'); return; }
+            input.value = hi;
+            write(hi);
+          });
+          input.parentNode.insertBefore(bar, input);
+          input.style.flex = '1';
+          bar.append(input, btn);
+          return fieldEl;
+        }
+
         function toggle(label, checked, onChange) {
           const row = el('<div class="ed__row"><label></label></div>');
           row.firstElementChild.textContent = label;
@@ -7311,10 +7415,17 @@
         function renderHeader(body) {
           const s = section('Header', 'The name across the top of the board, and the hours that decide when the morning menu shows.');
           s.appendChild(field('Name on the board', getCfg('identity.restaurantName', ''), v => setCfg('identity.restaurantName', v)));
-          s.appendChild(field('Name in Hindi', getCfg('identity.restaurantNameHi', ''), v => setCfg('identity.restaurantNameHi', v), { lang: 'hi' }));
+          s.appendChild(withFlag(
+            field('Name in Hindi', getCfg('identity.restaurantNameHi', ''), v => setCfg('identity.restaurantNameHi', v), { lang: 'hi' }),
+            () => getCfg('identity.restaurantName', ''),
+            v => setCfg('identity.restaurantNameHi', v)));
           s.appendChild(grid(
             field('Morning from', getCfg('identity.morningFrom', '07:00'), v => setCfg('identity.morningFrom', v), { placeholder: '07:00' }),
             field('…until', getCfg('identity.morningTo', '11:00'), v => setCfg('identity.morningTo', v), { placeholder: '11:00' }),
+          ));
+          s.appendChild(grid(
+            field('Evening from', getCfg('identity.eveningFrom', '17:00'), v => setCfg('identity.eveningFrom', v), { placeholder: '17:00' }),
+            field('…until', getCfg('identity.eveningTo', '23:00'), v => setCfg('identity.eveningTo', v), { placeholder: '23:00' }),
           ));
           s.appendChild(field('Language swap (seconds)', getCfg('identity.langSwitchSeconds', 10), v => setCfg('identity.langSwitchSeconds', +v || 10), { type: 'number', min: 4, max: 30 }));
           body.appendChild(s);
@@ -7391,26 +7502,25 @@
           ], v => { cfg.sort = v; repaint(); }));
           body.appendChild(s1);
 
-          const s2 = section('Category type size', 'Scales one category card relative to the rest. Drag its slider, or grab the handle on the card itself.');
+          const s2 = section('Categories', 'Rename a heading for this screen only, and scale its type. The menu itself is untouched.');
           const cats = [...new Set(menuItems.map(effCategory))].filter(Boolean);
           cats.forEach((cat) => {
-            const row = document.createElement('div');
-            row.className = 'ed__row';
-            const lab = document.createElement('label');
-            lab.textContent = cat;
-            const val = document.createElement('span');
-            val.style.cssText = 'width:34px;text-align:right;color:#8e93a8;font-variant-numeric:tabular-nums';
-            const rng = document.createElement('input');
-            rng.type = 'range'; rng.min = '0.7'; rng.max = '1.8'; rng.step = '0.05';
-            rng.style.flex = '1';
-            rng.value = String(getCatFontScale(cat));
-            val.textContent = Number(rng.value).toFixed(2);
-            rng.addEventListener('input', () => {
-              val.textContent = Number(rng.value).toFixed(2);
-              setCatScale(cat, parseFloat(rng.value));
-            });
-            row.append(lab, rng, val);
-            s2.appendChild(row);
+            const card = document.createElement('div');
+            card.className = 'ed__card';
+            const hd = el('<div class="ed__cardhd"><strong></strong></div>');
+            hd.firstElementChild.textContent = cat;
+            card.appendChild(hd);
+            if (!cfg.cats) cfg.cats = {};
+            if (!cfg.cats[cat]) cfg.cats[cat] = {};
+            const ov = cfg.cats[cat];
+            card.appendChild(field('Heading', ov.label || '', v => { ov.label = v; repaint(); }, { placeholder: cat }));
+            const src = menuItems.find(m => effCategory(m) === cat);
+            card.appendChild(withFlag(
+              field('Heading (Hindi)', ov.labelHi || '', v => { ov.labelHi = v; repaint(); }, { lang: 'hi', placeholder: (src && src.cat_hi) || '' }),
+              () => ov.label || cat,
+              v => { ov.labelHi = v; repaint(); }));
+            card.appendChild(slider('Type size', getCatFontScale(cat), 0.7, 1.8, v => { ov.fs = v; setCatScale(cat, v); }));
+            s2.appendChild(card);
           });
           if (!cats.length) s2.appendChild(el('<p class="ed__note">This board has no categories yet.</p>'));
           body.appendChild(s2);
@@ -7457,10 +7567,11 @@
             hd.appendChild(x);
             card.appendChild(hd);
 
-            card.appendChild(grid(
-              field('Title', ad.title || '', v => { ad.title = v; hd.firstElementChild.textContent = v || ('Ad ' + (i + 1)); repaint(); }),
-              field('Title (Hindi)', ad.hi || '', v => { ad.hi = v; markDirty(); }, { lang: 'hi' }),
-            ));
+            card.appendChild(field('Title', ad.title || '', v => { ad.title = v; hd.firstElementChild.textContent = v || ('Ad ' + (i + 1)); repaint(); }));
+            card.appendChild(withFlag(
+              field('Title (Hindi)', ad.hi || '', v => { ad.hi = v; repaint(); }, { lang: 'hi' }),
+              () => ad.title || '',
+              v => { ad.hi = v; repaint(); }));
             card.appendChild(field('Text', ad.text || '', v => { ad.text = v; markDirty(); }));
             card.appendChild(grid(
               field('Price', ad.price || '', v => { ad.price = v; markDirty(); }),
@@ -7470,6 +7581,35 @@
               field('For (sec)', ad.forSec, v => { ad.forSec = +v || 10; markDirty(); }, { type: 'number', min: 3, max: 60 }),
               field('Photo URL', '', v => { if (v.trim()) { ad.images = (ad.images || []).concat(v.trim()).slice(0, 6); markDirty(); } }, { placeholder: 'Paste and it is added' }),
             ));
+
+            card.appendChild(selectField('Entrance', ad.anim || 'ad-in', AD_ANIM_LABELS, v => { ad.anim = v; repaint(); }));
+
+            const play = document.createElement('div');
+            play.className = 'ed__row';
+            const bSample = el('<button class="ed__btn" type="button">Show still</button>');
+            bSample.addEventListener('click', () => { selAd = ad.id; Ads.sample(ad); });
+            const bPlay = el('<button class="ed__btn" type="button">Play</button>');
+            bPlay.addEventListener('click', () => { selAd = ad.id; Ads.preview(ad); });
+            const bStop = el('<button class="ed__btn" type="button">Hide</button>');
+            bStop.addEventListener('click', () => Ads.stop());
+            play.append(bSample, bPlay, bStop);
+            card.appendChild(play);
+
+            card.appendChild(slider('Title size', ad.fsTitle || 1, 0.6, 2, v => { ad.fsTitle = v; repaint(); }));
+            card.appendChild(slider('Hindi size', ad.fsHi || 1, 0.6, 2, v => { ad.fsHi = v; repaint(); }));
+            card.appendChild(slider('Text size', ad.fsText || 1, 0.6, 2, v => { ad.fsText = v; repaint(); }));
+            card.appendChild(slider('Price size', ad.fsPrice || 1, 0.6, 2, v => { ad.fsPrice = v; repaint(); }));
+
+            if (!ad.img) ad.img = { x: 0, y: 0, w: 34, h: 100, fit: 'cover' };
+            card.appendChild(grid(
+              field('Photo x %', ad.img.x, v => { ad.img.x = +v || 0; repaint(); }, { type: 'number' }),
+              field('Photo y %', ad.img.y, v => { ad.img.y = +v || 0; repaint(); }, { type: 'number' }),
+            ));
+            card.appendChild(grid(
+              field('Photo w %', ad.img.w, v => { ad.img.w = +v || 34; repaint(); }, { type: 'number' }),
+              field('Photo h %', ad.img.h, v => { ad.img.h = +v || 100; repaint(); }, { type: 'number' }),
+            ));
+            card.appendChild(selectField('Photo fit', ad.img.fit || 'cover', [['cover', 'Fill the box'], ['contain', 'Fit inside']], v => { ad.img.fit = v; repaint(); }));
 
             /* Tagged dishes, picked out of the menu this board is already showing. */
             const tagWrap = document.createElement('div');
@@ -7586,6 +7726,8 @@
               langSwitchSeconds: num(cfg.identity && cfg.identity.langSwitchSeconds),
               morningFrom: cfg.identity && cfg.identity.morningFrom,
               morningTo: cfg.identity && cfg.identity.morningTo,
+              eveningFrom: cfg.identity && cfg.identity.eveningFrom,
+              eveningTo: cfg.identity && cfg.identity.eveningTo,
             }),
             layout: layoutOverride && layoutOverride.columns
               ? clean({ columns: layoutOverride.columns, fonts: layoutOverride.fonts })
@@ -7596,9 +7738,15 @@
               fx: clean({ on: cfg.fx.on, anim: cfg.fx.anim, everyMin: num(cfg.fx.everyMin), forSec: num(cfg.fx.forSec) }),
               hol: clean({ key: cfg.hol && cfg.hol.key, country: cfg.hol && cfg.hol.country }),
               divAnim: clean({ on: cfg.divAnim.on, style: cfg.divAnim.style, everyMin: num(cfg.divAnim.everyMin) }),
+              sort: cfg.sort,
+              moves: cfg.moves && Object.keys(cfg.moves).length ? cfg.moves : undefined,
+              cats: cfg.cats && Object.keys(cfg.cats).length ? cfg.cats : undefined,
               days: (cfg.days || []).map(d => clean({ d: d.d, n: d.n, h: d.h, a: d.a })),
               ads: (cfg.ads || []).map(a => clean({
                 id: a.id, on: a.on, title: a.title, hi: a.hi, text: a.text, price: a.price,
+                fs: num(a.fs), fsTitle: num(a.fsTitle), fsHi: num(a.fsHi), fsText: num(a.fsText), fsPrice: num(a.fsPrice),
+                anim: a.anim,
+                img: a.img ? clean({ x: num(a.img.x), y: num(a.img.y), w: num(a.img.w), h: num(a.img.h), fit: a.img.fit }) : undefined,
                 images: (a.images || []).filter(Boolean),
                 items: (a.items || []).filter(Boolean),
                 everyMin: num(a.everyMin), forSec: num(a.forSec),
